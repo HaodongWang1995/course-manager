@@ -1,7 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  authApi,
+  courseApi,
+  scheduleApi,
+  setToken,
+  clearToken,
+  getToken,
+  type User,
+  type Course,
+  type Schedule,
+} from "@/api/client";
+import {
   teacherScheduleStore,
-  teacherCoursesStore,
   teacherStudentsStore,
   reportsStore,
   calendarStore,
@@ -10,34 +20,44 @@ import {
   studentAssignmentsStore,
   studentResourcesStore,
   feedbackStore,
-  auth,
-  type TeacherCourse,
   type TeacherStudent,
   type GeneratedReport,
   type UpcomingDeadline,
   type FeedbackDraft,
 } from "@/api/storage";
 
-// Simulate API delay
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+// ── Auth (Real API) ──────────────────────────────────
 
-// ── Auth ───────────────────────────────────────────
-
-export function useAuth() {
+export function useCurrentUser() {
   return useQuery({
-    queryKey: ["auth"],
-    queryFn: async () => {
-      return auth.get();
-    },
+    queryKey: ["auth", "me"],
+    queryFn: () => authApi.me(),
+    enabled: !!getToken(),
+    retry: false,
   });
 }
 
 export function useLogin() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ email, role }: { email: string; role: "student" | "teacher" }) => {
-      await delay(300);
-      return auth.login(email, role);
+    mutationFn: async (data: { email: string; password: string }) => {
+      const res = await authApi.login(data);
+      setToken(res.token);
+      return res.user;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
+    },
+  });
+}
+
+export function useRegister() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { email: string; password: string; name: string; role: string }) => {
+      const res = await authApi.register(data);
+      setToken(res.token);
+      return res.user;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auth"] });
@@ -49,45 +69,45 @@ export function useLogout() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      auth.logout();
+      clearToken();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      queryClient.clear();
     },
   });
 }
 
-// ── Teacher Schedule ───────────────────────────────
+// ── Courses (Real API) ────────────────────────────────
 
-export function useTeacherSchedule() {
+export function useTeacherCourses(params?: { search?: string; category?: string; status?: string }) {
   return useQuery({
-    queryKey: ["teacher", "schedule"],
-    queryFn: async () => {
-      await delay(100);
-      return teacherScheduleStore.getAll();
-    },
+    queryKey: ["teacher", "courses", params],
+    queryFn: () => courseApi.list(params),
+    enabled: !!getToken(),
   });
 }
 
-// ── Teacher Courses ────────────────────────────────
-
-export function useTeacherCourses() {
+export function useStudentCourses(params?: { search?: string; category?: string }) {
   return useQuery({
-    queryKey: ["teacher", "courses"],
-    queryFn: async () => {
-      await delay(100);
-      return teacherCoursesStore.getAll();
-    },
+    queryKey: ["student", "courses", params],
+    queryFn: () => courseApi.list(params),
+    enabled: !!getToken(),
+  });
+}
+
+export function useCourseDetail(id: string) {
+  return useQuery({
+    queryKey: ["course", id],
+    queryFn: () => courseApi.get(id),
+    enabled: !!id && !!getToken(),
   });
 }
 
 export function useAddCourse() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (course: Omit<TeacherCourse, "progress"> & { progress?: number }) => {
-      await delay(200);
-      return teacherCoursesStore.add(course);
-    },
+    mutationFn: (data: { title: string; description?: string; price?: number; category?: string; status?: string }) =>
+      courseApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teacher", "courses"] });
     },
@@ -97,12 +117,11 @@ export function useAddCourse() {
 export function useUpdateCourse() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ code, data }: { code: string; data: Partial<TeacherCourse> }) => {
-      await delay(200);
-      return teacherCoursesStore.update(code, data);
-    },
-    onSuccess: () => {
+    mutationFn: ({ id, data }: { id: string; data: Partial<Pick<Course, "title" | "description" | "price" | "cover_image" | "category">> }) =>
+      courseApi.update(id, data),
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["teacher", "courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course", variables.id] });
     },
   });
 }
@@ -110,12 +129,81 @@ export function useUpdateCourse() {
 export function useDeleteCourse() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (code: string) => {
-      await delay(200);
-      return teacherCoursesStore.remove(code);
-    },
+    mutationFn: (id: string) => courseApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teacher", "courses"] });
+    },
+  });
+}
+
+export function useUpdateCourseStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      courseApi.updateStatus(id, status),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["teacher", "courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course", variables.id] });
+    },
+  });
+}
+
+// ── Schedules (Real API) ──────────────────────────────
+
+export function useCourseSchedules(courseId: string) {
+  return useQuery({
+    queryKey: ["schedules", courseId],
+    queryFn: () => scheduleApi.list(courseId),
+    enabled: !!courseId && !!getToken(),
+  });
+}
+
+export function useAddSchedule() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ courseId, data }: { courseId: string; data: { lesson_number?: number; title?: string; start_time: string; end_time: string; room?: string } }) =>
+      scheduleApi.create(courseId, data),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["schedules", variables.courseId] });
+      queryClient.invalidateQueries({ queryKey: ["course", variables.courseId] });
+    },
+  });
+}
+
+export function useUpdateSchedule() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Schedule, "id" | "course_id">> }) =>
+      scheduleApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["schedules"] });
+    },
+  });
+}
+
+export function useDeleteSchedule() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => scheduleApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["schedules"] });
+    },
+  });
+}
+
+// ── Below: Legacy localStorage hooks (unchanged for Phase 1) ──
+
+// Simulate API delay
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+// ── Teacher Schedule ───────────────────────────────
+
+export function useTeacherSchedule() {
+  return useQuery({
+    queryKey: ["teacher", "schedule"],
+    queryFn: async () => {
+      await delay(100);
+      return teacherScheduleStore.getAll();
     },
   });
 }

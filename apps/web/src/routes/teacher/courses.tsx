@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import {
-  CourseCard,
   Button,
   Card,
   CardContent,
@@ -35,35 +34,51 @@ import {
   Trash2,
   Eye,
   BookOpen,
+  EyeOff,
 } from "lucide-react";
-import { useTeacherCourses, useAddCourse, useDeleteCourse } from "@/hooks/use-queries";
-import { teacherCoursesStore } from "@/api/storage";
+import {
+  useTeacherCourses,
+  useAddCourse,
+  useDeleteCourse,
+  useUpdateCourseStatus,
+} from "@/hooks/use-queries";
+import type { Course } from "@/api/client";
 
 export const Route = createFileRoute("/teacher/courses")({
   component: CoursesPage,
 });
 
+const statusLabels: Record<string, string> = {
+  active: "已上架",
+  draft: "草稿",
+  archived: "已下架",
+};
+
+const statusColors: Record<string, string> = {
+  active: "bg-green-50 text-green-700 border-green-200",
+  draft: "bg-gray-50 text-gray-600 border-gray-200",
+  archived: "bg-amber-50 text-amber-700 border-amber-200",
+};
+
 function CoursesPage() {
   const navigate = useNavigate();
-  const { data: courses = [], isLoading } = useTeacherCourses();
-  const addCourseMutation = useAddCourse();
-  const deleteCourseMutation = useDeleteCourse();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showAddDialog, setShowAddDialog] = useState(false);
 
-  // Filter and search courses
+  const { data: courses = [], isLoading } = useTeacherCourses();
+  const addCourseMutation = useAddCourse();
+  const deleteCourseMutation = useDeleteCourse();
+
   const filteredCourses = useMemo(() => {
     return courses.filter((course) => {
       const matchesSearch =
-        course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.code.toLowerCase().includes(searchQuery.toLowerCase());
-      
+        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (course.category || "").toLowerCase().includes(searchQuery.toLowerCase());
+
       const matchesFilter =
-        filterStatus === "all" ||
-        (filterStatus === "active" && course.progress < 100) ||
-        (filterStatus === "completed" && course.progress === 100);
+        filterStatus === "all" || course.status === filterStatus;
 
       return matchesSearch && matchesFilter;
     });
@@ -71,12 +86,10 @@ function CoursesPage() {
 
   const stats = useMemo(() => {
     const total = courses.length;
-    const active = courses.filter((c) => c.progress < 100).length;
-    const completed = courses.filter((c) => c.progress === 100).length;
-    const avgProgress =
-      courses.reduce((sum, c) => sum + c.progress, 0) / total || 0;
-
-    return { total, active, completed, avgProgress };
+    const active = courses.filter((c) => c.status === "active").length;
+    const draft = courses.filter((c) => c.status === "draft").length;
+    const archived = courses.filter((c) => c.status === "archived").length;
+    return { total, active, draft, archived };
   }, [courses]);
 
   if (isLoading) {
@@ -93,9 +106,7 @@ function CoursesPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">课程管理</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            管理您的所有课程和学生
-          </p>
+          <p className="mt-1 text-sm text-gray-500">管理您的所有课程</p>
         </div>
         <Button className="gap-2" onClick={() => setShowAddDialog(true)}>
           <Plus className="h-4 w-4" />
@@ -103,13 +114,11 @@ function CoursesPage() {
         </Button>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              总课程数
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">总课程数</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
@@ -117,56 +126,43 @@ function CoursesPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              进行中
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">已上架</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.active}</div>
+            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              已完成
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">草稿</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {stats.completed}
-            </div>
+            <div className="text-2xl font-bold text-gray-600">{stats.draft}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              平均进度
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">已下架</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">
-              {Math.round(stats.avgProgress)}%
-            </div>
+            <div className="text-2xl font-bold text-amber-600">{stats.archived}</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters and Search */}
+      {/* Filters */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            {/* Search */}
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <Input
-                placeholder="搜索课程名称或代码..."
+                placeholder="搜索课程名称..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
             </div>
-
-            {/* Filter */}
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <Filter className="mr-2 h-4 w-4" />
@@ -174,12 +170,11 @@ function CoursesPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">全部课程</SelectItem>
-                <SelectItem value="active">进行中</SelectItem>
-                <SelectItem value="completed">已完成</SelectItem>
+                <SelectItem value="active">已上架</SelectItem>
+                <SelectItem value="draft">草稿</SelectItem>
+                <SelectItem value="archived">已下架</SelectItem>
               </SelectContent>
             </Select>
-
-            {/* View Mode Toggle */}
             <div className="flex gap-2">
               <Button
                 variant={viewMode === "grid" ? "default" : "outline"}
@@ -213,20 +208,20 @@ function CoursesPage() {
       <AddCourseDialog
         open={showAddDialog}
         onOpenChange={setShowAddDialog}
-        onAdd={(course) => {
-          addCourseMutation.mutate(course);
-          setShowAddDialog(false);
+        onAdd={(data) => {
+          addCourseMutation.mutate(data, {
+            onSuccess: () => setShowAddDialog(false),
+          });
         }}
+        isLoading={addCourseMutation.isPending}
       />
 
-      {/* Courses List */}
+      {/* Courses */}
       {filteredCourses.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <BookOpen className="h-12 w-12 text-gray-400" />
-            <p className="mt-4 text-sm font-medium text-gray-900">
-              没有找到课程
-            </p>
+            <p className="mt-4 text-sm font-medium text-gray-900">没有找到课程</p>
             <p className="mt-1 text-sm text-gray-500">
               {searchQuery || filterStatus !== "all"
                 ? "尝试调整搜索或筛选条件"
@@ -243,13 +238,13 @@ function CoursesPage() {
       ) : viewMode === "grid" ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredCourses.map((course) => (
-            <CourseCardWithActions key={course.code} course={course} />
+            <CourseGridCard key={course.id} course={course} />
           ))}
         </div>
       ) : (
         <div className="space-y-4">
           {filteredCourses.map((course) => (
-            <CourseListItem key={course.code} course={course} />
+            <CourseListItem key={course.id} course={course} />
           ))}
         </div>
       )}
@@ -257,85 +252,77 @@ function CoursesPage() {
   );
 }
 
-function CourseCardWithActions({
-  course,
-}: {
-  course: {
-    code: string;
-    name: string;
-    section: string;
-    studentCount: number;
-    lessonCount: number;
-    progress: number;
-  };
-}) {
+function CourseGridCard({ course }: { course: Course }) {
   const navigate = useNavigate();
-  
+
   return (
-    <div className="relative group">
-      <div
-        onClick={() => navigate({ to: `/teacher/courses/${course.code}` })}
-        className="cursor-pointer"
+    <div className="group relative">
+      <Card
+        className="cursor-pointer transition-shadow hover:shadow-md"
+        onClick={() => navigate({ to: `/teacher/courses/${course.id}` })}
       >
-        <CourseCard
-          code={course.code}
-          name={course.name}
-          section={course.section}
-          studentCount={course.studentCount}
-          lessonCount={course.lessonCount}
-          progress={course.progress}
-        />
-      </div>
-      <div className="absolute right-4 top-4 opacity-0 transition-opacity group-hover:opacity-100">
-        <CourseActionsMenu course={course} />
-      </div>
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between">
+            <Badge
+              className={`border ${statusColors[course.status]}`}
+              variant="outline"
+            >
+              {statusLabels[course.status]}
+            </Badge>
+            <div className="opacity-0 transition-opacity group-hover:opacity-100">
+              <CourseActionsMenu course={course} />
+            </div>
+          </div>
+          <h3 className="mt-3 text-lg font-semibold text-gray-900">{course.title}</h3>
+          {course.description && (
+            <p className="mt-1 line-clamp-2 text-sm text-gray-500">{course.description}</p>
+          )}
+          <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
+            {course.category && <span>{course.category}</span>}
+            <span>{course.lesson_count} 节课</span>
+          </div>
+          {course.price > 0 && (
+            <div className="mt-2 text-lg font-bold text-blue-600">
+              ¥{Number(course.price).toFixed(2)}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
-function CourseListItem({
-  course,
-}: {
-  course: {
-    code: string;
-    name: string;
-    section: string;
-    studentCount: number;
-    lessonCount: number;
-    progress: number;
-  };
-}) {
+function CourseListItem({ course }: { course: Course }) {
   const navigate = useNavigate();
-  
+
   return (
     <Card
-      onClick={() => navigate({ to: `/teacher/courses/${course.code}` })}
       className="cursor-pointer transition-shadow hover:shadow-md"
+      onClick={() => navigate({ to: `/teacher/courses/${course.id}` })}
     >
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <Badge variant="default">{course.code}</Badge>
-              <h3 className="text-lg font-semibold text-gray-900">
-                {course.name}
-              </h3>
+              <Badge
+                className={`border ${statusColors[course.status]}`}
+                variant="outline"
+              >
+                {statusLabels[course.status]}
+              </Badge>
+              <h3 className="text-lg font-semibold text-gray-900">{course.title}</h3>
             </div>
-            <p className="mt-1 text-sm text-gray-500">{course.section}</p>
+            {course.description && (
+              <p className="mt-1 line-clamp-1 text-sm text-gray-500">{course.description}</p>
+            )}
             <div className="mt-3 flex items-center gap-6 text-sm text-gray-500">
-              <span>{course.studentCount} 名学生</span>
-              <span>{course.lessonCount} 节课</span>
-              <span className="font-medium text-gray-900">
-                进度: {course.progress}%
-              </span>
-            </div>
-            <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-gray-100">
-              <div
-                className={`h-full rounded-full transition-all ${
-                  course.progress === 100 ? "bg-green-500" : "bg-blue-600"
-                }`}
-                style={{ width: `${course.progress}%` }}
-              />
+              {course.category && <span>{course.category}</span>}
+              <span>{course.lesson_count} 节课</span>
+              {course.price > 0 && (
+                <span className="font-medium text-blue-600">
+                  ¥{Number(course.price).toFixed(2)}
+                </span>
+              )}
             </div>
           </div>
           <div className="ml-4">
@@ -347,16 +334,10 @@ function CourseListItem({
   );
 }
 
-function CourseActionsMenu({
-  course,
-}: {
-  course: {
-    code: string;
-    name: string;
-  };
-}) {
+function CourseActionsMenu({ course }: { course: Course }) {
   const navigate = useNavigate();
   const deleteMutation = useDeleteCourse();
+  const statusMutation = useUpdateCourseStatus();
 
   return (
     <DropdownMenu>
@@ -373,7 +354,7 @@ function CourseActionsMenu({
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation();
-            navigate({ to: `/teacher/courses/${course.code}` });
+            navigate({ to: `/teacher/courses/${course.id}` });
           }}
         >
           <Eye className="mr-2 h-4 w-4" />
@@ -382,18 +363,39 @@ function CourseActionsMenu({
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation();
-            navigate({ to: `/teacher/courses/${course.code}` });
+            navigate({ to: `/teacher/courses/${course.id}` });
           }}
         >
           <Edit className="mr-2 h-4 w-4" />
           编辑课程
         </DropdownMenuItem>
+        {course.status === "active" ? (
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              statusMutation.mutate({ id: course.id, status: "archived" });
+            }}
+          >
+            <EyeOff className="mr-2 h-4 w-4" />
+            下架课程
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              statusMutation.mutate({ id: course.id, status: "active" });
+            }}
+          >
+            <Eye className="mr-2 h-4 w-4" />
+            上架课程
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem
           className="text-red-600"
           onClick={(e) => {
             e.stopPropagation();
-            if (window.confirm(`确定要删除课程 "${course.name}" 吗？`)) {
-              deleteMutation.mutate(course.code);
+            if (window.confirm(`确定要删除课程 "${course.title}" 吗？`)) {
+              deleteMutation.mutate(course.id);
             }
           }}
         >
@@ -405,38 +407,38 @@ function CourseActionsMenu({
   );
 }
 
-// ── Add Course Dialog ──────────────────────────────
-
 function AddCourseDialog({
   open,
   onOpenChange,
   onAdd,
+  isLoading,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAdd: (course: { code: string; name: string; section: string; studentCount: number; lessonCount: number }) => void;
+  onAdd: (data: { title: string; description?: string; price?: number; category?: string; status?: string }) => void;
+  isLoading: boolean;
 }) {
-  const [code, setCode] = useState("");
-  const [name, setName] = useState("");
-  const [section, setSection] = useState("");
-  const [studentCount, setStudentCount] = useState("");
-  const [lessonCount, setLessonCount] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [category, setCategory] = useState("");
+  const [status, setStatus] = useState("active");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code || !name) return;
+    if (!title) return;
     onAdd({
-      code,
-      name,
-      section: section || "Section A",
-      studentCount: parseInt(studentCount) || 0,
-      lessonCount: parseInt(lessonCount) || 0,
+      title,
+      description: description || undefined,
+      price: price ? parseFloat(price) : undefined,
+      category: category || undefined,
+      status,
     });
-    setCode("");
-    setName("");
-    setSection("");
-    setStudentCount("");
-    setLessonCount("");
+    setTitle("");
+    setDescription("");
+    setPrice("");
+    setCategory("");
+    setStatus("active");
   };
 
   return (
@@ -448,61 +450,67 @@ function AddCourseDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="course-code">课程代码</Label>
+            <Label htmlFor="course-title">课程标题</Label>
             <Input
-              id="course-code"
-              placeholder="例如: MAT101"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="course-name">课程名称</Label>
-            <Input
-              id="course-name"
+              id="course-title"
               placeholder="例如: 线性代数"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="course-section">班级信息</Label>
-            <Input
-              id="course-section"
-              placeholder="例如: Section A • Mon, Wed"
-              value={section}
-              onChange={(e) => setSection(e.target.value)}
+            <Label htmlFor="course-desc">课程描述</Label>
+            <textarea
+              id="course-desc"
+              placeholder="课程简介..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="flex min-h-[80px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="student-count">学生人数</Label>
+              <Label htmlFor="course-price">价格 (¥)</Label>
               <Input
-                id="student-count"
+                id="course-price"
                 type="number"
-                placeholder="0"
-                value={studentCount}
-                onChange={(e) => setStudentCount(e.target.value)}
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lesson-count">课时数</Label>
+              <Label htmlFor="course-category">分类</Label>
               <Input
-                id="lesson-count"
-                type="number"
-                placeholder="0"
-                value={lessonCount}
-                onChange={(e) => setLessonCount(e.target.value)}
+                id="course-category"
+                placeholder="例如: 数学"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
               />
             </div>
+          </div>
+          <div className="space-y-2">
+            <Label>发布状态</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">立即上架</SelectItem>
+                <SelectItem value="draft">保存为草稿</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               取消
             </Button>
-            <Button type="submit">创建课程</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "创建中..." : "创建课程"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -26,6 +26,7 @@ import { Route as StudentAssignmentsRouteImport } from './routes/student/assignm
 import { Route as TeacherFeedbackCourseIdRouteImport } from './routes/teacher/feedback.$courseId'
 import { Route as TeacherCoursesCourseIdRouteImport } from './routes/teacher/courses/$courseId'
 import { Route as StudentFeedbackCourseIdRouteImport } from './routes/student/feedback.$courseId'
+import { Route as StudentCoursesCourseIdRouteImport } from './routes/student/courses.$courseId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -112,6 +113,11 @@ const StudentFeedbackCourseIdRoute = StudentFeedbackCourseIdRouteImport.update({
   path: '/feedback/$courseId',
   getParentRoute: () => StudentRouteRoute,
 } as any)
+const StudentCoursesCourseIdRoute = StudentCoursesCourseIdRouteImport.update({
+  id: '/courses/$courseId',
+  path: '/courses/$courseId',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/teacher/students': typeof TeacherStudentsRoute
   '/student/': typeof StudentIndexRoute
   '/teacher/': typeof TeacherIndexRoute
+  '/student/courses/$courseId': typeof StudentCoursesCourseIdRoute
   '/student/feedback/$courseId': typeof StudentFeedbackCourseIdRoute
   '/teacher/courses/$courseId': typeof TeacherCoursesCourseIdRoute
   '/teacher/feedback/$courseId': typeof TeacherFeedbackCourseIdRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/teacher/students': typeof TeacherStudentsRoute
   '/student': typeof StudentIndexRoute
   '/teacher': typeof TeacherIndexRoute
+  '/student/courses/$courseId': typeof StudentCoursesCourseIdRoute
   '/student/feedback/$courseId': typeof StudentFeedbackCourseIdRoute
   '/teacher/courses/$courseId': typeof TeacherCoursesCourseIdRoute
   '/teacher/feedback/$courseId': typeof TeacherFeedbackCourseIdRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/teacher/students': typeof TeacherStudentsRoute
   '/student/': typeof StudentIndexRoute
   '/teacher/': typeof TeacherIndexRoute
+  '/student/courses/$courseId': typeof StudentCoursesCourseIdRoute
   '/student/feedback/$courseId': typeof StudentFeedbackCourseIdRoute
   '/teacher/courses/$courseId': typeof TeacherCoursesCourseIdRoute
   '/teacher/feedback/$courseId': typeof TeacherFeedbackCourseIdRoute
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/teacher/students'
     | '/student/'
     | '/teacher/'
+    | '/student/courses/$courseId'
     | '/student/feedback/$courseId'
     | '/teacher/courses/$courseId'
     | '/teacher/feedback/$courseId'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/teacher/students'
     | '/student'
     | '/teacher'
+    | '/student/courses/$courseId'
     | '/student/feedback/$courseId'
     | '/teacher/courses/$courseId'
     | '/teacher/feedback/$courseId'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/teacher/students'
     | '/student/'
     | '/teacher/'
+    | '/student/courses/$courseId'
     | '/student/feedback/$courseId'
     | '/teacher/courses/$courseId'
     | '/teacher/feedback/$courseId'
@@ -356,6 +368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentFeedbackCourseIdRouteImport
       parentRoute: typeof StudentRouteRoute
     }
+    '/student/courses/$courseId': {
+      id: '/student/courses/$courseId'
+      path: '/courses/$courseId'
+      fullPath: '/student/courses/$courseId'
+      preLoaderRoute: typeof StudentCoursesCourseIdRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
   }
 }
 
@@ -364,6 +383,7 @@ interface StudentRouteRouteChildren {
   StudentGradesRoute: typeof StudentGradesRoute
   StudentResourcesRoute: typeof StudentResourcesRoute
   StudentIndexRoute: typeof StudentIndexRoute
+  StudentCoursesCourseIdRoute: typeof StudentCoursesCourseIdRoute
   StudentFeedbackCourseIdRoute: typeof StudentFeedbackCourseIdRoute
 }
 
@@ -372,6 +392,7 @@ const StudentRouteRouteChildren: StudentRouteRouteChildren = {
   StudentGradesRoute: StudentGradesRoute,
   StudentResourcesRoute: StudentResourcesRoute,
   StudentIndexRoute: StudentIndexRoute,
+  StudentCoursesCourseIdRoute: StudentCoursesCourseIdRoute,
   StudentFeedbackCourseIdRoute: StudentFeedbackCourseIdRoute,
 }
 

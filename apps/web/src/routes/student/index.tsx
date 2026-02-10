@@ -1,224 +1,146 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Badge } from "@course-manager/ui";
-import { ScheduleCard } from "@course-manager/ui";
-import { Bell, ChevronRight } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useStudentSchedule } from "@/hooks/use-queries";
+import { useState, useMemo } from "react";
+import { Button, Card, CardContent, Input, Badge } from "@course-manager/ui";
+import { Search, BookOpen, Clock, User } from "lucide-react";
+import { useStudentCourses } from "@/hooks/use-queries";
+import type { Course } from "@/api/client";
 
 export const Route = createFileRoute("/student/")({
-  component: StudentSchedule,
+  component: StudentCourseBrowse,
 });
 
-const days = [
-  { label: "Mon", date: 21 },
-  { label: "Tue", date: 22 },
-  { label: "Wed", date: 23 },
-  { label: "Thu", date: 24 },
-  { label: "Fri", date: 25 },
-  { label: "Sat", date: 26 },
-];
+const categories = ["全部", "数学", "物理", "化学", "英语", "计算机", "其他"];
 
-const tagColors: Record<string, string> = {
-  "Material Ready": "bg-blue-100 text-blue-700",
-  "No New Feedback": "bg-gray-100 text-gray-600",
-  "Quiz Tomorrow": "bg-amber-100 text-amber-700",
-  "Feedback Posted": "bg-green-100 text-green-700",
-};
-
-function StudentSchedule() {
+function StudentCourseBrowse() {
   const navigate = useNavigate();
-  const { data: schedule = [] } = useStudentSchedule();
-  const [selectedDay, setSelectedDay] = useState(24);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("全部");
+  const { data: courses = [], isLoading } = useStudentCourses();
 
-  const morningClasses = useMemo(() => {
-    return schedule
-      .filter((c) => c.section === "morning")
-      .map((c) => ({
-        ...c,
-        tag: c.tag || "",
-        tagColor: tagColors[c.tag || ""] || "bg-gray-100 text-gray-600",
-      }));
-  }, [schedule]);
+  const filteredCourses = useMemo(() => {
+    return courses.filter((course) => {
+      const matchesSearch =
+        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (course.description || "").toLowerCase().includes(searchQuery.toLowerCase());
 
-  const afternoonClasses = useMemo(() => {
-    return schedule
-      .filter((c) => c.section === "afternoon")
-      .map((c) => ({
-        ...c,
-        tag: c.tag || "",
-        tagColor: tagColors[c.tag || ""] || "bg-gray-100 text-gray-600",
-      }));
-  }, [schedule]);
+      const matchesCategory =
+        selectedCategory === "全部" || course.category === selectedCategory;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [courses, searchQuery, selectedCategory]);
+
   return (
-    <div className="mx-auto max-w-lg space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Schedule</h1>
-          <p className="mt-0.5 text-sm text-gray-500">October 24</p>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">课程浏览</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          浏览所有可选课程，共 {courses.length} 门课程
+        </p>
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <Input
+          placeholder="搜索课程..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
+      {/* Category Filter */}
+      <div className="flex flex-wrap gap-2">
+        {categories.map((cat) => (
+          <Button
+            key={cat}
+            variant={selectedCategory === cat ? "default" : "outline"}
+            size="sm"
+            onClick={() => setSelectedCategory(cat)}
+          >
+            {cat}
+          </Button>
+        ))}
+      </div>
+
+      {/* Course List */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-gray-500">加载中...</div>
         </div>
-        <button className="relative rounded-full bg-white p-2.5 shadow-sm border border-gray-200">
-          <Bell className="h-5 w-5 text-gray-600" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500" />
-        </button>
-      </div>
-
-      {/* Day Selector */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {days.map((day) => {
-          const isActive = day.date === selectedDay;
-          return (
-            <button
-              key={day.date}
-              onClick={() => setSelectedDay(day.date)}
-              className={`flex flex-col items-center gap-1 rounded-xl px-3.5 py-2.5 text-center transition-colors ${
-                isActive
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
-              }`}
-            >
-              <span className={`text-xs font-medium ${isActive ? "text-blue-100" : "text-gray-400"}`}>
-                {day.label}
-              </span>
-              <span className={`text-sm font-bold ${isActive ? "text-white" : "text-gray-900"}`}>
-                {day.date}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Weekly / Monthly Toggle */}
-      <div className="flex rounded-lg bg-gray-100 p-1">
-        <button className="flex-1 rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-sm">
-          Weekly
-        </button>
-        <button className="flex-1 rounded-md px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
-          Monthly
-        </button>
-      </div>
-
-      {/* Morning Classes */}
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-400">
-            Morning Classes
-          </h2>
-          <ChevronRight className="h-4 w-4 text-gray-400" />
-        </div>
-        <div className="space-y-3">
-          {morningClasses.map((cls) => (
-            <div key={cls.courseName} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-              {/* Header */}
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="text-sm font-semibold text-gray-900">{cls.courseName}</h3>
-                <span
-                  className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${
-                    cls.status === "in-progress"
-                      ? "bg-blue-50 text-blue-700 border-blue-200"
-                      : cls.status === "upcoming"
-                        ? "bg-amber-50 text-amber-700 border-amber-200"
-                        : "bg-green-50 text-green-700 border-green-200"
-                  }`}
-                >
-                  {cls.status === "in-progress"
-                    ? "In Progress"
-                    : cls.status === "upcoming"
-                      ? "Upcoming"
-                      : "Completed"}
-                </span>
-              </div>
-              {/* Details */}
-              <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-                <span>{cls.teacher}</span>
-                <span className="text-gray-300">|</span>
-                <span>{cls.room}</span>
-                <span className="text-gray-300">|</span>
-                <span>{cls.startTime} - {cls.endTime}</span>
-              </div>
-              {/* Tag */}
-              <div className="mt-3">
-                <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${cls.tagColor}`}>
-                  {cls.tag}
-                </span>
-              </div>
-              {/* Actions */}
-              <div className="mt-3 flex items-center gap-2">
-                <button className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                  View Requirements
-                </button>
-                <button
-                  onClick={() => navigate({ to: `/student/feedback/${cls.id}` })}
-                  className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Read Feedback
-                </button>
-              </div>
-            </div>
+      ) : filteredCourses.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <BookOpen className="h-12 w-12 text-gray-400" />
+            <p className="mt-4 text-sm font-medium text-gray-900">没有找到课程</p>
+            <p className="mt-1 text-sm text-gray-500">尝试调整搜索或筛选条件</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {filteredCourses.map((course) => (
+            <StudentCourseCard
+              key={course.id}
+              course={course}
+              onClick={() => navigate({ to: `/student/courses/${course.id}` })}
+            />
           ))}
         </div>
-      </section>
-
-      {/* Afternoon Classes */}
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-400">
-            Afternoon Classes
-          </h2>
-          <ChevronRight className="h-4 w-4 text-gray-400" />
-        </div>
-        <div className="space-y-3">
-          {afternoonClasses.map((cls) => (
-            <div key={cls.courseName} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-              {/* Header */}
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="text-sm font-semibold text-gray-900">{cls.courseName}</h3>
-                <span
-                  className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${
-                    cls.status === "in-progress"
-                      ? "bg-blue-50 text-blue-700 border-blue-200"
-                      : cls.status === "upcoming"
-                        ? "bg-amber-50 text-amber-700 border-amber-200"
-                        : "bg-green-50 text-green-700 border-green-200"
-                  }`}
-                >
-                  {cls.status === "in-progress"
-                    ? "In Progress"
-                    : cls.status === "upcoming"
-                      ? "Upcoming"
-                      : "Completed"}
-                </span>
-              </div>
-              {/* Details */}
-              <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-                <span>{cls.teacher}</span>
-                <span className="text-gray-300">|</span>
-                <span>{cls.room}</span>
-                <span className="text-gray-300">|</span>
-                <span>{cls.startTime} - {cls.endTime}</span>
-              </div>
-              {/* Tag */}
-              <div className="mt-3">
-                <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${cls.tagColor}`}>
-                  {cls.tag}
-                </span>
-              </div>
-              {/* Actions */}
-              <div className="mt-3 flex items-center gap-2">
-                <button className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                  View Requirements
-                </button>
-                <button
-                  onClick={() => navigate({ to: `/student/feedback/${cls.id}` })}
-                  className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Read Feedback
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      )}
     </div>
+  );
+}
+
+function StudentCourseCard({
+  course,
+  onClick,
+}: {
+  course: Course;
+  onClick: () => void;
+}) {
+  return (
+    <Card
+      className="cursor-pointer transition-shadow hover:shadow-md"
+      onClick={onClick}
+    >
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-gray-900">{course.title}</h3>
+            {course.description && (
+              <p className="mt-1 line-clamp-2 text-sm text-gray-500">
+                {course.description}
+              </p>
+            )}
+          </div>
+          {course.category && (
+            <Badge variant="outline" className="ml-2 shrink-0">
+              {course.category}
+            </Badge>
+          )}
+        </div>
+
+        <div className="mt-4 flex items-center gap-4 text-xs text-gray-500">
+          <span className="flex items-center gap-1">
+            <User className="h-3.5 w-3.5" />
+            {course.teacher_name}
+          </span>
+          <span className="flex items-center gap-1">
+            <Clock className="h-3.5 w-3.5" />
+            {course.lesson_count} 节课
+          </span>
+        </div>
+
+        {course.price > 0 ? (
+          <div className="mt-3 text-lg font-bold text-blue-600">
+            ¥{Number(course.price).toFixed(2)}
+          </div>
+        ) : (
+          <div className="mt-3 text-sm font-medium text-green-600">免费</div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   Sidebar,
   TopBar,
@@ -16,7 +16,11 @@ import {
   HelpCircle,
   Home,
   User,
+  LogOut,
 } from "lucide-react";
+import { useCurrentUser, useLogout } from "@/hooks/use-queries";
+import { getToken } from "@/api/client";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/student")({
   component: StudentLayout,
@@ -44,6 +48,38 @@ const bottomNavItems = [
 
 function StudentLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const logoutMutation = useLogout();
+  const { data: user, isLoading, isError } = useCurrentUser();
+
+  // Auth guard
+  useEffect(() => {
+    if (!getToken()) {
+      navigate({ to: "/login" });
+      return;
+    }
+    if (!isLoading && (isError || (user && user.role !== "student"))) {
+      navigate({ to: "/login" });
+    }
+  }, [user, isLoading, isError, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-gray-500">加载中...</div>
+      </div>
+    );
+  }
+
+  if (!user || user.role !== "student") {
+    return null;
+  }
+
+  const handleLogout = () => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => navigate({ to: "/login" }),
+    });
+  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -57,8 +93,8 @@ function StudentLayout() {
           ]}
           activeHref={location.pathname}
           user={{
-            name: "Alex Morgan",
-            role: "Student ID: 48291",
+            name: user.name,
+            role: "学生",
           }}
           appName="EduPortal"
         />
@@ -68,9 +104,16 @@ function StudentLayout() {
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* TopBar - hidden on mobile */}
         <div className="hidden lg:block">
-          <TopBar searchPlaceholder="Search courses, resources...">
-            <NotificationBell count={5} />
-            <UserAvatar name="Alex Morgan" />
+          <TopBar searchPlaceholder="搜索课程、资源...">
+            <NotificationBell count={0} />
+            <button
+              onClick={handleLogout}
+              className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              title="退出登录"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+            <UserAvatar name={user.name} />
           </TopBar>
         </div>
 
