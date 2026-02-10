@@ -1,0 +1,7 @@
+{
+    "powertools": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "powertools-for-aws-mcp"]
+    }
+}
