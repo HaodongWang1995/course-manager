@@ -1,10 +1,11 @@
-import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import {
   Sidebar,
   TopBar,
   NotificationBell,
   UserAvatar,
   BottomNav,
+  AuthLoading,
 } from "@course-manager/ui";
 import {
   LayoutDashboard,
@@ -12,15 +13,14 @@ import {
   BookOpen,
   BarChart3,
   MessageSquare,
+  ClipboardList,
   Settings,
   HelpCircle,
   Home,
   User,
   LogOut,
 } from "lucide-react";
-import { useCurrentUser, useLogout } from "@/hooks/use-queries";
-import { getToken } from "@/api/client";
-import { useEffect } from "react";
+import { useAuthGuard, useAuthLogout } from "@/hooks/use-auth-guard";
 
 export const Route = createFileRoute("/student")({
   component: StudentLayout,
@@ -31,6 +31,7 @@ const sidebarItems = [
   { label: "Schedule", href: "/student", icon: Calendar },
   { label: "Courses", href: "/student/assignments", icon: BookOpen },
   { label: "Grades", href: "/student/grades", icon: BarChart3 },
+  { label: "Enrollments", href: "/student/enrollments", icon: ClipboardList },
   { label: "Messages", href: "/student/messages", icon: MessageSquare },
 ];
 
@@ -48,38 +49,23 @@ const bottomNavItems = [
 
 function StudentLayout() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const logoutMutation = useLogout();
-  const { data: user, isLoading, isError } = useCurrentUser();
+  const { user, isLoading, isAuthed } = useAuthGuard("student");
+  const handleLogout = useAuthLogout();
+  const isGradesImmersive = location.pathname === "/student/grades";
 
-  // Auth guard
-  useEffect(() => {
-    if (!getToken()) {
-      navigate({ to: "/login" });
-      return;
-    }
-    if (!isLoading && (isError || (user && user.role !== "student"))) {
-      navigate({ to: "/login" });
-    }
-  }, [user, isLoading, isError, navigate]);
+  if (isLoading) return <AuthLoading />;
+  if (!isAuthed || !user) return null;
 
-  if (isLoading) {
+  if (isGradesImmersive) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="text-gray-500">加载中...</div>
+      <div className="flex h-screen bg-[#eff6ff]">
+        <main className="flex-1 overflow-y-auto pb-20">
+          <Outlet />
+        </main>
+        <BottomNav items={bottomNavItems} activeHref={location.pathname} />
       </div>
     );
   }
-
-  if (!user || user.role !== "student") {
-    return null;
-  }
-
-  const handleLogout = () => {
-    logoutMutation.mutate(undefined, {
-      onSuccess: () => navigate({ to: "/login" }),
-    });
-  };
 
   return (
     <div className="flex h-screen bg-gray-50">

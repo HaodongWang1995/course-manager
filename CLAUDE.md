@@ -1,19 +1,31 @@
 # Course Manager (EduManager / EduPortal)
 
-A modern course management system built as a monorepo, supporting both Teacher and Student roles with responsive mobile/desktop layouts.
+A modern course management system built as a monorepo, supporting both Teacher and Student roles with responsive mobile/desktop layouts. Features real backend API with JWT authentication, PostgreSQL database, and full CRUD for courses, enrollments, and schedules.
 
 ## Tech Stack
 
-- **Monorepo**: pnpm workspaces + Turborepo
+### Frontend
 - **Framework**: React 19 + TypeScript
 - **Build**: Vite 6
 - **Styling**: TailwindCSS v4
 - **Routing**: TanStack Router (file-based routing)
 - **Server State**: TanStack Query v5
 - **UI Components**: shadcn/ui pattern (Radix UI primitives + CVA + tailwind-merge)
+- **Form Validation**: Zod
 - **Icons**: Lucide React
 - **Charts**: Recharts
 - **Font**: Lexend (Google Fonts)
+
+### Backend
+- **Runtime**: Node.js + TypeScript (tsx for dev)
+- **Framework**: Express 4
+- **Database**: PostgreSQL (pg driver)
+- **Auth**: JWT (jsonwebtoken) + bcryptjs
+- **Testing**: Vitest + Supertest
+
+### Infra
+- **Monorepo**: pnpm workspaces + Turborepo
+- **Testing**: Vitest (all packages)
 
 ## Project Structure
 
@@ -24,72 +36,140 @@ course-manager/
 ├── turbo.json                # Turborepo task config
 ├── tsconfig.base.json        # Shared TypeScript config
 ├── CLAUDE.md                 # This file
+├── PRD/                      # Product requirements documents
 │
 ├── packages/
 │   └── ui/                   # @course-manager/ui - Shared component library
 │       ├── package.json
-│       ├── tsconfig.json
+│       ├── vitest.config.ts
 │       └── src/
 │           ├── index.ts      # Barrel exports
 │           ├── globals.css   # Design tokens & base styles
 │           ├── lib/
 │           │   └── utils.ts  # cn() utility (clsx + tailwind-merge)
+│           ├── __tests__/    # Component & utility tests
 │           └── components/
-│               ├── button.tsx        # Button with variants (CVA)
-│               ├── input.tsx         # Text input
-│               ├── label.tsx         # Form label
-│               ├── card.tsx          # Card container
-│               ├── badge.tsx         # Status badges
-│               ├── avatar.tsx        # User avatars
-│               ├── progress.tsx      # Progress bars
-│               ├── separator.tsx     # Visual separator
-│               ├── tabs.tsx          # Tab navigation
-│               ├── select.tsx        # Select dropdown
-│               ├── checkbox.tsx      # Checkbox input
-│               ├── dialog.tsx        # Modal dialogs
-│               ├── dropdown-menu.tsx # Dropdown menus
-│               ├── tooltip.tsx       # Tooltips
-│               ├── scroll-area.tsx   # Custom scrollbars
-│               ├── collapsible.tsx   # Collapsible sections
-│               ├── sidebar.tsx       # Desktop sidebar navigation
-│               ├── top-bar.tsx       # Top navigation bar
+│               ├── auth-loading.tsx  # Auth loading spinner
+│               ├── avatar.tsx        # User avatars (Radix)
+│               ├── badge.tsx         # Status badges (CVA)
 │               ├── bottom-nav.tsx    # Mobile bottom tab bar
+│               ├── button.tsx        # Button with variants (CVA)
+│               ├── card.tsx          # Card container
+│               ├── checkbox.tsx      # Checkbox (Radix)
+│               ├── collapsible.tsx   # Collapsible sections (Radix)
+│               ├── dialog.tsx        # Modal dialogs (Radix)
+│               ├── dropdown-menu.tsx # Dropdown menus (Radix)
+│               ├── input.tsx         # Text input
 │               ├── kpi-card.tsx      # KPI stat cards
+│               ├── label.tsx         # Form label (Radix)
+│               ├── page-layout.tsx   # Page layout wrappers
+│               ├── progress.tsx      # Progress bars (Radix)
 │               ├── schedule-card.tsx # Class schedule cards
-│               ├── course-card.tsx   # Course info cards
-│               └── page-layout.tsx   # Page layout wrappers
+│               ├── scroll-area.tsx   # Custom scrollbars (Radix)
+│               ├── select.tsx        # Select dropdown (Radix)
+│               ├── separator.tsx     # Visual separator (Radix)
+│               ├── sidebar.tsx       # Desktop sidebar navigation
+│               ├── tabs.tsx          # Tab navigation (Radix)
+│               ├── tooltip.tsx       # Tooltips (Radix)
+│               └── top-bar.tsx       # Top navigation bar
 │
 └── apps/
-    └── web/                  # @course-manager/web - Main application
+    ├── api/                  # @course-manager/api - Backend API server
+    │   ├── package.json
+    │   ├── vitest.config.ts
+    │   ├── .env              # Environment variables (DB, JWT secret)
+    │   ├── sql/
+    │   │   ├── 001_init.sql          # Core schema (users, courses, schedules)
+    │   │   └── 002_enrollments.sql   # Enrollments table migration
+    │   └── src/
+    │       ├── index.ts              # Server entry (listen on PORT)
+    │       ├── app.ts                # Express app setup (CORS, routes)
+    │       ├── db.ts                 # PostgreSQL connection & queries
+    │       ├── middleware/
+    │       │   └── auth.ts           # JWT auth middleware
+    │       ├── routes/
+    │       │   ├── auth.ts           # POST /api/auth/register, login, GET /me
+    │       │   ├── courses.ts        # CRUD /api/courses, PATCH status
+    │       │   ├── enrollments.ts    # POST /api/enrollments, PATCH review
+    │       │   └── schedules.ts      # CRUD /api/courses/:id/schedules
+    │       └── __tests__/
+    │           ├── setup.ts
+    │           ├── helpers.ts
+    │           └── routes/           # Route-level integration tests
+    │
+    └── web/                  # @course-manager/web - Frontend application
         ├── package.json
         ├── vite.config.ts
+        ├── vitest.config.ts
         ├── index.html
         └── src/
             ├── main.tsx              # App entry point
             ├── routeTree.gen.ts      # Auto-generated route tree
             ├── styles/globals.css    # App-level styles
-            ├── api/mock-data.ts      # Mock data for development
-            ├── hooks/use-queries.ts  # TanStack Query hooks
+            ├── api/
+            │   ├── client.ts         # HTTP client (fetch + JWT token management)
+            │   ├── mock-data.ts      # Mock data for development
+            │   └── storage.ts        # LocalStorage wrapper (auth persistence)
+            ├── lib/
+            │   └── schemas.ts        # Zod validation schemas
+            ├── hooks/
+            │   ├── use-queries.ts    # TanStack Query hooks (all API calls)
+            │   └── use-auth-guard.ts # Auth protection hook
+            ├── components/
+            │   ├── index.ts          # Component barrel exports
+            │   ├── empty-state.tsx   # Empty state placeholder
+            │   ├── form-field.tsx    # Form field wrappers (text, textarea, select, datetime)
+            │   └── stat-card.tsx     # Statistics display card
+            ├── __tests__/            # Frontend tests
             └── routes/
                 ├── __root.tsx
-                ├── index.tsx          # → Redirects to /login
-                ├── login.tsx          # Login & role selection
+                ├── index.tsx              # → Redirects to /landing
+                ├── landing.tsx            # Public landing page
+                ├── login.tsx              # Login & registration
                 ├── teacher/
-                │   ├── route.tsx      # Teacher layout (sidebar + topbar)
-                │   ├── index.tsx      # Dashboard
-                │   ├── calendar.tsx   # Calendar view
-                │   ├── courses.tsx    # Course management
-                │   ├── students.tsx   # Student directory
-                │   ├── reports.tsx    # Reports & analytics
+                │   ├── route.tsx          # Teacher layout (sidebar + topbar)
+                │   ├── index.tsx          # Dashboard
+                │   ├── calendar.tsx       # Calendar view
+                │   ├── courses.tsx        # Course list & management
+                │   ├── courses.$courseId.tsx  # Course detail/edit
+                │   ├── enrollments.tsx    # Enrollment review
+                │   ├── students.tsx       # Student directory
+                │   ├── reports.tsx        # Reports & analytics
                 │   └── feedback.$courseId.tsx  # Feedback editor
                 └── student/
-                    ├── route.tsx      # Student layout (bottom nav + sidebar)
-                    ├── index.tsx      # Schedule (mobile home)
-                    ├── grades.tsx     # Gradebook
-                    ├── assignments.tsx # Assignment center
-                    ├── resources.tsx  # Resource library
-                    └── feedback.$courseId.tsx  # Course feedback detail
+                    ├── route.tsx          # Student layout (bottom nav + sidebar)
+                    ├── index.tsx          # Dashboard / Schedule
+                    ├── courses.$courseId.tsx  # Course detail view
+                    ├── enrollments.tsx    # My enrollments
+                    ├── grades.tsx         # Gradebook
+                    ├── assignments.tsx    # Assignment center
+                    ├── resources.tsx      # Resource library
+                    └── feedback.$courseId.tsx  # Course feedback
 ```
+
+## API Endpoints
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/auth/register` | No | Register new user (teacher/student) |
+| POST | `/api/auth/login` | No | Login, returns JWT token |
+| GET | `/api/auth/me` | Yes | Get current user info |
+| GET | `/api/courses` | Yes | List courses (with search/category/status filters) |
+| GET | `/api/courses/:id` | Yes | Get course detail (includes schedules) |
+| POST | `/api/courses` | Teacher | Create course |
+| PUT | `/api/courses/:id` | Teacher | Update course |
+| DELETE | `/api/courses/:id` | Teacher | Delete course |
+| PATCH | `/api/courses/:id/status` | Teacher | Update course status |
+| GET | `/api/courses/:id/schedules` | Yes | List schedules for a course |
+| POST | `/api/courses/:id/schedules` | Teacher | Create schedule |
+| PUT | `/api/schedules/:id` | Teacher | Update schedule |
+| DELETE | `/api/schedules/:id` | Teacher | Delete schedule |
+| POST | `/api/enrollments` | Student | Apply to enroll in a course |
+| GET | `/api/enrollments` | Yes | List my enrollments (student) / by course (teacher) |
+| GET | `/api/enrollments/course/:id` | Teacher | List enrollments for a course |
+| PATCH | `/api/enrollments/:id/review` | Teacher | Approve/reject enrollment |
+| DELETE | `/api/enrollments/:id` | Student | Cancel enrollment |
+| GET | `/api/health` | No | Health check |
 
 ## Commands
 
@@ -97,7 +177,7 @@ course-manager/
 # Install dependencies
 pnpm install
 
-# Development (all packages)
+# Development (all packages: web + api)
 pnpm dev
 
 # Build all packages
@@ -105,6 +185,12 @@ pnpm build
 
 # Type checking
 pnpm typecheck
+
+# Run tests (all packages)
+pnpm test
+
+# Run tests with coverage
+pnpm test:coverage
 
 # Lint
 pnpm lint
@@ -151,9 +237,12 @@ pnpm clean
 - Route tree auto-generated by `@tanstack/router-plugin/vite`
 
 ### Data Fetching
+- API client with JWT auth in `apps/web/src/api/client.ts`
 - TanStack Query hooks in `apps/web/src/hooks/use-queries.ts`
 - Query keys follow pattern: `[role, resource]` (e.g., `["teacher", "courses"]`)
-- Mock data in `apps/web/src/api/mock-data.ts`
+- Auth token stored in localStorage via `api/client.ts` (getToken/setToken/clearToken)
+- Auth guard hook in `apps/web/src/hooks/use-auth-guard.ts`
+- Form validation schemas in `apps/web/src/lib/schemas.ts` (Zod)
 
 ### Styling
 - TailwindCSS v4 with `@import "tailwindcss"` syntax
@@ -161,6 +250,19 @@ pnpm clean
 - No separate CSS modules - all styling via Tailwind utility classes
 - Responsive: mobile-first, use `md:`, `lg:` breakpoints
 
+### Backend
+- Express app configured in `apps/api/src/app.ts`, server in `index.ts`
+- PostgreSQL via `pg` driver, connection/queries in `apps/api/src/db.ts`
+- JWT auth middleware in `apps/api/src/middleware/auth.ts`
+- SQL migrations in `apps/api/sql/` (numbered: 001_, 002_, ...)
+- Environment variables in `apps/api/.env` (DATABASE_URL, JWT_SECRET, PORT)
+
+### Testing
+- Vitest for all packages (config in each package's `vitest.config.ts`)
+- Backend: Supertest for HTTP integration tests in `apps/api/src/__tests__/`
+- Frontend: Component and API client tests in `apps/web/src/__tests__/`
+- UI: Component tests in `packages/ui/src/__tests__/`
+
 ### Roles
-- **Teacher (EduManager)**: Dashboard, Calendar, Courses, Students, Reports, Feedback Editor
-- **Student (EduPortal)**: Schedule, Gradebook, Assignments, Resources, Feedback Detail
+- **Teacher (EduManager)**: Dashboard, Calendar, Courses (CRUD), Course Detail, Enrollments (review), Students, Reports, Feedback Editor
+- **Student (EduPortal)**: Dashboard/Schedule, Course Detail, Enrollments (apply/cancel), Gradebook, Assignments, Resources, Feedback Detail

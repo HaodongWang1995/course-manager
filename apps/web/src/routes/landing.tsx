@@ -8,7 +8,6 @@ import {
   CardTitle,
   Badge,
   KpiCard,
-  CourseCard,
   ScheduleCard,
   Separator,
   Input,
@@ -35,6 +34,48 @@ import {
 export const Route = createFileRoute("/landing")({
   component: LandingPage,
 });
+
+function CourseCard({
+  code,
+  name,
+  section,
+  studentCount,
+  lessonCount,
+  progress,
+}: {
+  code: string;
+  name: string;
+  section: string;
+  studentCount: number;
+  lessonCount: number;
+  progress: number;
+}) {
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <span className="inline-block rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+        {code}
+      </span>
+      <h3 className="mt-3 text-base font-semibold text-gray-900">{name}</h3>
+      <p className="mt-1 text-sm text-gray-500">{section}</p>
+      <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
+        <span>{studentCount} students</span>
+        <span>{lessonCount} lessons</span>
+      </div>
+      <div className="mt-4">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-gray-500">Progress</span>
+          <span className="font-medium text-gray-900">{progress}%</span>
+        </div>
+        <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-gray-100">
+          <div
+            className={`h-full rounded-full ${progress === 100 ? "bg-green-500" : "bg-blue-600"}`}
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function LandingPage() {
   return (

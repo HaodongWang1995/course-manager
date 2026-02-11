@@ -4,6 +4,7 @@ import { Button, Card, CardContent, Input, Badge } from "@course-manager/ui";
 import { Search, BookOpen, Clock, User } from "lucide-react";
 import { useStudentCourses } from "@/hooks/use-queries";
 import type { Course } from "@/api/client";
+import { EmptyState } from "@/components/empty-state";
 
 export const Route = createFileRoute("/student/")({
   component: StudentCourseBrowse,
@@ -71,13 +72,11 @@ function StudentCourseBrowse() {
           <div className="text-gray-500">加载中...</div>
         </div>
       ) : filteredCourses.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <BookOpen className="h-12 w-12 text-gray-400" />
-            <p className="mt-4 text-sm font-medium text-gray-900">没有找到课程</p>
-            <p className="mt-1 text-sm text-gray-500">尝试调整搜索或筛选条件</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={BookOpen}
+          title="没有找到课程"
+          description="尝试调整搜索或筛选条件"
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {filteredCourses.map((course) => (

@@ -4,16 +4,13 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
   Input,
-  Label,
+  Badge,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Badge,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -43,6 +40,11 @@ import {
   useUpdateCourseStatus,
 } from "@/hooks/use-queries";
 import type { Course } from "@/api/client";
+import { StatCard } from "@/components/stat-card";
+import { EmptyState } from "@/components/empty-state";
+import { FormTextField, FormTextareaField, FormSelectField } from "@/components/form-field";
+import { useForm } from "@tanstack/react-form";
+import { courseFormValidator } from "@/lib/schemas";
 
 export const Route = createFileRoute("/teacher/courses")({
   component: CoursesPage,
@@ -116,38 +118,10 @@ function CoursesPage() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">总课程数</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">已上架</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">草稿</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-600">{stats.draft}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">已下架</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-amber-600">{stats.archived}</div>
-          </CardContent>
-        </Card>
+        <StatCard label="总课程数" value={stats.total} />
+        <StatCard label="已上架" value={stats.active} color="text-green-600" />
+        <StatCard label="草稿" value={stats.draft} color="text-gray-600" />
+        <StatCard label="已下架" value={stats.archived} color="text-amber-600" />
       </div>
 
       {/* Filters */}
@@ -218,23 +192,23 @@ function CoursesPage() {
 
       {/* Courses */}
       {filteredCourses.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <BookOpen className="h-12 w-12 text-gray-400" />
-            <p className="mt-4 text-sm font-medium text-gray-900">没有找到课程</p>
-            <p className="mt-1 text-sm text-gray-500">
-              {searchQuery || filterStatus !== "all"
-                ? "尝试调整搜索或筛选条件"
-                : "创建您的第一个课程"}
-            </p>
-            {!searchQuery && filterStatus === "all" && (
-              <Button className="mt-4 gap-2" onClick={() => setShowAddDialog(true)}>
+        <EmptyState
+          icon={BookOpen}
+          title="没有找到课程"
+          description={
+            searchQuery || filterStatus !== "all"
+              ? "尝试调整搜索或筛选条件"
+              : "创建您的第一个课程"
+          }
+          action={
+            !searchQuery && filterStatus === "all" ? (
+              <Button className="gap-2" onClick={() => setShowAddDialog(true)}>
                 <Plus className="h-4 w-4" />
                 新建课程
               </Button>
-            )}
-          </CardContent>
-        </Card>
+            ) : undefined
+          }
+        />
       ) : viewMode === "grid" ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredCourses.map((course) => (
@@ -418,97 +392,108 @@ function AddCourseDialog({
   onAdd: (data: { title: string; description?: string; price?: number; category?: string; status?: string }) => void;
   isLoading: boolean;
 }) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("");
-  const [status, setStatus] = useState("active");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title) return;
-    onAdd({
-      title,
-      description: description || undefined,
-      price: price ? parseFloat(price) : undefined,
-      category: category || undefined,
-      status,
-    });
-    setTitle("");
-    setDescription("");
-    setPrice("");
-    setCategory("");
-    setStatus("active");
-  };
+  const form = useForm({
+    defaultValues: {
+      title: "",
+      description: "" as string | undefined,
+      price: undefined as number | undefined,
+      category: "" as string | undefined,
+      status: "active" as "active" | "draft",
+    },
+    validators: {
+      onChange: courseFormValidator,
+    },
+    onSubmit: ({ value }) => {
+      onAdd({
+        title: value.title,
+        description: value.description || undefined,
+        price: value.price,
+        category: value.category || undefined,
+        status: value.status,
+      });
+      form.reset();
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>新建课程</DialogTitle>
-          <DialogDescription>填写课程信息以创建新课程</DialogDescription>
+          <DialogDescription>填写课程基本信息，创建后可继续编辑详情</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="course-title">课程标题</Label>
-            <Input
-              id="course-title"
-              placeholder="例如: 线性代数"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="course-desc">课程描述</Label>
-            <textarea
-              id="course-desc"
-              placeholder="课程简介..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="flex min-h-[80px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+          className="space-y-5"
+        >
+          <form.Field name="title">
+            {(field) => (
+              <FormTextField
+                field={field}
+                label="课程标题"
+                required
+                placeholder="例如: 线性代数"
+                autoFocus
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="description">
+            {(field) => (
+              <FormTextareaField
+                field={field}
+                label="课程描述"
+                placeholder="简要介绍课程内容和目标..."
+              />
+            )}
+          </form.Field>
+
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="course-price">价格 (¥)</Label>
-              <Input
-                id="course-price"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="course-category">分类</Label>
-              <Input
-                id="course-category"
-                placeholder="例如: 数学"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              />
-            </div>
+            <form.Field name="price">
+              {(field) => (
+                <FormTextField
+                  field={field}
+                  label="价格 (¥)"
+                  type="number"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                />
+              )}
+            </form.Field>
+
+            <form.Field name="category">
+              {(field) => (
+                <FormTextField
+                  field={field}
+                  label="分类"
+                  placeholder="例如: 数学"
+                />
+              )}
+            </form.Field>
           </div>
-          <div className="space-y-2">
-            <Label>发布状态</Label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">立即上架</SelectItem>
-                <SelectItem value="draft">保存为草稿</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+
+          <form.Field name="status">
+            {(field) => (
+              <FormSelectField
+                field={field}
+                label="发布状态"
+                options={[
+                  { value: "active", label: "立即上架" },
+                  { value: "draft", label: "保存为草稿" },
+                ]}
+              />
+            )}
+          </form.Field>
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               取消
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading} className="min-w-[100px]">
               {isLoading ? "创建中..." : "创建课程"}
             </Button>
           </DialogFooter>

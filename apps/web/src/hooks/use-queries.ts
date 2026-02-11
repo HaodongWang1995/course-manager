@@ -3,12 +3,14 @@ import {
   authApi,
   courseApi,
   scheduleApi,
+  enrollmentApi,
   setToken,
   clearToken,
   getToken,
   type User,
   type Course,
   type Schedule,
+  type Enrollment,
 } from "@/api/client";
 import {
   teacherScheduleStore,
@@ -187,6 +189,57 @@ export function useDeleteSchedule() {
     mutationFn: (id: string) => scheduleApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["schedules"] });
+    },
+  });
+}
+
+// ── Enrollments (Real API) ────────────────────────────
+
+export function useMyEnrollments(params?: { status?: string }) {
+  return useQuery({
+    queryKey: ["student", "enrollments", params],
+    queryFn: () => enrollmentApi.listMine(params),
+    enabled: !!getToken(),
+  });
+}
+
+export function useCourseEnrollments(courseId: string, params?: { status?: string }) {
+  return useQuery({
+    queryKey: ["teacher", "enrollments", courseId, params],
+    queryFn: () => enrollmentApi.listByCourse(courseId, params),
+    enabled: !!courseId && !!getToken(),
+  });
+}
+
+export function useApplyEnrollment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { course_id: string; note?: string }) =>
+      enrollmentApi.apply(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["student", "enrollments"] });
+      queryClient.invalidateQueries({ queryKey: ["student", "courses"] });
+    },
+  });
+}
+
+export function useReviewEnrollment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { status: "approved" | "rejected"; reject_reason?: string } }) =>
+      enrollmentApi.review(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teacher", "enrollments"] });
+    },
+  });
+}
+
+export function useCancelEnrollment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => enrollmentApi.cancel(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["student", "enrollments"] });
     },
   });
 }

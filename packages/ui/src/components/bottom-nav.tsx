@@ -21,37 +21,37 @@ export function BottomNav({ items, activeHref, className }: BottomNavProps) {
   return (
     <nav
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-gray-200 bg-white px-2 pb-safe",
+        "fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white px-2 pb-[max(9px,env(safe-area-inset-bottom))] pt-[9px]",
         className
       )}
     >
-      {displayItems.map((item) => {
-        const isActive = activeHref === item.href;
-        const Icon = item.icon;
+      <div className="flex h-16 w-full items-center">
+        {displayItems.map((item) => {
+          const isActive = activeHref === item.href;
+          const Icon = item.icon;
 
-        return (
-          <a
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex min-w-0 flex-1 flex-col items-center gap-1 py-2 text-center transition-colors",
-              isActive
-                ? "text-blue-600"
-                : "text-gray-400 hover:text-gray-600"
-            )}
-          >
-            <Icon className={cn("h-5 w-5", isActive && "text-blue-600")} />
-            <span
+          return (
+            <a
+              key={item.href}
+              href={item.href}
               className={cn(
-                "truncate text-[10px] font-medium",
-                isActive ? "text-blue-600" : "text-gray-400"
+                "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-center transition-colors",
+                isActive ? "text-[#137fec]" : "text-slate-400 hover:text-slate-600"
               )}
             >
-              {item.label}
-            </span>
-          </a>
-        );
-      })}
+              <Icon className={cn("h-5 w-5", isActive && "text-[#137fec]")} />
+              <span
+                className={cn(
+                  "truncate text-[10px] font-medium leading-[15px]",
+                  isActive ? "text-[#137fec]" : "text-slate-400"
+                )}
+              >
+                {item.label}
+              </span>
+            </a>
+          );
+        })}
+      </div>
     </nav>
   );
 }

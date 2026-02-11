@@ -156,6 +156,58 @@ export const courseApi = {
   },
 };
 
+// ── Enrollments ──────────────────────────────────
+
+export interface Enrollment {
+  id: string;
+  student_id: string;
+  course_id: string;
+  status: "pending" | "approved" | "rejected";
+  note?: string;
+  reject_reason?: string;
+  created_at: string;
+  updated_at: string;
+  // Joined fields
+  course_title?: string;
+  teacher_name?: string;
+  student_name?: string;
+  student_email?: string;
+}
+
+export const enrollmentApi = {
+  apply(data: { course_id: string; note?: string }) {
+    return request<Enrollment>("/api/enrollments", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  listMine(params?: { status?: string }) {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.set("status", params.status);
+    const qs = searchParams.toString();
+    return request<Enrollment[]>(`/api/enrollments${qs ? `?${qs}` : ""}`);
+  },
+
+  listByCourse(courseId: string, params?: { status?: string }) {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.set("status", params.status);
+    const qs = searchParams.toString();
+    return request<Enrollment[]>(`/api/enrollments/course/${courseId}${qs ? `?${qs}` : ""}`);
+  },
+
+  review(id: string, data: { status: "approved" | "rejected"; reject_reason?: string }) {
+    return request<Enrollment>(`/api/enrollments/${id}/review`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  },
+
+  cancel(id: string) {
+    return request<{ success: boolean }>(`/api/enrollments/${id}`, { method: "DELETE" });
+  },
+};
+
 // ── Schedules ─────────────────────────────────────
 
 export const scheduleApi = {

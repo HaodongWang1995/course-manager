@@ -1,18 +1,17 @@
-import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { Sidebar, TopBar, NotificationBell, UserAvatar } from "@course-manager/ui";
+import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
+import { Sidebar, TopBar, NotificationBell, UserAvatar, AuthLoading } from "@course-manager/ui";
 import {
   LayoutDashboard,
   Calendar,
   BookOpen,
   Users,
   BarChart3,
+  ClipboardList,
   Settings,
   HelpCircle,
   LogOut,
 } from "lucide-react";
-import { useCurrentUser, useLogout } from "@/hooks/use-queries";
-import { getToken } from "@/api/client";
-import { useEffect } from "react";
+import { useAuthGuard, useAuthLogout } from "@/hooks/use-auth-guard";
 
 export const Route = createFileRoute("/teacher")({
   component: TeacherLayout,
@@ -23,6 +22,7 @@ const sidebarItems = [
   { label: "Calendar", href: "/teacher/calendar", icon: Calendar },
   { label: "Courses", href: "/teacher/courses", icon: BookOpen },
   { label: "Students", href: "/teacher/students", icon: Users },
+  { label: "Enrollments", href: "/teacher/enrollments", icon: ClipboardList },
   { label: "Reports", href: "/teacher/reports", icon: BarChart3 },
 ];
 
@@ -33,38 +33,11 @@ const supportItems = [
 
 function TeacherLayout() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const logoutMutation = useLogout();
-  const { data: user, isLoading, isError } = useCurrentUser();
+  const { user, isLoading, isAuthed } = useAuthGuard("teacher");
+  const handleLogout = useAuthLogout();
 
-  // Auth guard
-  useEffect(() => {
-    if (!getToken()) {
-      navigate({ to: "/login" });
-      return;
-    }
-    if (!isLoading && (isError || (user && user.role !== "teacher"))) {
-      navigate({ to: "/login" });
-    }
-  }, [user, isLoading, isError, navigate]);
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="text-gray-500">加载中...</div>
-      </div>
-    );
-  }
-
-  if (!user || user.role !== "teacher") {
-    return null;
-  }
-
-  const handleLogout = () => {
-    logoutMutation.mutate(undefined, {
-      onSuccess: () => navigate({ to: "/login" }),
-    });
-  };
+  if (isLoading) return <AuthLoading />;
+  if (!isAuthed || !user) return null;
 
   return (
     <div className="flex h-screen bg-gray-50">

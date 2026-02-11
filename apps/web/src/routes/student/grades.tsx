@@ -1,257 +1,262 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { KpiCard, Badge, Card, CardContent, CardHeader, CardTitle } from "@course-manager/ui";
-import { ChevronRight, TrendingUp, Filter } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+  ArrowLeft,
+  Calculator,
+  CheckCircle2,
+  ChevronRight,
+  FlaskConical,
+  Filter,
+  GraduationCap,
+  ScrollText,
+  Trophy,
+} from "lucide-react";
 
 export const Route = createFileRoute("/student/grades")({
   component: StudentGrades,
 });
 
-const performanceData = [
-  { subject: "Math", you: 95, avg: 78 },
-  { subject: "Sci", you: 88, avg: 82 },
-  { subject: "Hist", you: 92, avg: 75 },
-  { subject: "Eng", you: 85, avg: 80 },
-  { subject: "Art", you: 90, avg: 85 },
+type SubjectLabel = "Math" | "Sci" | "Hist" | "Eng" | "Art";
+
+type Kpi = {
+  label: string;
+  value: string;
+  icon: typeof GraduationCap;
+  iconColorClass: string;
+  iconBgClass: string;
+};
+
+type ExamScore = {
+  label: string;
+  value: string;
+};
+
+type CourseGrade = {
+  id: string;
+  name: string;
+  teacher: string;
+  overall: string;
+  icon: typeof Calculator;
+  iconColorClass: string;
+  iconBgClass: string;
+  midterm: ExamScore;
+  final: ExamScore;
+};
+
+const kpis: Kpi[] = [
+  {
+    label: "GPA",
+    value: "3.8",
+    icon: GraduationCap,
+    iconColorClass: "text-[#137fec]",
+    iconBgClass: "bg-blue-50",
+  },
+  {
+    label: "Class Rank",
+    value: "5th",
+    icon: Trophy,
+    iconColorClass: "text-purple-500",
+    iconBgClass: "bg-slate-50",
+  },
+  {
+    label: "Completion",
+    value: "92%",
+    icon: CheckCircle2,
+    iconColorClass: "text-emerald-600",
+    iconBgClass: "bg-blue-50",
+  },
 ];
 
-const courses = [
+const subjectLabels: SubjectLabel[] = ["Math", "Sci", "Hist", "Eng", "Art"];
+
+const courses: CourseGrade[] = [
   {
-    id: "math-101",
+    id: "mathematics-101",
     name: "Mathematics 101",
     teacher: "Mr. Anderson",
-    grade: 95,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-    ringColor: "stroke-blue-600",
-    midterm: { label: "A", score: 92 },
-    final: { label: "A+", score: 98 },
+    overall: "95%",
+    icon: Calculator,
+    iconColorClass: "text-orange-600",
+    iconBgClass: "bg-orange-100",
+    midterm: { label: "Midterm", value: "A (92)" },
+    final: { label: "Final", value: "A+ (98)" },
   },
   {
-    id: "physics-adv",
+    id: "advanced-physics",
     name: "Advanced Physics",
     teacher: "Ms. Roberts",
-    grade: 88,
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
-    ringColor: "stroke-purple-600",
-    midterm: { label: "B+", score: 89 },
-    final: { label: "B", score: 87 },
+    overall: "88%",
+    icon: FlaskConical,
+    iconColorClass: "text-emerald-600",
+    iconBgClass: "bg-emerald-100",
+    midterm: { label: "Midterm", value: "B+ (89)" },
+    final: { label: "Final", value: "B (87)" },
   },
   {
-    id: "history-world",
+    id: "world-history",
     name: "World History",
     teacher: "Mr. Lewis",
-    grade: 92,
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-50",
-    ringColor: "stroke-emerald-600",
-    midterm: { label: "A-", score: 91 },
-    final: { label: "A", score: 93 },
+    overall: "92%",
+    icon: ScrollText,
+    iconColorClass: "text-indigo-600",
+    iconBgClass: "bg-indigo-100",
+    midterm: { label: "Midterm", value: "A- (91)" },
+    final: { label: "Final", value: "A (93)" },
   },
 ];
-
-function CircularProgress({
-  percentage,
-  ringColor,
-  color,
-}: {
-  percentage: number;
-  ringColor: string;
-  color: string;
-}) {
-  const radius = 30;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percentage / 100) * circumference;
-
-  return (
-    <div className="relative flex h-20 w-20 items-center justify-center">
-      <svg className="h-20 w-20 -rotate-90" viewBox="0 0 80 80">
-        <circle
-          cx="40"
-          cy="40"
-          r={radius}
-          fill="none"
-          stroke="#e5e7eb"
-          strokeWidth="6"
-        />
-        <circle
-          cx="40"
-          cy="40"
-          r={radius}
-          fill="none"
-          className={ringColor}
-          strokeWidth="6"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-        />
-      </svg>
-      <span className={`absolute text-lg font-bold ${color}`}>{percentage}%</span>
-    </div>
-  );
-}
 
 function StudentGrades() {
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      {/* Header */}
-      <div>
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Gradebook</h1>
-          <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">
-            <Filter className="h-3.5 w-3.5" />
-            Filter
-          </button>
-        </div>
-        <div className="mt-2 flex items-center gap-2">
-          <Badge variant="secondary" className="text-xs">
-            Showing: Fall 2023
-          </Badge>
-          <Badge variant="outline" className="text-xs">
-            Full Year
-          </Badge>
-        </div>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-3 gap-3">
-        <KpiCard
-          value="3.8"
-          label="GPA"
-          trend={{ value: "+0.2", positive: true }}
-        />
-        <KpiCard
-          value="5th"
-          label="Class Rank"
-          trend={{ value: "+2", positive: true }}
-        />
-        <KpiCard
-          value="92%"
-          label="Completion"
-          trend={{ value: "+5%", positive: true }}
-        />
-      </div>
-
-      {/* Performance Overview Chart */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Performance Overview</CardTitle>
-          <p className="text-xs text-gray-500">Your scores vs class average</p>
-        </CardHeader>
-        <CardContent>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={performanceData}
-                margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
-                barGap={4}
-              >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                <XAxis
-                  dataKey="subject"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                  domain={[0, 100]}
-                />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: "8px",
-                    border: "1px solid #e5e7eb",
-                    fontSize: "12px",
-                  }}
-                />
-                <Legend
-                  verticalAlign="top"
-                  align="right"
-                  iconType="circle"
-                  iconSize={8}
-                  wrapperStyle={{ fontSize: "12px", paddingBottom: "8px" }}
-                />
-                <Bar dataKey="you" name="You" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={20} />
-                <Bar dataKey="avg" name="Avg" fill="#d1d5db" radius={[4, 4, 0, 0]} barSize={20} />
-              </BarChart>
-            </ResponsiveContainer>
+    <div className="-mx-4 min-h-full bg-[#eff6ff] pb-24 md:-mx-6 lg:mx-0 lg:min-h-[calc(100vh-5.5rem)] lg:pb-6">
+      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 px-4 pb-[13px] pt-3 backdrop-blur-md md:px-6 lg:px-8">
+        <div className="flex h-10 w-full items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <h1 className="text-lg font-bold tracking-[-0.45px] text-slate-900">Gradebook</h1>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Courses Section */}
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Courses</h2>
-          <button className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700">
-            View All
-            <ChevronRight className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="rounded-full p-2 text-[#137fec] transition-colors hover:bg-[#137fec]/10"
+              aria-label="Open filters"
+            >
+              <Filter className="h-5 w-5" />
+            </button>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 bg-slate-200 text-[10px] font-semibold text-slate-600">
+              SW
+            </div>
+          </div>
         </div>
-        <div className="space-y-3">
-          {courses.map((course) => (
-            <Card key={course.id} className="overflow-hidden">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  {/* Circular Progress */}
-                  <CircularProgress
-                    percentage={course.grade}
-                    ringColor={course.ringColor}
-                    color={course.color}
-                  />
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-gray-900 truncate">
-                      {course.name}
-                    </h3>
-                    <p className="mt-0.5 text-xs text-gray-500">{course.teacher}</p>
+        <div className="mt-2 flex w-full items-center gap-2 text-xs">
+          <span className="font-medium text-slate-500">Showing:</span>
+          <span className="rounded-full bg-[#137fec]/10 px-2 py-0.5 font-medium text-[#137fec]">Fall 2023</span>
+          <span className="rounded-full bg-[#137fec]/10 px-2 py-0.5 font-medium text-[#137fec]">Full Year</span>
+        </div>
+      </header>
 
-                    <div className="mt-2 flex items-center gap-3">
-                      <div className={`rounded-lg ${course.bgColor} px-2.5 py-1`}>
-                        <span className="text-[10px] text-gray-500 block">Midterm</span>
-                        <span className={`text-sm font-bold ${course.color}`}>
-                          {course.midterm.label}
-                          <span className="ml-0.5 text-xs font-normal text-gray-400">
-                            ({course.midterm.score})
-                          </span>
-                        </span>
+      <main className="mx-auto flex w-full max-w-[448px] flex-col gap-6 px-4 py-4 md:px-0">
+        <section className="grid grid-cols-3 gap-3">
+          {kpis.map((kpi) => {
+            const Icon = kpi.icon;
+            return (
+              <article
+                key={kpi.label}
+                className="flex min-h-[126px] flex-col items-center justify-center rounded-xl border border-slate-100 bg-white p-[13px] shadow-sm"
+              >
+                <div className={`mb-1 flex h-10 w-10 items-center justify-center rounded-full ${kpi.iconBgClass}`}>
+                  <Icon className={`h-5 w-5 ${kpi.iconColorClass}`} />
+                </div>
+                <p className="text-2xl font-bold leading-8 text-slate-900">{kpi.value}</p>
+                <p className="text-xs font-medium text-slate-500">{kpi.label}</p>
+              </article>
+            );
+          })}
+        </section>
+
+        <section className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-base font-bold leading-6 text-slate-900">Performance Overview</h2>
+              <p className="text-xs leading-4 text-slate-500">Vs. Class Average</p>
+            </div>
+            <div className="mt-1 flex items-center gap-3 text-[10px] font-medium text-slate-600">
+              <span className="inline-flex items-center gap-1">
+                <span className="h-2 w-2 rounded-full bg-[#137fec]" />
+                You
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="h-2 w-2 rounded-full bg-slate-300" />
+                Avg
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-6 h-48">
+            <div className="relative h-[192px] rounded-b-md">
+              <div className="absolute inset-0 grid grid-rows-5">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <div key={index} className="border-b border-slate-100" />
+                ))}
+              </div>
+              <div className="absolute inset-x-0 bottom-0 grid grid-cols-5 px-2 pb-1">
+                {subjectLabels.map((subject) => (
+                  <span key={subject} className="text-center text-[10px] font-medium uppercase text-slate-500">
+                    {subject}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-bold leading-7 text-slate-900">Courses</h2>
+            <Link
+              to="/student/courses/$courseId"
+              params={{ courseId: "mathematics-101" }}
+              className="text-sm font-medium text-[#137fec] transition-colors hover:text-[#0f6ecf]"
+            >
+              View All
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            {courses.map((course) => {
+              const Icon = course.icon;
+              return (
+                <article
+                  key={course.id}
+                  className="rounded-xl border border-slate-100 bg-white p-[17px] shadow-sm"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-0.5 flex h-10 w-10 items-center justify-center rounded-lg ${course.iconBgClass}`}>
+                        <Icon className={`h-5 w-5 ${course.iconColorClass}`} />
                       </div>
-                      <div className={`rounded-lg ${course.bgColor} px-2.5 py-1`}>
-                        <span className="text-[10px] text-gray-500 block">Final</span>
-                        <span className={`text-sm font-bold ${course.color}`}>
-                          {course.final.label}
-                          <span className="ml-0.5 text-xs font-normal text-gray-400">
-                            ({course.final.score})
-                          </span>
-                        </span>
+                      <div>
+                        <h3 className="text-base font-bold leading-5 text-slate-900">{course.name}</h3>
+                        <p className="text-xs leading-4 text-slate-500">Teacher: {course.teacher}</p>
                       </div>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-lg font-bold leading-7 text-[#137fec]">{course.overall}</p>
+                      <p className="text-[10px] font-medium uppercase leading-4 text-slate-400">Overall</p>
                     </div>
                   </div>
 
-                  {/* View Breakdown */}
-                  <button className="shrink-0 text-xs font-medium text-blue-600 hover:text-blue-700">
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <div className="rounded-lg border border-slate-100 bg-slate-50 p-[9px] text-center">
+                      <p className="text-xs text-slate-500">{course.midterm.label}</p>
+                      <p className="text-base font-bold leading-6 text-slate-800">{course.midterm.value}</p>
+                    </div>
+                    <div className="rounded-lg border border-slate-100 bg-slate-50 p-[9px] text-center">
+                      <p className="text-xs text-slate-500">{course.final.label}</p>
+                      <p className="text-base font-bold leading-6 text-slate-800">{course.final.value}</p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-[#137fec]/10 pb-2 pt-3 text-sm font-semibold text-[#137fec] transition-colors hover:bg-[#137fec]/15 active:bg-[#137fec]/20"
+                  >
                     View Breakdown
-                    <ChevronRight className="ml-0.5 inline h-3 w-3" />
+                    <ChevronRight className="h-4 w-4" />
                   </button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
