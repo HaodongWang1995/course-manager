@@ -11,7 +11,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@course-manager/ui";
-import { Plus, Clock, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Clock, MapPin, ChevronLeft, ChevronRight } from "lucide-react"; // eslint-disable-line @typescript-eslint/no-unused-vars -- Clock used in sidebar
 
 export const Route = createFileRoute("/(app)/teacher/calendar")({
   component: TeacherCalendar,
@@ -44,6 +44,168 @@ const deadlines = [
   { title: "Submit Lab Reports", date: "Oct 28", course: "PHY202" },
   { title: "Homework Set 5 Due", date: "Nov 1", course: "MAT202" },
 ];
+
+// ── Month View ────────────────────────────────────────
+const monthDays = Array.from({ length: 35 }, (_, i) => {
+  const day = i - 0; // Oct starts on Sun (offset 0)
+  return { num: day >= 0 && day < 31 ? day + 1 : null, idx: i };
+});
+
+// Map calendar events to day-of-month (Mon 23 = day 0 → Oct 23, etc.)
+const eventsByMonthDay: Record<number, typeof calendarEvents> = {};
+for (const ev of calendarEvents) {
+  const monthDay = 23 + ev.day; // weekDays start at Oct 23
+  if (!eventsByMonthDay[monthDay]) eventsByMonthDay[monthDay] = [];
+  eventsByMonthDay[monthDay].push(ev);
+}
+
+function MonthView() {
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  return (
+    <div>
+      <div className="grid grid-cols-7 border-b border-gray-200">
+        {dayNames.map((d) => (
+          <div key={d} className="border-l border-gray-100 p-2 text-center text-xs font-medium text-gray-500 first:border-l-0">
+            {d}
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-7">
+        {monthDays.map(({ num, idx }) => (
+          <div
+            key={idx}
+            className={`min-h-[80px] border-b border-l border-gray-100 p-1.5 first:border-l-0 ${num === null ? "bg-gray-50" : ""}`}
+          >
+            {num !== null && (
+              <>
+                <span className={`text-xs font-medium ${num === 24 ? "flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white" : "text-gray-700"}`}>
+                  {num}
+                </span>
+                <div className="mt-1 space-y-0.5">
+                  {(eventsByMonthDay[num] || []).slice(0, 2).map((ev, i) => (
+                    <div key={i} className={`truncate rounded px-1 py-0.5 text-[10px] font-medium ${ev.color}`}>
+                      {ev.title.split(" - ")[0]}
+                    </div>
+                  ))}
+                  {(eventsByMonthDay[num] || []).length > 2 && (
+                    <div className="text-[10px] text-gray-400">+{(eventsByMonthDay[num] || []).length - 2} more</div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Day View ──────────────────────────────────────────
+// Show Tuesday Oct 24 (day index 1)
+const dayEvents = calendarEvents.filter((e) => e.day === 1);
+
+function DayView() {
+  return (
+    <div className="overflow-x-auto">
+      <div className="min-w-[400px]">
+        <div className="grid grid-cols-[60px_1fr] border-b border-gray-200">
+          <div className="p-2" />
+          <div className="border-l border-gray-200 bg-blue-50 p-2 text-center text-sm font-medium text-blue-700">
+            Tue 24
+          </div>
+        </div>
+        <div className="relative">
+          {hours.map((hour) => (
+            <div
+              key={hour}
+              className="grid grid-cols-[60px_1fr] border-b border-gray-100"
+              style={{ height: 60 }}
+            >
+              <div className="flex items-start justify-end pr-2 pt-1 text-xs text-gray-400">
+                {hour > 12 ? hour - 12 : hour}
+                {hour >= 12 ? " PM" : " AM"}
+              </div>
+              <div className="relative border-l border-gray-100" />
+            </div>
+          ))}
+          {dayEvents.map((event, idx) => {
+            const top = (event.startHour - 8) * 60;
+            const height = event.duration * 60;
+            return (
+              <div
+                key={idx}
+                className={`absolute rounded-md border p-2 text-xs ${event.color}`}
+                style={{ top, height, left: "64px", right: "4px" }}
+              >
+                <p className="font-medium">{event.title}</p>
+                <div className="mt-1 flex items-center gap-1 opacity-75">
+                  <MapPin className="h-3 w-3" />
+                  {event.room}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Week View ─────────────────────────────────────────
+function WeekView() {
+  return (
+    <div className="overflow-x-auto">
+      <div className="min-w-[700px]">
+        <div className="grid grid-cols-[60px_repeat(5,1fr)] border-b border-gray-200">
+          <div className="p-2" />
+          {weekDays.map((day, i) => (
+            <div
+              key={day}
+              className={`border-l border-gray-200 p-2 text-center text-sm font-medium ${
+                i === 1 ? "bg-blue-50 text-blue-700" : "text-gray-600"
+              }`}
+            >
+              {day}
+            </div>
+          ))}
+        </div>
+        <div className="relative">
+          {hours.map((hour) => (
+            <div
+              key={hour}
+              className="grid grid-cols-[60px_repeat(5,1fr)] border-b border-gray-100"
+              style={{ height: 60 }}
+            >
+              <div className="flex items-start justify-end pr-2 pt-1 text-xs text-gray-400">
+                {hour > 12 ? hour - 12 : hour}
+                {hour >= 12 ? " PM" : " AM"}
+              </div>
+              {weekDays.map((_, dayIdx) => (
+                <div key={dayIdx} className="relative border-l border-gray-100" />
+              ))}
+            </div>
+          ))}
+          {calendarEvents.map((event, idx) => {
+            const top = (event.startHour - 8) * 60;
+            const height = event.duration * 60;
+            const left = `calc(60px + ${event.day} * ((100% - 60px) / 5) + 2px)`;
+            const width = `calc((100% - 60px) / 5 - 4px)`;
+            return (
+              <div
+                key={idx}
+                className={`absolute rounded-md border p-1.5 text-xs ${event.color}`}
+                style={{ top, height, left, width }}
+              >
+                <p className="font-medium leading-tight">{event.title}</p>
+                <p className="mt-0.5 opacity-75">{event.room}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function TeacherCalendar() {
   const [view, setView] = useState("week");
@@ -82,7 +244,11 @@ function TeacherCalendar() {
                     <ChevronLeft className="h-5 w-5 text-gray-500" />
                   </button>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    October 23 - 27, 2023
+                    {view === "month"
+                      ? "October 2023"
+                      : view === "day"
+                        ? "Tuesday, October 24, 2023"
+                        : "October 23 - 27, 2023"}
                   </h2>
                   <button className="rounded-lg p-1 hover:bg-gray-100">
                     <ChevronRight className="h-5 w-5 text-gray-500" />
@@ -94,67 +260,13 @@ function TeacherCalendar() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <div className="min-w-[700px]">
-                  {/* Day Headers */}
-                  <div className="grid grid-cols-[60px_repeat(5,1fr)] border-b border-gray-200">
-                    <div className="p-2" />
-                    {weekDays.map((day, i) => (
-                      <div
-                        key={day}
-                        className={`border-l border-gray-200 p-2 text-center text-sm font-medium ${
-                          i === 1 ? "bg-blue-50 text-blue-700" : "text-gray-600"
-                        }`}
-                      >
-                        {day}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Time Grid */}
-                  <div className="relative">
-                    {hours.map((hour) => (
-                      <div
-                        key={hour}
-                        className="grid grid-cols-[60px_repeat(5,1fr)] border-b border-gray-100"
-                        style={{ height: 60 }}
-                      >
-                        <div className="flex items-start justify-end pr-2 pt-1 text-xs text-gray-400">
-                          {hour > 12 ? hour - 12 : hour}
-                          {hour >= 12 ? " PM" : " AM"}
-                        </div>
-                        {weekDays.map((_, dayIdx) => (
-                          <div
-                            key={dayIdx}
-                            className="relative border-l border-gray-100"
-                          />
-                        ))}
-                      </div>
-                    ))}
-
-                    {/* Events overlay */}
-                    {calendarEvents.map((event, idx) => {
-                      const top = (event.startHour - 8) * 60;
-                      const height = event.duration * 60;
-                      const left = `calc(60px + ${event.day} * ((100% - 60px) / 5) + 2px)`;
-                      const width = `calc((100% - 60px) / 5 - 4px)`;
-
-                      return (
-                        <div
-                          key={idx}
-                          className={`absolute rounded-md border p-1.5 text-xs ${event.color}`}
-                          style={{ top, height, left, width }}
-                        >
-                          <p className="font-medium leading-tight">
-                            {event.title}
-                          </p>
-                          <p className="mt-0.5 opacity-75">{event.room}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
+              {view === "month" ? (
+                <MonthView />
+              ) : view === "day" ? (
+                <DayView />
+              ) : (
+                <WeekView />
+              )}
             </CardContent>
           </Card>
         </div>

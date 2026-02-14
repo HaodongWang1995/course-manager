@@ -38,9 +38,14 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   });
 
   if (res.status === 401) {
-    clearToken();
-    window.location.href = "/login";
-    throw new ApiError(401, "未登录");
+    const data = await res.json();
+    // Only redirect to login for expired/invalid token on protected routes.
+    // Don't redirect if already on the login page (e.g. wrong credentials).
+    if (window.location.pathname !== "/login") {
+      clearToken();
+      window.location.href = "/login";
+    }
+    throw new ApiError(401, data.error || "未登录");
   }
 
   const data = await res.json();
