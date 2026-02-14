@@ -14,6 +14,14 @@ import { useLogin, useRegister } from "@/hooks/use-queries";
 import { useForm } from "@tanstack/react-form";
 import { loginSchema, registerSchema } from "@/lib/schemas";
 
+function formatFieldErrors(errors: unknown[]): string {
+  return errors
+    .map((e) =>
+      typeof e === "string" ? e : (e as { message?: string })?.message ?? String(e)
+    )
+    .join(", ");
+}
+
 export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
@@ -173,7 +181,7 @@ function LoginPage() {
                       />
                     </div>
                     {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{field.state.meta.errors.join(", ")}</p>
+                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
                 )}
@@ -206,7 +214,7 @@ function LoginPage() {
                       </button>
                     </div>
                     {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{field.state.meta.errors.join(", ")}</p>
+                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
                 )}
@@ -260,7 +268,7 @@ function LoginPage() {
                       className="h-12 rounded-lg border-slate-200 text-base placeholder:text-slate-400"
                     />
                     {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{field.state.meta.errors.join(", ")}</p>
+                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
                 )}
@@ -286,7 +294,7 @@ function LoginPage() {
                       />
                     </div>
                     {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{field.state.meta.errors.join(", ")}</p>
+                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
                 )}
@@ -319,7 +327,7 @@ function LoginPage() {
                       </button>
                     </div>
                     {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{field.state.meta.errors.join(", ")}</p>
+                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
                 )}
@@ -438,7 +446,7 @@ function LoginPage() {
                       onBlur={field.handleBlur}
                     />
                     {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{field.state.meta.errors.join(", ")}</p>
+                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
                 )}
@@ -467,7 +475,7 @@ function LoginPage() {
                       </button>
                     </div>
                     {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{field.state.meta.errors.join(", ")}</p>
+                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
                 )}
@@ -527,7 +535,7 @@ function LoginPage() {
                       onBlur={field.handleBlur}
                     />
                     {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{field.state.meta.errors.join(", ")}</p>
+                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
                 )}
@@ -546,7 +554,7 @@ function LoginPage() {
                       onBlur={field.handleBlur}
                     />
                     {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{field.state.meta.errors.join(", ")}</p>
+                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
                 )}
@@ -575,7 +583,7 @@ function LoginPage() {
                       </button>
                     </div>
                     {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{field.state.meta.errors.join(", ")}</p>
+                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
                 )}

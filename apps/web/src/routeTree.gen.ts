@@ -11,24 +11,28 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LandingRouteImport } from './routes/landing'
-import { Route as TeacherRouteRouteImport } from './routes/teacher/route'
-import { Route as StudentRouteRouteImport } from './routes/student/route'
+import { Route as CoursesRouteImport } from './routes/courses'
+import { Route as appRouteRouteImport } from './routes/(app)/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TeacherIndexRouteImport } from './routes/teacher/index'
-import { Route as StudentIndexRouteImport } from './routes/student/index'
-import { Route as TeacherStudentsRouteImport } from './routes/teacher/students'
-import { Route as TeacherReportsRouteImport } from './routes/teacher/reports'
-import { Route as TeacherEnrollmentsRouteImport } from './routes/teacher/enrollments'
-import { Route as TeacherCoursesRouteImport } from './routes/teacher/courses'
-import { Route as TeacherCalendarRouteImport } from './routes/teacher/calendar'
-import { Route as StudentResourcesRouteImport } from './routes/student/resources'
-import { Route as StudentGradesRouteImport } from './routes/student/grades'
-import { Route as StudentEnrollmentsRouteImport } from './routes/student/enrollments'
-import { Route as StudentAssignmentsRouteImport } from './routes/student/assignments'
-import { Route as TeacherFeedbackCourseIdRouteImport } from './routes/teacher/feedback.$courseId'
-import { Route as TeacherCoursesCourseIdRouteImport } from './routes/teacher/courses.$courseId'
-import { Route as StudentFeedbackCourseIdRouteImport } from './routes/student/feedback.$courseId'
-import { Route as StudentCoursesCourseIdRouteImport } from './routes/student/courses.$courseId'
+import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
+import { Route as appTeacherRouteRouteImport } from './routes/(app)/teacher/route'
+import { Route as appStudentRouteRouteImport } from './routes/(app)/student/route'
+import { Route as appTeacherIndexRouteImport } from './routes/(app)/teacher/index'
+import { Route as appStudentIndexRouteImport } from './routes/(app)/student/index'
+import { Route as appTeacherStudentsRouteImport } from './routes/(app)/teacher/students'
+import { Route as appTeacherReportsRouteImport } from './routes/(app)/teacher/reports'
+import { Route as appTeacherEnrollmentsRouteImport } from './routes/(app)/teacher/enrollments'
+import { Route as appTeacherCoursesRouteImport } from './routes/(app)/teacher/courses'
+import { Route as appTeacherCalendarRouteImport } from './routes/(app)/teacher/calendar'
+import { Route as appStudentResourcesRouteImport } from './routes/(app)/student/resources'
+import { Route as appStudentGradesRouteImport } from './routes/(app)/student/grades'
+import { Route as appStudentEnrollmentsRouteImport } from './routes/(app)/student/enrollments'
+import { Route as appStudentAssignmentsRouteImport } from './routes/(app)/student/assignments'
+import { Route as appTeacherCoursesIndexRouteImport } from './routes/(app)/teacher/courses.index'
+import { Route as appTeacherFeedbackCourseIdRouteImport } from './routes/(app)/teacher/feedback.$courseId'
+import { Route as appTeacherCoursesCourseIdRouteImport } from './routes/(app)/teacher/courses.$courseId'
+import { Route as appStudentFeedbackCourseIdRouteImport } from './routes/(app)/student/feedback.$courseId'
+import { Route as appStudentCoursesCourseIdRouteImport } from './routes/(app)/student/courses.$courseId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -40,14 +44,13 @@ const LandingRoute = LandingRouteImport.update({
   path: '/landing',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TeacherRouteRoute = TeacherRouteRouteImport.update({
-  id: '/teacher',
-  path: '/teacher',
+const CoursesRoute = CoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudentRouteRoute = StudentRouteRouteImport.update({
-  id: '/student',
-  path: '/student',
+const appRouteRoute = appRouteRouteImport.update({
+  id: '/(app)',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -55,155 +58,190 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TeacherIndexRoute = TeacherIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => TeacherRouteRoute,
-} as any)
-const StudentIndexRoute = StudentIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => StudentRouteRoute,
-} as any)
-const TeacherStudentsRoute = TeacherStudentsRouteImport.update({
-  id: '/students',
-  path: '/students',
-  getParentRoute: () => TeacherRouteRoute,
-} as any)
-const TeacherReportsRoute = TeacherReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => TeacherRouteRoute,
-} as any)
-const TeacherEnrollmentsRoute = TeacherEnrollmentsRouteImport.update({
-  id: '/enrollments',
-  path: '/enrollments',
-  getParentRoute: () => TeacherRouteRoute,
-} as any)
-const TeacherCoursesRoute = TeacherCoursesRouteImport.update({
-  id: '/courses',
-  path: '/courses',
-  getParentRoute: () => TeacherRouteRoute,
-} as any)
-const TeacherCalendarRoute = TeacherCalendarRouteImport.update({
-  id: '/calendar',
-  path: '/calendar',
-  getParentRoute: () => TeacherRouteRoute,
-} as any)
-const StudentResourcesRoute = StudentResourcesRouteImport.update({
-  id: '/resources',
-  path: '/resources',
-  getParentRoute: () => StudentRouteRoute,
-} as any)
-const StudentGradesRoute = StudentGradesRouteImport.update({
-  id: '/grades',
-  path: '/grades',
-  getParentRoute: () => StudentRouteRoute,
-} as any)
-const StudentEnrollmentsRoute = StudentEnrollmentsRouteImport.update({
-  id: '/enrollments',
-  path: '/enrollments',
-  getParentRoute: () => StudentRouteRoute,
-} as any)
-const StudentAssignmentsRoute = StudentAssignmentsRouteImport.update({
-  id: '/assignments',
-  path: '/assignments',
-  getParentRoute: () => StudentRouteRoute,
-} as any)
-const TeacherFeedbackCourseIdRoute = TeacherFeedbackCourseIdRouteImport.update({
-  id: '/feedback/$courseId',
-  path: '/feedback/$courseId',
-  getParentRoute: () => TeacherRouteRoute,
-} as any)
-const TeacherCoursesCourseIdRoute = TeacherCoursesCourseIdRouteImport.update({
+const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
   id: '/$courseId',
   path: '/$courseId',
-  getParentRoute: () => TeacherCoursesRoute,
+  getParentRoute: () => CoursesRoute,
 } as any)
-const StudentFeedbackCourseIdRoute = StudentFeedbackCourseIdRouteImport.update({
-  id: '/feedback/$courseId',
-  path: '/feedback/$courseId',
-  getParentRoute: () => StudentRouteRoute,
+const appTeacherRouteRoute = appTeacherRouteRouteImport.update({
+  id: '/teacher',
+  path: '/teacher',
+  getParentRoute: () => appRouteRoute,
 } as any)
-const StudentCoursesCourseIdRoute = StudentCoursesCourseIdRouteImport.update({
-  id: '/courses/$courseId',
-  path: '/courses/$courseId',
-  getParentRoute: () => StudentRouteRoute,
+const appStudentRouteRoute = appStudentRouteRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => appRouteRoute,
 } as any)
+const appTeacherIndexRoute = appTeacherIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => appTeacherRouteRoute,
+} as any)
+const appStudentIndexRoute = appStudentIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => appStudentRouteRoute,
+} as any)
+const appTeacherStudentsRoute = appTeacherStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => appTeacherRouteRoute,
+} as any)
+const appTeacherReportsRoute = appTeacherReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => appTeacherRouteRoute,
+} as any)
+const appTeacherEnrollmentsRoute = appTeacherEnrollmentsRouteImport.update({
+  id: '/enrollments',
+  path: '/enrollments',
+  getParentRoute: () => appTeacherRouteRoute,
+} as any)
+const appTeacherCoursesRoute = appTeacherCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
+  getParentRoute: () => appTeacherRouteRoute,
+} as any)
+const appTeacherCalendarRoute = appTeacherCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => appTeacherRouteRoute,
+} as any)
+const appStudentResourcesRoute = appStudentResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => appStudentRouteRoute,
+} as any)
+const appStudentGradesRoute = appStudentGradesRouteImport.update({
+  id: '/grades',
+  path: '/grades',
+  getParentRoute: () => appStudentRouteRoute,
+} as any)
+const appStudentEnrollmentsRoute = appStudentEnrollmentsRouteImport.update({
+  id: '/enrollments',
+  path: '/enrollments',
+  getParentRoute: () => appStudentRouteRoute,
+} as any)
+const appStudentAssignmentsRoute = appStudentAssignmentsRouteImport.update({
+  id: '/assignments',
+  path: '/assignments',
+  getParentRoute: () => appStudentRouteRoute,
+} as any)
+const appTeacherCoursesIndexRoute = appTeacherCoursesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => appTeacherCoursesRoute,
+} as any)
+const appTeacherFeedbackCourseIdRoute =
+  appTeacherFeedbackCourseIdRouteImport.update({
+    id: '/feedback/$courseId',
+    path: '/feedback/$courseId',
+    getParentRoute: () => appTeacherRouteRoute,
+  } as any)
+const appTeacherCoursesCourseIdRoute =
+  appTeacherCoursesCourseIdRouteImport.update({
+    id: '/$courseId',
+    path: '/$courseId',
+    getParentRoute: () => appTeacherCoursesRoute,
+  } as any)
+const appStudentFeedbackCourseIdRoute =
+  appStudentFeedbackCourseIdRouteImport.update({
+    id: '/feedback/$courseId',
+    path: '/feedback/$courseId',
+    getParentRoute: () => appStudentRouteRoute,
+  } as any)
+const appStudentCoursesCourseIdRoute =
+  appStudentCoursesCourseIdRouteImport.update({
+    id: '/courses/$courseId',
+    path: '/courses/$courseId',
+    getParentRoute: () => appStudentRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/student': typeof StudentRouteRouteWithChildren
-  '/teacher': typeof TeacherRouteRouteWithChildren
+  '/courses': typeof CoursesRouteWithChildren
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
-  '/student/assignments': typeof StudentAssignmentsRoute
-  '/student/enrollments': typeof StudentEnrollmentsRoute
-  '/student/grades': typeof StudentGradesRoute
-  '/student/resources': typeof StudentResourcesRoute
-  '/teacher/calendar': typeof TeacherCalendarRoute
-  '/teacher/courses': typeof TeacherCoursesRouteWithChildren
-  '/teacher/enrollments': typeof TeacherEnrollmentsRoute
-  '/teacher/reports': typeof TeacherReportsRoute
-  '/teacher/students': typeof TeacherStudentsRoute
-  '/student/': typeof StudentIndexRoute
-  '/teacher/': typeof TeacherIndexRoute
-  '/student/courses/$courseId': typeof StudentCoursesCourseIdRoute
-  '/student/feedback/$courseId': typeof StudentFeedbackCourseIdRoute
-  '/teacher/courses/$courseId': typeof TeacherCoursesCourseIdRoute
-  '/teacher/feedback/$courseId': typeof TeacherFeedbackCourseIdRoute
+  '/student': typeof appStudentRouteRouteWithChildren
+  '/teacher': typeof appTeacherRouteRouteWithChildren
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/student/assignments': typeof appStudentAssignmentsRoute
+  '/student/enrollments': typeof appStudentEnrollmentsRoute
+  '/student/grades': typeof appStudentGradesRoute
+  '/student/resources': typeof appStudentResourcesRoute
+  '/teacher/calendar': typeof appTeacherCalendarRoute
+  '/teacher/courses': typeof appTeacherCoursesRouteWithChildren
+  '/teacher/enrollments': typeof appTeacherEnrollmentsRoute
+  '/teacher/reports': typeof appTeacherReportsRoute
+  '/teacher/students': typeof appTeacherStudentsRoute
+  '/student/': typeof appStudentIndexRoute
+  '/teacher/': typeof appTeacherIndexRoute
+  '/student/courses/$courseId': typeof appStudentCoursesCourseIdRoute
+  '/student/feedback/$courseId': typeof appStudentFeedbackCourseIdRoute
+  '/teacher/courses/$courseId': typeof appTeacherCoursesCourseIdRoute
+  '/teacher/feedback/$courseId': typeof appTeacherFeedbackCourseIdRoute
+  '/teacher/courses/': typeof appTeacherCoursesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/courses': typeof CoursesRouteWithChildren
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
-  '/student/assignments': typeof StudentAssignmentsRoute
-  '/student/enrollments': typeof StudentEnrollmentsRoute
-  '/student/grades': typeof StudentGradesRoute
-  '/student/resources': typeof StudentResourcesRoute
-  '/teacher/calendar': typeof TeacherCalendarRoute
-  '/teacher/courses': typeof TeacherCoursesRouteWithChildren
-  '/teacher/enrollments': typeof TeacherEnrollmentsRoute
-  '/teacher/reports': typeof TeacherReportsRoute
-  '/teacher/students': typeof TeacherStudentsRoute
-  '/student': typeof StudentIndexRoute
-  '/teacher': typeof TeacherIndexRoute
-  '/student/courses/$courseId': typeof StudentCoursesCourseIdRoute
-  '/student/feedback/$courseId': typeof StudentFeedbackCourseIdRoute
-  '/teacher/courses/$courseId': typeof TeacherCoursesCourseIdRoute
-  '/teacher/feedback/$courseId': typeof TeacherFeedbackCourseIdRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/student/assignments': typeof appStudentAssignmentsRoute
+  '/student/enrollments': typeof appStudentEnrollmentsRoute
+  '/student/grades': typeof appStudentGradesRoute
+  '/student/resources': typeof appStudentResourcesRoute
+  '/teacher/calendar': typeof appTeacherCalendarRoute
+  '/teacher/enrollments': typeof appTeacherEnrollmentsRoute
+  '/teacher/reports': typeof appTeacherReportsRoute
+  '/teacher/students': typeof appTeacherStudentsRoute
+  '/student': typeof appStudentIndexRoute
+  '/teacher': typeof appTeacherIndexRoute
+  '/student/courses/$courseId': typeof appStudentCoursesCourseIdRoute
+  '/student/feedback/$courseId': typeof appStudentFeedbackCourseIdRoute
+  '/teacher/courses/$courseId': typeof appTeacherCoursesCourseIdRoute
+  '/teacher/feedback/$courseId': typeof appTeacherFeedbackCourseIdRoute
+  '/teacher/courses': typeof appTeacherCoursesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/student': typeof StudentRouteRouteWithChildren
-  '/teacher': typeof TeacherRouteRouteWithChildren
+  '/(app)': typeof appRouteRouteWithChildren
+  '/courses': typeof CoursesRouteWithChildren
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
-  '/student/assignments': typeof StudentAssignmentsRoute
-  '/student/enrollments': typeof StudentEnrollmentsRoute
-  '/student/grades': typeof StudentGradesRoute
-  '/student/resources': typeof StudentResourcesRoute
-  '/teacher/calendar': typeof TeacherCalendarRoute
-  '/teacher/courses': typeof TeacherCoursesRouteWithChildren
-  '/teacher/enrollments': typeof TeacherEnrollmentsRoute
-  '/teacher/reports': typeof TeacherReportsRoute
-  '/teacher/students': typeof TeacherStudentsRoute
-  '/student/': typeof StudentIndexRoute
-  '/teacher/': typeof TeacherIndexRoute
-  '/student/courses/$courseId': typeof StudentCoursesCourseIdRoute
-  '/student/feedback/$courseId': typeof StudentFeedbackCourseIdRoute
-  '/teacher/courses/$courseId': typeof TeacherCoursesCourseIdRoute
-  '/teacher/feedback/$courseId': typeof TeacherFeedbackCourseIdRoute
+  '/(app)/student': typeof appStudentRouteRouteWithChildren
+  '/(app)/teacher': typeof appTeacherRouteRouteWithChildren
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/(app)/student/assignments': typeof appStudentAssignmentsRoute
+  '/(app)/student/enrollments': typeof appStudentEnrollmentsRoute
+  '/(app)/student/grades': typeof appStudentGradesRoute
+  '/(app)/student/resources': typeof appStudentResourcesRoute
+  '/(app)/teacher/calendar': typeof appTeacherCalendarRoute
+  '/(app)/teacher/courses': typeof appTeacherCoursesRouteWithChildren
+  '/(app)/teacher/enrollments': typeof appTeacherEnrollmentsRoute
+  '/(app)/teacher/reports': typeof appTeacherReportsRoute
+  '/(app)/teacher/students': typeof appTeacherStudentsRoute
+  '/(app)/student/': typeof appStudentIndexRoute
+  '/(app)/teacher/': typeof appTeacherIndexRoute
+  '/(app)/student/courses/$courseId': typeof appStudentCoursesCourseIdRoute
+  '/(app)/student/feedback/$courseId': typeof appStudentFeedbackCourseIdRoute
+  '/(app)/teacher/courses/$courseId': typeof appTeacherCoursesCourseIdRoute
+  '/(app)/teacher/feedback/$courseId': typeof appTeacherFeedbackCourseIdRoute
+  '/(app)/teacher/courses/': typeof appTeacherCoursesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/student'
-    | '/teacher'
+    | '/courses'
     | '/landing'
     | '/login'
+    | '/student'
+    | '/teacher'
+    | '/courses/$courseId'
     | '/student/assignments'
     | '/student/enrollments'
     | '/student/grades'
@@ -219,17 +257,19 @@ export interface FileRouteTypes {
     | '/student/feedback/$courseId'
     | '/teacher/courses/$courseId'
     | '/teacher/feedback/$courseId'
+    | '/teacher/courses/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/courses'
     | '/landing'
     | '/login'
+    | '/courses/$courseId'
     | '/student/assignments'
     | '/student/enrollments'
     | '/student/grades'
     | '/student/resources'
     | '/teacher/calendar'
-    | '/teacher/courses'
     | '/teacher/enrollments'
     | '/teacher/reports'
     | '/teacher/students'
@@ -239,34 +279,39 @@ export interface FileRouteTypes {
     | '/student/feedback/$courseId'
     | '/teacher/courses/$courseId'
     | '/teacher/feedback/$courseId'
+    | '/teacher/courses'
   id:
     | '__root__'
     | '/'
-    | '/student'
-    | '/teacher'
+    | '/(app)'
+    | '/courses'
     | '/landing'
     | '/login'
-    | '/student/assignments'
-    | '/student/enrollments'
-    | '/student/grades'
-    | '/student/resources'
-    | '/teacher/calendar'
-    | '/teacher/courses'
-    | '/teacher/enrollments'
-    | '/teacher/reports'
-    | '/teacher/students'
-    | '/student/'
-    | '/teacher/'
-    | '/student/courses/$courseId'
-    | '/student/feedback/$courseId'
-    | '/teacher/courses/$courseId'
-    | '/teacher/feedback/$courseId'
+    | '/(app)/student'
+    | '/(app)/teacher'
+    | '/courses/$courseId'
+    | '/(app)/student/assignments'
+    | '/(app)/student/enrollments'
+    | '/(app)/student/grades'
+    | '/(app)/student/resources'
+    | '/(app)/teacher/calendar'
+    | '/(app)/teacher/courses'
+    | '/(app)/teacher/enrollments'
+    | '/(app)/teacher/reports'
+    | '/(app)/teacher/students'
+    | '/(app)/student/'
+    | '/(app)/teacher/'
+    | '/(app)/student/courses/$courseId'
+    | '/(app)/student/feedback/$courseId'
+    | '/(app)/teacher/courses/$courseId'
+    | '/(app)/teacher/feedback/$courseId'
+    | '/(app)/teacher/courses/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  StudentRouteRoute: typeof StudentRouteRouteWithChildren
-  TeacherRouteRoute: typeof TeacherRouteRouteWithChildren
+  appRouteRoute: typeof appRouteRouteWithChildren
+  CoursesRoute: typeof CoursesRouteWithChildren
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
 }
@@ -287,18 +332,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/teacher': {
-      id: '/teacher'
-      path: '/teacher'
-      fullPath: '/teacher'
-      preLoaderRoute: typeof TeacherRouteRouteImport
+    '/courses': {
+      id: '/courses'
+      path: '/courses'
+      fullPath: '/courses'
+      preLoaderRoute: typeof CoursesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/student': {
-      id: '/student'
-      path: '/student'
-      fullPath: '/student'
-      preLoaderRoute: typeof StudentRouteRouteImport
+    '/(app)': {
+      id: '/(app)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof appRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -308,178 +353,232 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/teacher/': {
-      id: '/teacher/'
+    '/courses/$courseId': {
+      id: '/courses/$courseId'
+      path: '/$courseId'
+      fullPath: '/courses/$courseId'
+      preLoaderRoute: typeof CoursesCourseIdRouteImport
+      parentRoute: typeof CoursesRoute
+    }
+    '/(app)/teacher': {
+      id: '/(app)/teacher'
+      path: '/teacher'
+      fullPath: '/teacher'
+      preLoaderRoute: typeof appTeacherRouteRouteImport
+      parentRoute: typeof appRouteRoute
+    }
+    '/(app)/student': {
+      id: '/(app)/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof appStudentRouteRouteImport
+      parentRoute: typeof appRouteRoute
+    }
+    '/(app)/teacher/': {
+      id: '/(app)/teacher/'
       path: '/'
       fullPath: '/teacher/'
-      preLoaderRoute: typeof TeacherIndexRouteImport
-      parentRoute: typeof TeacherRouteRoute
+      preLoaderRoute: typeof appTeacherIndexRouteImport
+      parentRoute: typeof appTeacherRouteRoute
     }
-    '/student/': {
-      id: '/student/'
+    '/(app)/student/': {
+      id: '/(app)/student/'
       path: '/'
       fullPath: '/student/'
-      preLoaderRoute: typeof StudentIndexRouteImport
-      parentRoute: typeof StudentRouteRoute
+      preLoaderRoute: typeof appStudentIndexRouteImport
+      parentRoute: typeof appStudentRouteRoute
     }
-    '/teacher/students': {
-      id: '/teacher/students'
+    '/(app)/teacher/students': {
+      id: '/(app)/teacher/students'
       path: '/students'
       fullPath: '/teacher/students'
-      preLoaderRoute: typeof TeacherStudentsRouteImport
-      parentRoute: typeof TeacherRouteRoute
+      preLoaderRoute: typeof appTeacherStudentsRouteImport
+      parentRoute: typeof appTeacherRouteRoute
     }
-    '/teacher/reports': {
-      id: '/teacher/reports'
+    '/(app)/teacher/reports': {
+      id: '/(app)/teacher/reports'
       path: '/reports'
       fullPath: '/teacher/reports'
-      preLoaderRoute: typeof TeacherReportsRouteImport
-      parentRoute: typeof TeacherRouteRoute
+      preLoaderRoute: typeof appTeacherReportsRouteImport
+      parentRoute: typeof appTeacherRouteRoute
     }
-    '/teacher/enrollments': {
-      id: '/teacher/enrollments'
+    '/(app)/teacher/enrollments': {
+      id: '/(app)/teacher/enrollments'
       path: '/enrollments'
       fullPath: '/teacher/enrollments'
-      preLoaderRoute: typeof TeacherEnrollmentsRouteImport
-      parentRoute: typeof TeacherRouteRoute
+      preLoaderRoute: typeof appTeacherEnrollmentsRouteImport
+      parentRoute: typeof appTeacherRouteRoute
     }
-    '/teacher/courses': {
-      id: '/teacher/courses'
+    '/(app)/teacher/courses': {
+      id: '/(app)/teacher/courses'
       path: '/courses'
       fullPath: '/teacher/courses'
-      preLoaderRoute: typeof TeacherCoursesRouteImport
-      parentRoute: typeof TeacherRouteRoute
+      preLoaderRoute: typeof appTeacherCoursesRouteImport
+      parentRoute: typeof appTeacherRouteRoute
     }
-    '/teacher/calendar': {
-      id: '/teacher/calendar'
+    '/(app)/teacher/calendar': {
+      id: '/(app)/teacher/calendar'
       path: '/calendar'
       fullPath: '/teacher/calendar'
-      preLoaderRoute: typeof TeacherCalendarRouteImport
-      parentRoute: typeof TeacherRouteRoute
+      preLoaderRoute: typeof appTeacherCalendarRouteImport
+      parentRoute: typeof appTeacherRouteRoute
     }
-    '/student/resources': {
-      id: '/student/resources'
+    '/(app)/student/resources': {
+      id: '/(app)/student/resources'
       path: '/resources'
       fullPath: '/student/resources'
-      preLoaderRoute: typeof StudentResourcesRouteImport
-      parentRoute: typeof StudentRouteRoute
+      preLoaderRoute: typeof appStudentResourcesRouteImport
+      parentRoute: typeof appStudentRouteRoute
     }
-    '/student/grades': {
-      id: '/student/grades'
+    '/(app)/student/grades': {
+      id: '/(app)/student/grades'
       path: '/grades'
       fullPath: '/student/grades'
-      preLoaderRoute: typeof StudentGradesRouteImport
-      parentRoute: typeof StudentRouteRoute
+      preLoaderRoute: typeof appStudentGradesRouteImport
+      parentRoute: typeof appStudentRouteRoute
     }
-    '/student/enrollments': {
-      id: '/student/enrollments'
+    '/(app)/student/enrollments': {
+      id: '/(app)/student/enrollments'
       path: '/enrollments'
       fullPath: '/student/enrollments'
-      preLoaderRoute: typeof StudentEnrollmentsRouteImport
-      parentRoute: typeof StudentRouteRoute
+      preLoaderRoute: typeof appStudentEnrollmentsRouteImport
+      parentRoute: typeof appStudentRouteRoute
     }
-    '/student/assignments': {
-      id: '/student/assignments'
+    '/(app)/student/assignments': {
+      id: '/(app)/student/assignments'
       path: '/assignments'
       fullPath: '/student/assignments'
-      preLoaderRoute: typeof StudentAssignmentsRouteImport
-      parentRoute: typeof StudentRouteRoute
+      preLoaderRoute: typeof appStudentAssignmentsRouteImport
+      parentRoute: typeof appStudentRouteRoute
     }
-    '/teacher/feedback/$courseId': {
-      id: '/teacher/feedback/$courseId'
+    '/(app)/teacher/courses/': {
+      id: '/(app)/teacher/courses/'
+      path: '/'
+      fullPath: '/teacher/courses/'
+      preLoaderRoute: typeof appTeacherCoursesIndexRouteImport
+      parentRoute: typeof appTeacherCoursesRoute
+    }
+    '/(app)/teacher/feedback/$courseId': {
+      id: '/(app)/teacher/feedback/$courseId'
       path: '/feedback/$courseId'
       fullPath: '/teacher/feedback/$courseId'
-      preLoaderRoute: typeof TeacherFeedbackCourseIdRouteImport
-      parentRoute: typeof TeacherRouteRoute
+      preLoaderRoute: typeof appTeacherFeedbackCourseIdRouteImport
+      parentRoute: typeof appTeacherRouteRoute
     }
-    '/teacher/courses/$courseId': {
-      id: '/teacher/courses/$courseId'
+    '/(app)/teacher/courses/$courseId': {
+      id: '/(app)/teacher/courses/$courseId'
       path: '/$courseId'
       fullPath: '/teacher/courses/$courseId'
-      preLoaderRoute: typeof TeacherCoursesCourseIdRouteImport
-      parentRoute: typeof TeacherCoursesRoute
+      preLoaderRoute: typeof appTeacherCoursesCourseIdRouteImport
+      parentRoute: typeof appTeacherCoursesRoute
     }
-    '/student/feedback/$courseId': {
-      id: '/student/feedback/$courseId'
+    '/(app)/student/feedback/$courseId': {
+      id: '/(app)/student/feedback/$courseId'
       path: '/feedback/$courseId'
       fullPath: '/student/feedback/$courseId'
-      preLoaderRoute: typeof StudentFeedbackCourseIdRouteImport
-      parentRoute: typeof StudentRouteRoute
+      preLoaderRoute: typeof appStudentFeedbackCourseIdRouteImport
+      parentRoute: typeof appStudentRouteRoute
     }
-    '/student/courses/$courseId': {
-      id: '/student/courses/$courseId'
+    '/(app)/student/courses/$courseId': {
+      id: '/(app)/student/courses/$courseId'
       path: '/courses/$courseId'
       fullPath: '/student/courses/$courseId'
-      preLoaderRoute: typeof StudentCoursesCourseIdRouteImport
-      parentRoute: typeof StudentRouteRoute
+      preLoaderRoute: typeof appStudentCoursesCourseIdRouteImport
+      parentRoute: typeof appStudentRouteRoute
     }
   }
 }
 
-interface StudentRouteRouteChildren {
-  StudentAssignmentsRoute: typeof StudentAssignmentsRoute
-  StudentEnrollmentsRoute: typeof StudentEnrollmentsRoute
-  StudentGradesRoute: typeof StudentGradesRoute
-  StudentResourcesRoute: typeof StudentResourcesRoute
-  StudentIndexRoute: typeof StudentIndexRoute
-  StudentCoursesCourseIdRoute: typeof StudentCoursesCourseIdRoute
-  StudentFeedbackCourseIdRoute: typeof StudentFeedbackCourseIdRoute
+interface appStudentRouteRouteChildren {
+  appStudentAssignmentsRoute: typeof appStudentAssignmentsRoute
+  appStudentEnrollmentsRoute: typeof appStudentEnrollmentsRoute
+  appStudentGradesRoute: typeof appStudentGradesRoute
+  appStudentResourcesRoute: typeof appStudentResourcesRoute
+  appStudentIndexRoute: typeof appStudentIndexRoute
+  appStudentCoursesCourseIdRoute: typeof appStudentCoursesCourseIdRoute
+  appStudentFeedbackCourseIdRoute: typeof appStudentFeedbackCourseIdRoute
 }
 
-const StudentRouteRouteChildren: StudentRouteRouteChildren = {
-  StudentAssignmentsRoute: StudentAssignmentsRoute,
-  StudentEnrollmentsRoute: StudentEnrollmentsRoute,
-  StudentGradesRoute: StudentGradesRoute,
-  StudentResourcesRoute: StudentResourcesRoute,
-  StudentIndexRoute: StudentIndexRoute,
-  StudentCoursesCourseIdRoute: StudentCoursesCourseIdRoute,
-  StudentFeedbackCourseIdRoute: StudentFeedbackCourseIdRoute,
+const appStudentRouteRouteChildren: appStudentRouteRouteChildren = {
+  appStudentAssignmentsRoute: appStudentAssignmentsRoute,
+  appStudentEnrollmentsRoute: appStudentEnrollmentsRoute,
+  appStudentGradesRoute: appStudentGradesRoute,
+  appStudentResourcesRoute: appStudentResourcesRoute,
+  appStudentIndexRoute: appStudentIndexRoute,
+  appStudentCoursesCourseIdRoute: appStudentCoursesCourseIdRoute,
+  appStudentFeedbackCourseIdRoute: appStudentFeedbackCourseIdRoute,
 }
 
-const StudentRouteRouteWithChildren = StudentRouteRoute._addFileChildren(
-  StudentRouteRouteChildren,
+const appStudentRouteRouteWithChildren = appStudentRouteRoute._addFileChildren(
+  appStudentRouteRouteChildren,
 )
 
-interface TeacherCoursesRouteChildren {
-  TeacherCoursesCourseIdRoute: typeof TeacherCoursesCourseIdRoute
+interface appTeacherCoursesRouteChildren {
+  appTeacherCoursesCourseIdRoute: typeof appTeacherCoursesCourseIdRoute
+  appTeacherCoursesIndexRoute: typeof appTeacherCoursesIndexRoute
 }
 
-const TeacherCoursesRouteChildren: TeacherCoursesRouteChildren = {
-  TeacherCoursesCourseIdRoute: TeacherCoursesCourseIdRoute,
+const appTeacherCoursesRouteChildren: appTeacherCoursesRouteChildren = {
+  appTeacherCoursesCourseIdRoute: appTeacherCoursesCourseIdRoute,
+  appTeacherCoursesIndexRoute: appTeacherCoursesIndexRoute,
 }
 
-const TeacherCoursesRouteWithChildren = TeacherCoursesRoute._addFileChildren(
-  TeacherCoursesRouteChildren,
+const appTeacherCoursesRouteWithChildren =
+  appTeacherCoursesRoute._addFileChildren(appTeacherCoursesRouteChildren)
+
+interface appTeacherRouteRouteChildren {
+  appTeacherCalendarRoute: typeof appTeacherCalendarRoute
+  appTeacherCoursesRoute: typeof appTeacherCoursesRouteWithChildren
+  appTeacherEnrollmentsRoute: typeof appTeacherEnrollmentsRoute
+  appTeacherReportsRoute: typeof appTeacherReportsRoute
+  appTeacherStudentsRoute: typeof appTeacherStudentsRoute
+  appTeacherIndexRoute: typeof appTeacherIndexRoute
+  appTeacherFeedbackCourseIdRoute: typeof appTeacherFeedbackCourseIdRoute
+}
+
+const appTeacherRouteRouteChildren: appTeacherRouteRouteChildren = {
+  appTeacherCalendarRoute: appTeacherCalendarRoute,
+  appTeacherCoursesRoute: appTeacherCoursesRouteWithChildren,
+  appTeacherEnrollmentsRoute: appTeacherEnrollmentsRoute,
+  appTeacherReportsRoute: appTeacherReportsRoute,
+  appTeacherStudentsRoute: appTeacherStudentsRoute,
+  appTeacherIndexRoute: appTeacherIndexRoute,
+  appTeacherFeedbackCourseIdRoute: appTeacherFeedbackCourseIdRoute,
+}
+
+const appTeacherRouteRouteWithChildren = appTeacherRouteRoute._addFileChildren(
+  appTeacherRouteRouteChildren,
 )
 
-interface TeacherRouteRouteChildren {
-  TeacherCalendarRoute: typeof TeacherCalendarRoute
-  TeacherCoursesRoute: typeof TeacherCoursesRouteWithChildren
-  TeacherEnrollmentsRoute: typeof TeacherEnrollmentsRoute
-  TeacherReportsRoute: typeof TeacherReportsRoute
-  TeacherStudentsRoute: typeof TeacherStudentsRoute
-  TeacherIndexRoute: typeof TeacherIndexRoute
-  TeacherFeedbackCourseIdRoute: typeof TeacherFeedbackCourseIdRoute
+interface appRouteRouteChildren {
+  appStudentRouteRoute: typeof appStudentRouteRouteWithChildren
+  appTeacherRouteRoute: typeof appTeacherRouteRouteWithChildren
 }
 
-const TeacherRouteRouteChildren: TeacherRouteRouteChildren = {
-  TeacherCalendarRoute: TeacherCalendarRoute,
-  TeacherCoursesRoute: TeacherCoursesRouteWithChildren,
-  TeacherEnrollmentsRoute: TeacherEnrollmentsRoute,
-  TeacherReportsRoute: TeacherReportsRoute,
-  TeacherStudentsRoute: TeacherStudentsRoute,
-  TeacherIndexRoute: TeacherIndexRoute,
-  TeacherFeedbackCourseIdRoute: TeacherFeedbackCourseIdRoute,
+const appRouteRouteChildren: appRouteRouteChildren = {
+  appStudentRouteRoute: appStudentRouteRouteWithChildren,
+  appTeacherRouteRoute: appTeacherRouteRouteWithChildren,
 }
 
-const TeacherRouteRouteWithChildren = TeacherRouteRoute._addFileChildren(
-  TeacherRouteRouteChildren,
+const appRouteRouteWithChildren = appRouteRoute._addFileChildren(
+  appRouteRouteChildren,
 )
+
+interface CoursesRouteChildren {
+  CoursesCourseIdRoute: typeof CoursesCourseIdRoute
+}
+
+const CoursesRouteChildren: CoursesRouteChildren = {
+  CoursesCourseIdRoute: CoursesCourseIdRoute,
+}
+
+const CoursesRouteWithChildren =
+  CoursesRoute._addFileChildren(CoursesRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  StudentRouteRoute: StudentRouteRouteWithChildren,
-  TeacherRouteRoute: TeacherRouteRouteWithChildren,
+  appRouteRoute: appRouteRouteWithChildren,
+  CoursesRoute: CoursesRouteWithChildren,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
 }
