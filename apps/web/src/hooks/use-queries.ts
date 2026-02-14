@@ -179,6 +179,7 @@ export function useUpdateSchedule() {
       scheduleApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["schedules"] });
+      queryClient.invalidateQueries({ queryKey: ["course"] });
     },
   });
 }
@@ -189,6 +190,7 @@ export function useDeleteSchedule() {
     mutationFn: (id: string) => scheduleApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["schedules"] });
+      queryClient.invalidateQueries({ queryKey: ["course"] });
     },
   });
 }
