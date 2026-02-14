@@ -40,7 +40,7 @@ import { useForm } from "@tanstack/react-form";
 import { scheduleFormValidator } from "@/lib/schemas";
 import { FormTextField, FormDateTimeField } from "@/components/form-field";
 
-export const Route = createFileRoute("/teacher/courses/$courseId")({
+export const Route = createFileRoute("/(app)/teacher/courses/$courseId")({
   component: TeacherCourseDetail,
 });
 

@@ -20,7 +20,7 @@ import {
 import { useState, useMemo } from "react";
 import { useStudentAssignments, useUpdateAssignmentStatus } from "@/hooks/use-queries";
 
-export const Route = createFileRoute("/student/assignments")({
+export const Route = createFileRoute("/(app)/student/assignments")({
   component: StudentAssignments,
 });
 

@@ -13,7 +13,7 @@ import {
 } from "@course-manager/ui";
 import { Plus, Clock, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 
-export const Route = createFileRoute("/teacher/calendar")({
+export const Route = createFileRoute("/(app)/teacher/calendar")({
   component: TeacherCalendar,
 });
 

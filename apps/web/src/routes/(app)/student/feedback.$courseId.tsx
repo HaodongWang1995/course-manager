@@ -13,7 +13,7 @@ import {
   BookOpen,
 } from "lucide-react";
 
-export const Route = createFileRoute("/student/feedback/$courseId")({
+export const Route = createFileRoute("/(app)/student/feedback/$courseId")({
   component: StudentFeedbackDetail,
 });
 

@@ -35,7 +35,7 @@ import {
   Legend,
 } from "recharts";
 
-export const Route = createFileRoute("/teacher/reports")({
+export const Route = createFileRoute("/(app)/teacher/reports")({
   component: TeacherReports,
 });
 

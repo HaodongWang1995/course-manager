@@ -24,7 +24,7 @@ import {
 import { useState, useMemo } from "react";
 import { useTeacherStudents } from "@/hooks/use-queries";
 
-export const Route = createFileRoute("/teacher/students")({
+export const Route = createFileRoute("/(app)/teacher/students")({
   component: TeacherStudentsDirectory,
 });
 

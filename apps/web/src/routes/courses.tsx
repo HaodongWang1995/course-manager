@@ -6,13 +6,13 @@ import { useStudentCourses } from "@/hooks/use-queries";
 import type { Course } from "@/api/client";
 import { EmptyState } from "@/components/empty-state";
 
-export const Route = createFileRoute("/student/")({
-  component: StudentCourseBrowse,
+export const Route = createFileRoute("/courses")({
+  component: PublicCourseBrowse,
 });
 
 const categories = ["全部", "数学", "物理", "化学", "英语", "计算机", "其他"];
 
-function StudentCourseBrowse() {
+function PublicCourseBrowse() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("全部");
@@ -32,8 +32,7 @@ function StudentCourseBrowse() {
   }, [courses, searchQuery, selectedCategory]);
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      {/* Header */}
+    <div className="mx-auto max-w-5xl space-y-6 p-6 md:p-10">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">课程浏览</h1>
         <p className="mt-1 text-sm text-gray-500">
@@ -41,7 +40,6 @@ function StudentCourseBrowse() {
         </p>
       </div>
 
-      {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
         <Input
@@ -52,7 +50,6 @@ function StudentCourseBrowse() {
         />
       </div>
 
-      {/* Category Filter */}
       <div className="flex flex-wrap gap-2">
         {categories.map((cat) => (
           <Button
@@ -66,7 +63,6 @@ function StudentCourseBrowse() {
         ))}
       </div>
 
-      {/* Course List */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <div className="text-gray-500">加载中...</div>
@@ -78,12 +74,12 @@ function StudentCourseBrowse() {
           description="尝试调整搜索或筛选条件"
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredCourses.map((course) => (
-            <StudentCourseCard
+            <PublicCourseCard
               key={course.id}
               course={course}
-              onClick={() => navigate({ to: `/student/courses/${course.id}` })}
+              onClick={() => navigate({ to: `/courses/${course.id}` })}
             />
           ))}
         </div>
@@ -92,7 +88,7 @@ function StudentCourseBrowse() {
   );
 }
 
-function StudentCourseCard({
+function PublicCourseCard({
   course,
   onClick,
 }: {
@@ -100,10 +96,7 @@ function StudentCourseCard({
   onClick: () => void;
 }) {
   return (
-    <Card
-      className="cursor-pointer transition-shadow hover:shadow-md"
-      onClick={onClick}
-    >
+    <Card className="cursor-pointer transition-shadow hover:shadow-md" onClick={onClick}>
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div className="flex-1">

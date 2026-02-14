@@ -10,7 +10,7 @@ import { EmptyState } from "@/components/empty-state";
 import { useState } from "react";
 import { useMyEnrollments, useCancelEnrollment } from "@/hooks/use-queries";
 
-export const Route = createFileRoute("/student/enrollments")({
+export const Route = createFileRoute("/(app)/student/enrollments")({
   component: StudentEnrollments,
 });
 

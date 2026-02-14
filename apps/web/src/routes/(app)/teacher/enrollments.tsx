@@ -16,7 +16,7 @@ import {
   useReviewEnrollment,
 } from "@/hooks/use-queries";
 
-export const Route = createFileRoute("/teacher/enrollments")({
+export const Route = createFileRoute("/(app)/teacher/enrollments")({
   component: TeacherEnrollments,
 });
 

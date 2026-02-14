@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { useTeacherSchedule, useUpcomingDeadlines } from "@/hooks/use-queries";
 
-export const Route = createFileRoute("/teacher/")({
+export const Route = createFileRoute("/(app)/teacher/")({
   component: TeacherDashboard,
 });
 

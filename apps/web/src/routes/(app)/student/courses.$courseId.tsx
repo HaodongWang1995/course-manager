@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useCourseDetail } from "@/hooks/use-queries";
 
-export const Route = createFileRoute("/student/courses/$courseId")({
+export const Route = createFileRoute("/(app)/student/courses/$courseId")({
   component: StudentCourseDetail,
 });
 

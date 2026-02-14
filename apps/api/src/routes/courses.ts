@@ -1,22 +1,20 @@
 import { Router, Request, Response } from "express";
 import pool from "../db.js";
-import { authRequired, teacherOnly } from "../middleware/auth.js";
+import { attachUser, authRequired, teacherOnly } from "../middleware/auth.js";
 
 const router: Router = Router();
 
-// All routes require authentication
-router.use(authRequired);
-
 // GET /api/courses - List courses
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", attachUser, async (req: Request, res: Response) => {
   try {
-    const { role, userId } = req.user!;
+    const role = req.user?.role;
+    const userId = req.user?.userId;
     const { search, category, status } = req.query;
 
     let query: string;
     let params: unknown[];
 
-    if (role === "teacher") {
+    if (role === "teacher" && userId) {
       // Teachers see their own courses
       query = `
         SELECT c.*, u.name as teacher_name,
@@ -27,7 +25,7 @@ router.get("/", async (req: Request, res: Response) => {
       `;
       params = [userId];
     } else {
-      // Students see all active courses
+      // Students or public users see all active courses
       query = `
         SELECT c.*, u.name as teacher_name,
           (SELECT COUNT(*) FROM course_schedules cs WHERE cs.course_id = c.id) as lesson_count
@@ -67,7 +65,7 @@ router.get("/", async (req: Request, res: Response) => {
 });
 
 // GET /api/courses/:id - Course detail
-router.get("/:id", async (req: Request, res: Response) => {
+router.get("/:id", attachUser, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -86,12 +84,12 @@ router.get("/:id", async (req: Request, res: Response) => {
 
     const course = courseResult.rows[0];
 
-    // Check access: teachers can only see their own, students can see active
-    if (req.user!.role === "teacher" && course.teacher_id !== req.user!.userId) {
+    // Check access: teachers can only see their own, students/public can see active
+    if (req.user?.role === "teacher" && course.teacher_id !== req.user!.userId) {
       res.status(403).json({ error: "无权访问此课程" });
       return;
     }
-    if (req.user!.role === "student" && course.status !== "active") {
+    if (req.user?.role !== "teacher" && course.status !== "active") {
       res.status(403).json({ error: "此课程不可用" });
       return;
     }
@@ -110,7 +108,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 });
 
 // POST /api/courses - Create course (teacher only)
-router.post("/", teacherOnly, async (req: Request, res: Response) => {
+router.post("/", authRequired, teacherOnly, async (req: Request, res: Response) => {
   try {
     const { title, description, price, cover_image, category, status } = req.body;
 
@@ -142,7 +140,7 @@ router.post("/", teacherOnly, async (req: Request, res: Response) => {
 });
 
 // PUT /api/courses/:id - Update course (teacher only)
-router.put("/:id", teacherOnly, async (req: Request, res: Response) => {
+router.put("/:id", authRequired, teacherOnly, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { title, description, price, cover_image, category } = req.body;
@@ -182,7 +180,7 @@ router.put("/:id", teacherOnly, async (req: Request, res: Response) => {
 });
 
 // DELETE /api/courses/:id - Delete course (teacher only)
-router.delete("/:id", teacherOnly, async (req: Request, res: Response) => {
+router.delete("/:id", authRequired, teacherOnly, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -208,7 +206,7 @@ router.delete("/:id", teacherOnly, async (req: Request, res: Response) => {
 });
 
 // PATCH /api/courses/:id/status - Toggle course status (teacher only)
-router.patch("/:id/status", teacherOnly, async (req: Request, res: Response) => {
+router.patch("/:id/status", authRequired, teacherOnly, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { status } = req.body;

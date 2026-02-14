@@ -10,7 +10,7 @@ import {
   X,
 } from "lucide-react";
 
-export const Route = createFileRoute("/student/resources")({
+export const Route = createFileRoute("/(app)/student/resources")({
   component: StudentResources,
 });
 
@@ -114,8 +114,8 @@ function StudentResources() {
 
       <div className="fixed inset-0 z-20 bg-slate-900/60 backdrop-blur-[1px]" />
 
-      <div className="pointer-events-none fixed inset-0 z-30 flex items-center justify-center px-4">
-        <section className="pointer-events-auto w-full max-w-96 overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200">
+      <div className="pointer-events-none fixed inset-0 z-30 grid place-items-center px-4 py-6">
+        <section className="pointer-events-auto w-full max-w-[384px] overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200">
           <header className="flex items-start justify-between border-b border-slate-100 px-5 pb-[21px] pt-5">
             <div>
               <h2 className="text-lg font-bold leading-[22.5px] text-slate-900">Resource Upload</h2>

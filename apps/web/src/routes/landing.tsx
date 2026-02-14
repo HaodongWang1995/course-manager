@@ -121,8 +121,8 @@ function LandingPage() {
                 Log in
               </Button>
             </Link>
-            <Link to="/login">
-              <Button size="sm">Get Started</Button>
+            <Link to="/courses">
+              <Button size="sm">Browse Courses</Button>
             </Link>
           </div>
         </div>
@@ -151,9 +151,11 @@ function LandingPage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Button variant="outline" size="lg">
-                View Demo
-              </Button>
+              <Link to="/courses">
+                <Button variant="outline" size="lg">
+                  Browse Courses
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

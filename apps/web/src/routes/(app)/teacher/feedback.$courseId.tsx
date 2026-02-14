@@ -28,7 +28,7 @@ import {
 import { useState, useEffect } from "react";
 import { useFeedbackDraft, useSaveFeedbackDraft, usePublishFeedback } from "@/hooks/use-queries";
 
-export const Route = createFileRoute("/teacher/feedback/$courseId")({
+export const Route = createFileRoute("/(app)/teacher/feedback/$courseId")({
   component: TeacherFeedbackEditor,
 });
 

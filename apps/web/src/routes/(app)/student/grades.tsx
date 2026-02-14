@@ -11,7 +11,7 @@ import {
   Trophy,
 } from "lucide-react";
 
-export const Route = createFileRoute("/student/grades")({
+export const Route = createFileRoute("/(app)/student/grades")({
   component: StudentGrades,
 });
 

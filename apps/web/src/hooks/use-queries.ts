@@ -93,7 +93,7 @@ export function useStudentCourses(params?: { search?: string; category?: string 
   return useQuery({
     queryKey: ["student", "courses", params],
     queryFn: () => courseApi.list(params),
-    enabled: !!getToken(),
+    enabled: true,
   });
 }
 
@@ -101,7 +101,7 @@ export function useCourseDetail(id: string) {
   return useQuery({
     queryKey: ["course", id],
     queryFn: () => courseApi.get(id),
-    enabled: !!id && !!getToken(),
+    enabled: !!id,
   });
 }
 
