@@ -4,6 +4,11 @@ import {
   courseApi,
   scheduleApi,
   enrollmentApi,
+  teacherApi,
+  assignmentApi,
+  gradeApi,
+  resourceApi,
+  feedbackApi,
   setToken,
   clearToken,
   getToken,
@@ -11,22 +16,9 @@ import {
   type Course,
   type Schedule,
   type Enrollment,
+  type Deadline,
+  type Feedback,
 } from "@/api/client";
-import {
-  teacherScheduleStore,
-  teacherStudentsStore,
-  reportsStore,
-  calendarStore,
-  studentScheduleStore,
-  studentGradesStore,
-  studentAssignmentsStore,
-  studentResourcesStore,
-  feedbackStore,
-  type TeacherStudent,
-  type GeneratedReport,
-  type UpcomingDeadline,
-  type FeedbackDraft,
-} from "@/api/storage";
 
 // ── Auth (Real API) ──────────────────────────────────
 
@@ -246,145 +238,71 @@ export function useCancelEnrollment() {
   });
 }
 
-// ── Below: Legacy localStorage hooks (unchanged for Phase 1) ──
+// ── Student Schedule from DB (approved enrollments → course schedules) ──
 
-// Simulate API delay
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+export function useStudentScheduleFromDB() {
+  const { data: enrollments = [] } = useMyEnrollments({ status: "approved" });
+  const courseIds = enrollments.map((e) => e.course_id);
 
-// ── Teacher Schedule ───────────────────────────────
+  return useQuery({
+    queryKey: ["student", "scheduleFromDB", courseIds],
+    queryFn: async () => {
+      if (courseIds.length === 0) return [];
+      const results = await Promise.all(
+        courseIds.map(async (id) => {
+          const course = await courseApi.get(id);
+          return (course.schedules || []).map((s: Schedule) => ({
+            ...s,
+            course_title: course.title,
+            course_id: course.id,
+          }));
+        }),
+      );
+      return results.flat();
+    },
+    enabled: courseIds.length > 0,
+  });
+}
+
+// ── Teacher Aggregated (Real API) ─────────────────────
 
 export function useTeacherSchedule() {
   return useQuery({
     queryKey: ["teacher", "schedule"],
-    queryFn: async () => {
-      await delay(100);
-      return teacherScheduleStore.getAll();
-    },
+    queryFn: () => teacherApi.schedule(),
+    enabled: !!getToken(),
   });
 }
-
-// ── Teacher Students ───────────────────────────────
 
 export function useTeacherStudents() {
   return useQuery({
     queryKey: ["teacher", "students"],
-    queryFn: async () => {
-      await delay(100);
-      return teacherStudentsStore.getAll();
-    },
+    queryFn: () => teacherApi.students(),
+    enabled: !!getToken(),
   });
 }
 
-export function useAddStudent() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (student: TeacherStudent) => {
-      await delay(200);
-      return teacherStudentsStore.add(student);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "students"] });
-    },
-  });
-}
-
-export function useDeleteStudent() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (id: string) => {
-      await delay(200);
-      return teacherStudentsStore.remove(id);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "students"] });
-    },
-  });
-}
-
-// ── Reports ────────────────────────────────────────
-
-export function useReportKPIs() {
+export function useTeacherStats() {
   return useQuery({
-    queryKey: ["teacher", "reportKPIs"],
-    queryFn: async () => {
-      await delay(100);
-      return reportsStore.getKPIs();
-    },
-  });
-}
-
-export function usePerformanceData() {
-  return useQuery({
-    queryKey: ["teacher", "performance"],
-    queryFn: async () => {
-      await delay(100);
-      return reportsStore.getPerformance();
-    },
-  });
-}
-
-export function useAttendanceTrends() {
-  return useQuery({
-    queryKey: ["teacher", "attendance"],
-    queryFn: async () => {
-      await delay(100);
-      return reportsStore.getAttendance();
-    },
-  });
-}
-
-export function useGeneratedReports() {
-  return useQuery({
-    queryKey: ["teacher", "reports"],
-    queryFn: async () => {
-      await delay(100);
-      return reportsStore.getGenerated();
-    },
-  });
-}
-
-export function useAddReport() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (report: GeneratedReport) => {
-      await delay(300);
-      return reportsStore.addGenerated(report);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "reports"] });
-    },
-  });
-}
-
-// ── Calendar ───────────────────────────────────────
-
-export function useCalendarEvents() {
-  return useQuery({
-    queryKey: ["teacher", "calendarEvents"],
-    queryFn: async () => {
-      await delay(100);
-      return calendarStore.getEvents();
-    },
+    queryKey: ["teacher", "stats"],
+    queryFn: () => teacherApi.stats(),
+    enabled: !!getToken(),
   });
 }
 
 export function useUpcomingDeadlines() {
   return useQuery({
     queryKey: ["teacher", "deadlines"],
-    queryFn: async () => {
-      await delay(100);
-      return calendarStore.getDeadlines();
-    },
+    queryFn: () => teacherApi.deadlines(),
+    enabled: !!getToken(),
   });
 }
 
 export function useAddDeadline() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (deadline: UpcomingDeadline) => {
-      await delay(200);
-      return calendarStore.addDeadline(deadline);
-    },
+    mutationFn: (data: { title: string; due_date: string; urgent?: boolean }) =>
+      teacherApi.addDeadline(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teacher", "deadlines"] });
     },
@@ -394,108 +312,87 @@ export function useAddDeadline() {
 export function useRemoveDeadline() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (title: string) => {
-      await delay(200);
-      return calendarStore.removeDeadline(title);
-    },
+    mutationFn: (id: string) => teacherApi.deleteDeadline(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teacher", "deadlines"] });
     },
   });
 }
 
-// ── Student Schedule ───────────────────────────────
-
-export function useStudentSchedule() {
-  return useQuery({
-    queryKey: ["student", "schedule"],
-    queryFn: async () => {
-      await delay(100);
-      return studentScheduleStore.getAll();
-    },
-  });
-}
-
-// ── Student Grades ─────────────────────────────────
+// ── Student Grades (Real API) ─────────────────────────
 
 export function useStudentGrades() {
   return useQuery({
     queryKey: ["student", "grades"],
-    queryFn: async () => {
-      await delay(100);
-      return studentGradesStore.get();
-    },
+    queryFn: () => gradeApi.studentSummary(),
+    enabled: !!getToken(),
   });
 }
 
-// ── Student Assignments ────────────────────────────
+// ── Student Assignments (Real API) ────────────────────
 
 export function useStudentAssignments() {
   return useQuery({
     queryKey: ["student", "assignments"],
-    queryFn: async () => {
-      await delay(100);
-      return studentAssignmentsStore.getAll();
-    },
+    queryFn: () => assignmentApi.listForStudent(),
+    enabled: !!getToken(),
   });
 }
 
 export function useUpdateAssignmentStatus() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      await delay(200);
-      return studentAssignmentsStore.updateStatus(id, status);
-    },
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      assignmentApi.submit(id, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["student", "assignments"] });
     },
   });
 }
 
-// ── Student Resources ──────────────────────────────
+// ── Student Resources (Real API) ──────────────────────
 
 export function useStudentResources() {
   return useQuery({
     queryKey: ["student", "resources"],
-    queryFn: async () => {
-      await delay(100);
-      return studentResourcesStore.get();
-    },
+    queryFn: () => resourceApi.listForStudent(),
+    enabled: !!getToken(),
   });
 }
 
-// ── Course Feedback ────────────────────────────────
+// ── Course Feedback (Real API) ────────────────────────
 
-export function useCourseFeedbackDetail(_courseId: string) {
+export function useCourseFeedbackDetail(courseId: string) {
   return useQuery({
-    queryKey: ["student", "feedback", _courseId],
-    queryFn: async () => {
-      await delay(100);
-      return feedbackStore.getDetail();
-    },
+    queryKey: ["feedback", courseId],
+    queryFn: () => feedbackApi.getByCourse(courseId),
+    enabled: !!courseId && !!getToken(),
   });
 }
 
 export function useFeedbackDraft(courseId: string) {
   return useQuery({
     queryKey: ["teacher", "feedbackDraft", courseId],
-    queryFn: async () => {
-      await delay(100);
-      return feedbackStore.getDraft(courseId);
-    },
+    queryFn: () => feedbackApi.getByCourse(courseId),
+    enabled: !!courseId && !!getToken(),
   });
 }
 
 export function useSaveFeedbackDraft() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (draft: FeedbackDraft) => {
-      await delay(200);
-      return feedbackStore.saveDraft(draft);
-    },
+    mutationFn: (data: {
+      course_id: string;
+      summary?: string;
+      quote?: string;
+      requirements?: string[];
+      assignment_title?: string;
+      due_date?: string;
+      actions?: Array<{ title: string; due_label?: string; pending?: boolean }>;
+    }) => feedbackApi.save(data),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "feedbackDraft", variables.courseId] });
+      queryClient.invalidateQueries({ queryKey: ["teacher", "feedbackDraft", variables.course_id] });
+      queryClient.invalidateQueries({ queryKey: ["feedback", variables.course_id] });
     },
   });
 }
@@ -503,12 +400,10 @@ export function useSaveFeedbackDraft() {
 export function usePublishFeedback() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (courseId: string) => {
-      await delay(300);
-      return feedbackStore.publish(courseId);
-    },
-    onSuccess: (_data, courseId) => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "feedbackDraft", courseId] });
+    mutationFn: (id: string) => feedbackApi.publish(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teacher", "feedbackDraft"] });
+      queryClient.invalidateQueries({ queryKey: ["feedback"] });
     },
   });
 }

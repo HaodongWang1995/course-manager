@@ -16,20 +16,16 @@ function StudentCourseBrowse() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("全部");
-  const { data: courses = [], isLoading } = useStudentCourses();
+  const apiParams = useMemo(() => {
+    const p: { search?: string; category?: string } = {};
+    if (searchQuery) p.search = searchQuery;
+    if (selectedCategory !== "全部") p.category = selectedCategory;
+    return p;
+  }, [searchQuery, selectedCategory]);
 
-  const filteredCourses = useMemo(() => {
-    return courses.filter((course) => {
-      const matchesSearch =
-        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (course.description || "").toLowerCase().includes(searchQuery.toLowerCase());
+  const { data: courses = [], isLoading } = useStudentCourses(apiParams);
 
-      const matchesCategory =
-        selectedCategory === "全部" || course.category === selectedCategory;
-
-      return matchesSearch && matchesCategory;
-    });
-  }, [courses, searchQuery, selectedCategory]);
+  const filteredCourses = courses;
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">

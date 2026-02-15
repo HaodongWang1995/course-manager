@@ -4,6 +4,11 @@ import authRoutes from "./routes/auth.js";
 import courseRoutes from "./routes/courses.js";
 import scheduleRoutes from "./routes/schedules.js";
 import enrollmentRoutes from "./routes/enrollments.js";
+import teacherRoutes from "./routes/teachers.js";
+import assignmentRoutes from "./routes/assignments.js";
+import gradeRoutes from "./routes/grades.js";
+import resourceRoutes from "./routes/resources.js";
+import feedbackRoutes from "./routes/feedback.js";
 
 const app: Express = express();
 
@@ -47,5 +52,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api", scheduleRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
+app.use("/api/teachers", teacherRoutes);
+app.use("/api", assignmentRoutes);
+app.use("/api/grades", gradeRoutes);
+app.use("/api", resourceRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 export default app;

@@ -47,57 +47,50 @@ function TeacherFeedbackEditor() {
   const publishMutation = usePublishFeedback();
   const [requirementsText, setRequirementsText] = useState("");
   const [feedbackText, setFeedbackText] = useState("");
+  const [quoteText, setQuoteText] = useState("");
   const [assignmentTitle, setAssignmentTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
-  // Load draft from localStorage when available
+  // Load draft from DB when available
   useEffect(() => {
     if (draft) {
-      setRequirementsText(draft.requirementsText);
-      setFeedbackText(draft.feedbackText);
-      setAssignmentTitle(draft.assignmentTitle);
-      setDueDate(draft.dueDate);
+      setRequirementsText((draft.requirements || []).join("\n"));
+      setFeedbackText(draft.summary || "");
+      setQuoteText(draft.quote || "");
+      setAssignmentTitle(draft.assignment_title || "");
+      setDueDate(draft.due_date || "");
     }
   }, [draft]);
 
+  const buildPayload = () => ({
+    course_id: courseId,
+    summary: feedbackText || undefined,
+    quote: quoteText || undefined,
+    requirements: requirementsText ? requirementsText.split("\n").filter(Boolean) : [],
+    assignment_title: assignmentTitle || undefined,
+    due_date: dueDate || undefined,
+  });
+
   const handleSaveDraft = () => {
-    saveDraftMutation.mutate(
-      {
-        courseId,
-        requirementsText,
-        feedbackText,
-        assignmentTitle,
-        dueDate,
-        published: false,
+    saveDraftMutation.mutate(buildPayload(), {
+      onSuccess: () => {
+        setSaveStatus("草稿已保存");
+        setTimeout(() => setSaveStatus(null), 2000);
       },
-      {
-        onSuccess: () => {
-          setSaveStatus("草稿已保存");
-          setTimeout(() => setSaveStatus(null), 2000);
-        },
-      }
-    );
+    });
   };
 
   const handlePublish = () => {
-    saveDraftMutation.mutate(
-      {
-        courseId,
-        requirementsText,
-        feedbackText,
-        assignmentTitle,
-        dueDate,
-        published: true,
+    saveDraftMutation.mutate(buildPayload(), {
+      onSuccess: (data) => {
+        if (data?.id) {
+          publishMutation.mutate(data.id);
+        }
+        setSaveStatus("已发布");
+        setTimeout(() => setSaveStatus(null), 2000);
       },
-      {
-        onSuccess: () => {
-          publishMutation.mutate(courseId);
-          setSaveStatus("已发布");
-          setTimeout(() => setSaveStatus(null), 2000);
-        },
-      }
-    );
+    });
   };
 
   return (

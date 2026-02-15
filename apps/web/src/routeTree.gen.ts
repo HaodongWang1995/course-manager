@@ -28,6 +28,7 @@ import { Route as appTeacherCoursesRouteImport } from './routes/(app)/teacher/co
 import { Route as appTeacherCalendarRouteImport } from './routes/(app)/teacher/calendar'
 import { Route as appStudentSupportRouteImport } from './routes/(app)/student/support'
 import { Route as appStudentSettingsRouteImport } from './routes/(app)/student/settings'
+import { Route as appStudentScheduleRouteImport } from './routes/(app)/student/schedule'
 import { Route as appStudentResourcesRouteImport } from './routes/(app)/student/resources'
 import { Route as appStudentMessagesRouteImport } from './routes/(app)/student/messages'
 import { Route as appStudentGradesRouteImport } from './routes/(app)/student/grades'
@@ -133,6 +134,11 @@ const appStudentSettingsRoute = appStudentSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => appStudentRouteRoute,
 } as any)
+const appStudentScheduleRoute = appStudentScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => appStudentRouteRoute,
+} as any)
 const appStudentResourcesRoute = appStudentResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/student/grades': typeof appStudentGradesRoute
   '/student/messages': typeof appStudentMessagesRoute
   '/student/resources': typeof appStudentResourcesRoute
+  '/student/schedule': typeof appStudentScheduleRoute
   '/student/settings': typeof appStudentSettingsRoute
   '/student/support': typeof appStudentSupportRoute
   '/teacher/calendar': typeof appTeacherCalendarRoute
@@ -229,6 +236,7 @@ export interface FileRoutesByTo {
   '/student/grades': typeof appStudentGradesRoute
   '/student/messages': typeof appStudentMessagesRoute
   '/student/resources': typeof appStudentResourcesRoute
+  '/student/schedule': typeof appStudentScheduleRoute
   '/student/settings': typeof appStudentSettingsRoute
   '/student/support': typeof appStudentSupportRoute
   '/teacher/calendar': typeof appTeacherCalendarRoute
@@ -260,6 +268,7 @@ export interface FileRoutesById {
   '/(app)/student/grades': typeof appStudentGradesRoute
   '/(app)/student/messages': typeof appStudentMessagesRoute
   '/(app)/student/resources': typeof appStudentResourcesRoute
+  '/(app)/student/schedule': typeof appStudentScheduleRoute
   '/(app)/student/settings': typeof appStudentSettingsRoute
   '/(app)/student/support': typeof appStudentSupportRoute
   '/(app)/teacher/calendar': typeof appTeacherCalendarRoute
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/student/grades'
     | '/student/messages'
     | '/student/resources'
+    | '/student/schedule'
     | '/student/settings'
     | '/student/support'
     | '/teacher/calendar'
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/student/grades'
     | '/student/messages'
     | '/student/resources'
+    | '/student/schedule'
     | '/student/settings'
     | '/student/support'
     | '/teacher/calendar'
@@ -350,6 +361,7 @@ export interface FileRouteTypes {
     | '/(app)/student/grades'
     | '/(app)/student/messages'
     | '/(app)/student/resources'
+    | '/(app)/student/schedule'
     | '/(app)/student/settings'
     | '/(app)/student/support'
     | '/(app)/teacher/calendar'
@@ -511,6 +523,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appStudentSettingsRouteImport
       parentRoute: typeof appStudentRouteRoute
     }
+    '/(app)/student/schedule': {
+      id: '/(app)/student/schedule'
+      path: '/schedule'
+      fullPath: '/student/schedule'
+      preLoaderRoute: typeof appStudentScheduleRouteImport
+      parentRoute: typeof appStudentRouteRoute
+    }
     '/(app)/student/resources': {
       id: '/(app)/student/resources'
       path: '/resources'
@@ -590,6 +609,7 @@ interface appStudentRouteRouteChildren {
   appStudentGradesRoute: typeof appStudentGradesRoute
   appStudentMessagesRoute: typeof appStudentMessagesRoute
   appStudentResourcesRoute: typeof appStudentResourcesRoute
+  appStudentScheduleRoute: typeof appStudentScheduleRoute
   appStudentSettingsRoute: typeof appStudentSettingsRoute
   appStudentSupportRoute: typeof appStudentSupportRoute
   appStudentIndexRoute: typeof appStudentIndexRoute
@@ -603,6 +623,7 @@ const appStudentRouteRouteChildren: appStudentRouteRouteChildren = {
   appStudentGradesRoute: appStudentGradesRoute,
   appStudentMessagesRoute: appStudentMessagesRoute,
   appStudentResourcesRoute: appStudentResourcesRoute,
+  appStudentScheduleRoute: appStudentScheduleRoute,
   appStudentSettingsRoute: appStudentSettingsRoute,
   appStudentSupportRoute: appStudentSupportRoute,
   appStudentIndexRoute: appStudentIndexRoute,

@@ -8,8 +8,6 @@ import {
   Button,
 } from "@course-manager/ui";
 import {
-  TrendingUp,
-  TrendingDown,
   Users,
   FileText,
   ClipboardCheck,
@@ -35,52 +33,11 @@ import {
   Legend,
 } from "recharts";
 
+import { useTeacherStats } from "@/hooks/use-queries";
+
 export const Route = createFileRoute("/(app)/teacher/reports")({
   component: TeacherReports,
 });
-
-const kpiCards = [
-  {
-    title: "Average Grade",
-    value: "B+ (87%)",
-    change: "+2.4%",
-    trend: "up" as const,
-    icon: FileText,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-    iconBg: "bg-blue-100",
-  },
-  {
-    title: "Active Students",
-    value: "142",
-    change: "+12",
-    trend: "up" as const,
-    icon: Users,
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-50",
-    iconBg: "bg-emerald-100",
-  },
-  {
-    title: "Submission Rate",
-    value: "94.5%",
-    change: "0%",
-    trend: "neutral" as const,
-    icon: ClipboardCheck,
-    color: "text-violet-600",
-    bgColor: "bg-violet-50",
-    iconBg: "bg-violet-100",
-  },
-  {
-    title: "Feedback Pending",
-    value: "18",
-    change: "-5%",
-    trend: "down" as const,
-    icon: MessageSquare,
-    color: "text-amber-600",
-    bgColor: "bg-amber-50",
-    iconBg: "bg-amber-100",
-  },
-];
 
 const performanceData = [
   { course: "Math 101", avgGrade: 85, students: 38 },
@@ -164,6 +121,39 @@ function getTypeBadge(type: string) {
 }
 
 function TeacherReports() {
+  const { data: stats } = useTeacherStats();
+
+  const kpiCards = [
+    {
+      title: "Total Courses",
+      value: stats?.course_count || "0",
+      icon: FileText,
+      color: "text-blue-600",
+      iconBg: "bg-blue-100",
+    },
+    {
+      title: "Active Students",
+      value: stats?.student_count || "0",
+      icon: Users,
+      color: "text-emerald-600",
+      iconBg: "bg-emerald-100",
+    },
+    {
+      title: "Total Lessons",
+      value: stats?.schedule_count || "0",
+      icon: ClipboardCheck,
+      color: "text-violet-600",
+      iconBg: "bg-violet-100",
+    },
+    {
+      title: "Pending Enrollments",
+      value: stats?.pending_enrollments || "0",
+      icon: MessageSquare,
+      color: "text-amber-600",
+      iconBg: "bg-amber-100",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50/50">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -179,7 +169,7 @@ function TeacherReports() {
               </p>
             </div>
             <Badge className="ml-2 bg-blue-50 text-blue-700 border-blue-200">
-              Fall 2023
+              Current
             </Badge>
           </div>
           <Button className="gap-2 bg-blue-600 hover:bg-blue-700">
@@ -197,26 +187,6 @@ function TeacherReports() {
                   <div>
                     <p className="text-sm font-medium text-gray-500">{kpi.title}</p>
                     <p className="mt-1 text-2xl font-bold text-gray-900">{kpi.value}</p>
-                    <div className="mt-1 flex items-center gap-1">
-                      {kpi.trend === "up" && (
-                        <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
-                      )}
-                      {kpi.trend === "down" && (
-                        <TrendingDown className="h-3.5 w-3.5 text-emerald-500" />
-                      )}
-                      <span
-                        className={`text-xs font-medium ${
-                          kpi.trend === "up"
-                            ? "text-emerald-600"
-                            : kpi.trend === "down"
-                              ? "text-emerald-600"
-                              : "text-gray-500"
-                        }`}
-                      >
-                        {kpi.change}
-                      </span>
-                      <span className="text-xs text-gray-400">vs last semester</span>
-                    </div>
                   </div>
                   <div className={`rounded-lg p-2.5 ${kpi.iconBg}`}>
                     <kpi.icon className={`h-5 w-5 ${kpi.color}`} />

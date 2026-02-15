@@ -10,101 +10,35 @@ import {
   ScrollText,
   Trophy,
 } from "lucide-react";
+import { useStudentGrades } from "@/hooks/use-queries";
 
 export const Route = createFileRoute("/(app)/student/grades")({
   component: StudentGrades,
 });
 
-type SubjectLabel = "Math" | "Sci" | "Hist" | "Eng" | "Art";
-
-type Kpi = {
-  label: string;
-  value: string;
-  icon: typeof GraduationCap;
-  iconColorClass: string;
-  iconBgClass: string;
-};
-
-type ExamScore = {
-  label: string;
-  value: string;
-};
-
-type CourseGrade = {
-  id: string;
-  name: string;
-  teacher: string;
-  overall: string;
-  icon: typeof Calculator;
-  iconColorClass: string;
-  iconBgClass: string;
-  midterm: ExamScore;
-  final: ExamScore;
-};
-
-const kpis: Kpi[] = [
-  {
-    label: "GPA",
-    value: "3.8",
-    icon: GraduationCap,
-    iconColorClass: "text-[#137fec]",
-    iconBgClass: "bg-blue-50",
-  },
-  {
-    label: "Class Rank",
-    value: "5th",
-    icon: Trophy,
-    iconColorClass: "text-purple-500",
-    iconBgClass: "bg-slate-50",
-  },
-  {
-    label: "Completion",
-    value: "92%",
-    icon: CheckCircle2,
-    iconColorClass: "text-emerald-600",
-    iconBgClass: "bg-blue-50",
-  },
+const courseIcons = [
+  { icon: Calculator, colorClass: "text-orange-600", bgClass: "bg-orange-100" },
+  { icon: FlaskConical, colorClass: "text-emerald-600", bgClass: "bg-emerald-100" },
+  { icon: ScrollText, colorClass: "text-indigo-600", bgClass: "bg-indigo-100" },
 ];
 
-const subjectLabels: SubjectLabel[] = ["Math", "Sci", "Hist", "Eng", "Art"];
-
-const courses: CourseGrade[] = [
-  {
-    id: "mathematics-101",
-    name: "Mathematics 101",
-    teacher: "Mr. Anderson",
-    overall: "95%",
-    icon: Calculator,
-    iconColorClass: "text-orange-600",
-    iconBgClass: "bg-orange-100",
-    midterm: { label: "Midterm", value: "A (92)" },
-    final: { label: "Final", value: "A+ (98)" },
-  },
-  {
-    id: "advanced-physics",
-    name: "Advanced Physics",
-    teacher: "Ms. Roberts",
-    overall: "88%",
-    icon: FlaskConical,
-    iconColorClass: "text-emerald-600",
-    iconBgClass: "bg-emerald-100",
-    midterm: { label: "Midterm", value: "B+ (89)" },
-    final: { label: "Final", value: "B (87)" },
-  },
-  {
-    id: "world-history",
-    name: "World History",
-    teacher: "Mr. Lewis",
-    overall: "92%",
-    icon: ScrollText,
-    iconColorClass: "text-indigo-600",
-    iconBgClass: "bg-indigo-100",
-    midterm: { label: "Midterm", value: "A- (91)" },
-    final: { label: "Final", value: "A (93)" },
-  },
+const kpiConfig = [
+  { key: "gpa" as const, label: "GPA", icon: GraduationCap, iconColorClass: "text-[#137fec]", iconBgClass: "bg-blue-50" },
+  { key: "rank" as const, label: "Class Rank", icon: Trophy, iconColorClass: "text-purple-500", iconBgClass: "bg-slate-50" },
+  { key: "completion" as const, label: "Completion", icon: CheckCircle2, iconColorClass: "text-emerald-600", iconBgClass: "bg-blue-50" },
 ];
 
 function StudentGrades() {
+  const { data: grades, isLoading } = useStudentGrades();
+
+  if (isLoading || !grades) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-gray-500">加载中...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="-mx-4 min-h-full bg-[#eff6ff] pb-24 md:-mx-6 lg:mx-0 lg:min-h-[calc(100vh-5.5rem)] lg:pb-6">
       <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 px-4 pb-[13px] pt-3 backdrop-blur-md md:px-6 lg:px-8">
@@ -143,8 +77,9 @@ function StudentGrades() {
 
       <main className="mx-auto flex w-full max-w-[448px] flex-col gap-6 px-4 py-4 md:px-0">
         <section className="grid grid-cols-3 gap-3">
-          {kpis.map((kpi) => {
+          {kpiConfig.map((kpi) => {
             const Icon = kpi.icon;
+            const value = grades[kpi.key];
             return (
               <article
                 key={kpi.label}
@@ -153,7 +88,7 @@ function StudentGrades() {
                 <div className={`mb-1 flex h-10 w-10 items-center justify-center rounded-full ${kpi.iconBgClass}`}>
                   <Icon className={`h-5 w-5 ${kpi.iconColorClass}`} />
                 </div>
-                <p className="text-2xl font-bold leading-8 text-slate-900">{kpi.value}</p>
+                <p className="text-2xl font-bold leading-8 text-slate-900">{value}</p>
                 <p className="text-xs font-medium text-slate-500">{kpi.label}</p>
               </article>
             );
@@ -185,10 +120,10 @@ function StudentGrades() {
                   <div key={index} className="border-b border-slate-100" />
                 ))}
               </div>
-              <div className="absolute inset-x-0 bottom-0 grid grid-cols-5 px-2 pb-1">
-                {subjectLabels.map((subject) => (
-                  <span key={subject} className="text-center text-[10px] font-medium uppercase text-slate-500">
-                    {subject}
+              <div className="absolute inset-x-0 bottom-0 grid px-2 pb-1" style={{ gridTemplateColumns: `repeat(${grades.chartData.length}, 1fr)` }}>
+                {grades.chartData.map((item) => (
+                  <span key={item.subject} className="text-center text-[10px] font-medium uppercase text-slate-500">
+                    {item.subject}
                   </span>
                 ))}
               </div>
@@ -199,27 +134,24 @@ function StudentGrades() {
         <section>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold leading-7 text-slate-900">Courses</h2>
-            <Link
-              to="/student/courses/$courseId"
-              params={{ courseId: "mathematics-101" }}
-              className="text-sm font-medium text-[#137fec] transition-colors hover:text-[#0f6ecf]"
-            >
-              View All
-            </Link>
+            <span className="text-sm font-medium text-[#137fec]">
+              {grades.courses.length} courses
+            </span>
           </div>
 
           <div className="space-y-3">
-            {courses.map((course) => {
-              const Icon = course.icon;
+            {grades.courses.map((course, idx) => {
+              const iconCfg = courseIcons[idx % courseIcons.length];
+              const Icon = iconCfg.icon;
               return (
                 <article
-                  key={course.id}
+                  key={course.name}
                   className="rounded-xl border border-slate-100 bg-white p-[17px] shadow-sm"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className={`mt-0.5 flex h-10 w-10 items-center justify-center rounded-lg ${course.iconBgClass}`}>
-                        <Icon className={`h-5 w-5 ${course.iconColorClass}`} />
+                      <div className={`mt-0.5 flex h-10 w-10 items-center justify-center rounded-lg ${iconCfg.bgClass}`}>
+                        <Icon className={`h-5 w-5 ${iconCfg.colorClass}`} />
                       </div>
                       <div>
                         <h3 className="text-base font-bold leading-5 text-slate-900">{course.name}</h3>
@@ -228,19 +160,19 @@ function StudentGrades() {
                     </div>
 
                     <div className="text-right">
-                      <p className="text-lg font-bold leading-7 text-[#137fec]">{course.overall}</p>
+                      <p className="text-lg font-bold leading-7 text-[#137fec]">{course.overall}%</p>
                       <p className="text-[10px] font-medium uppercase leading-4 text-slate-400">Overall</p>
                     </div>
                   </div>
 
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-[9px] text-center">
-                      <p className="text-xs text-slate-500">{course.midterm.label}</p>
-                      <p className="text-base font-bold leading-6 text-slate-800">{course.midterm.value}</p>
+                      <p className="text-xs text-slate-500">Midterm</p>
+                      <p className="text-base font-bold leading-6 text-slate-800">{course.midterm}</p>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-[9px] text-center">
-                      <p className="text-xs text-slate-500">{course.final.label}</p>
-                      <p className="text-base font-bold leading-6 text-slate-800">{course.final.value}</p>
+                      <p className="text-xs text-slate-500">Final</p>
+                      <p className="text-base font-bold leading-6 text-slate-800">{course.final}</p>
                     </div>
                   </div>
 

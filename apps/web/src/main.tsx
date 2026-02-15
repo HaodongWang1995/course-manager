@@ -5,10 +5,6 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
-import { seedIfNeeded } from "./api/storage";
-
-// Seed localStorage with mock data on first visit
-seedIfNeeded();
 
 const queryClient = new QueryClient({
   defaultOptions: {

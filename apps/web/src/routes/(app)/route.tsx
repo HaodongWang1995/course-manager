@@ -38,11 +38,11 @@ const teacherSidebarItems = [
 
 const studentSidebarItems = [
   { label: "Dashboard", href: "/student", icon: LayoutDashboard },
-  { label: "Schedule", href: "/student", icon: Calendar },
-  { label: "Courses", href: "/student/assignments", icon: BookOpen },
+  { label: "Schedule", href: "/student/schedule", icon: Calendar },
+  { label: "Courses", href: "/student", icon: BookOpen },
   { label: "Grades", href: "/student/grades", icon: BarChart3 },
   { label: "Enrollments", href: "/student/enrollments", icon: ClipboardList },
-  { label: "Messages", href: "/student/messages", icon: MessageSquare },
+  { label: "Resources", href: "/student/resources", icon: MessageSquare },
 ];
 
 const teacherSupportItems = [
@@ -58,7 +58,7 @@ const studentSupportItems = [
 const studentBottomNavItems = [
   { label: "Home", href: "/student", icon: Home },
   { label: "Grades", href: "/student/grades", icon: BarChart3 },
-  { label: "Schedule", href: "/student", icon: Calendar },
+  { label: "Schedule", href: "/student/schedule", icon: Calendar },
   { label: "Profile", href: "/student/profile", icon: User },
 ];
 

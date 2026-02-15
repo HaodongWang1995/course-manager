@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   Button,
   Card,
@@ -6,6 +7,14 @@ import {
   CardHeader,
   CardTitle,
   Badge,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  Input,
+  Label,
 } from "@course-manager/ui";
 import {
   ArrowLeft,
@@ -14,17 +23,33 @@ import {
   MapPin,
   Calendar,
   BookOpen,
+  CheckCircle,
+  XCircle,
+  Loader2,
 } from "lucide-react";
-import { useCourseDetail } from "@/hooks/use-queries";
+import { useCourseDetail, useMyEnrollments, useApplyEnrollment } from "@/hooks/use-queries";
 
 export const Route = createFileRoute("/(app)/student/courses/$courseId")({
   component: StudentCourseDetail,
 });
 
+const statusLabels: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+  pending: { label: "审核中", variant: "secondary" },
+  approved: { label: "已通过", variant: "default" },
+  rejected: { label: "已拒绝", variant: "destructive" },
+};
+
 function StudentCourseDetail() {
   const { courseId } = Route.useParams();
   const navigate = useNavigate();
   const { data: course, isLoading } = useCourseDetail(courseId);
+  const { data: enrollments = [] } = useMyEnrollments();
+  const applyMutation = useApplyEnrollment();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [note, setNote] = useState("");
+  const [applied, setApplied] = useState(false);
+
+  const existingEnrollment = enrollments.find((e) => e.course_id === courseId);
 
   if (isLoading) {
     return (
@@ -44,6 +69,19 @@ function StudentCourseDetail() {
       </div>
     );
   }
+
+  const handleApply = () => {
+    applyMutation.mutate(
+      { course_id: courseId, note: note || undefined },
+      {
+        onSuccess: () => {
+          setDialogOpen(false);
+          setNote("");
+          setApplied(true);
+        },
+      },
+    );
+  };
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -99,6 +137,36 @@ function StudentCourseDetail() {
               </p>
             </div>
           )}
+
+          {/* Enrollment Action */}
+          <div className="mt-6 border-t border-gray-100 pt-4">
+            {existingEnrollment ? (
+              <div className="flex items-center gap-3">
+                {existingEnrollment.status === "approved" && <CheckCircle className="h-5 w-5 text-green-500" />}
+                {existingEnrollment.status === "rejected" && <XCircle className="h-5 w-5 text-red-500" />}
+                {existingEnrollment.status === "pending" && <Clock className="h-5 w-5 text-yellow-500" />}
+                <span className="text-sm text-gray-600">选课状态：</span>
+                <Badge variant={statusLabels[existingEnrollment.status]?.variant || "outline"}>
+                  {statusLabels[existingEnrollment.status]?.label || existingEnrollment.status}
+                </Badge>
+                {existingEnrollment.reject_reason && (
+                  <span className="text-sm text-red-500">（{existingEnrollment.reject_reason}）</span>
+                )}
+              </div>
+            ) : applied ? (
+              <div className="flex items-center gap-3">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <span className="text-sm text-gray-600">申请已提交！</span>
+                <Button variant="link" size="sm" onClick={() => navigate({ to: "/student/enrollments" })}>
+                  查看我的选课
+                </Button>
+              </div>
+            ) : (
+              <Button onClick={() => setDialogOpen(true)} className="w-full sm:w-auto">
+                申请选课
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -145,6 +213,38 @@ function StudentCourseDetail() {
           </CardContent>
         </Card>
       )}
+
+      {/* Enrollment Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>申请选课</DialogTitle>
+            <DialogDescription>
+              申请加入「{course.title}」
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="note">备注（可选）</Label>
+              <Input
+                id="note"
+                placeholder="向老师说明你的选课原因..."
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              取消
+            </Button>
+            <Button onClick={handleApply} disabled={applyMutation.isPending}>
+              {applyMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              提交申请
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

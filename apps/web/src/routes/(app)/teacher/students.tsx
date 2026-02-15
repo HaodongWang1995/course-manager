@@ -66,10 +66,11 @@ function TeacherStudentsDirectory() {
   const students = useMemo(() => {
     return rawStudents.map((s, i) => ({
       ...s,
-      initials: s.initials || s.name.split(" ").map((n) => n[0]).join(""),
+      initials: s.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase(),
       avatarColor: avatarColors[i % avatarColors.length],
-      year: "Sophomore" as string,
-      status: s.attendance < 60 ? "at-risk" : "active",
+      year: "-" as string,
+      attendance: 0,
+      status: "active" as string,
     }));
   }, [rawStudents]);
 

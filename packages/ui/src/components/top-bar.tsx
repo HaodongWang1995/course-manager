@@ -20,7 +20,7 @@ export function TopBar({
   return (
     <header
       className={cn(
-        "flex h-[65px] items-center justify-between border-b border-slate-200 bg-white px-4 md:px-6",
+        "flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 md:px-6",
         className
       )}
     >

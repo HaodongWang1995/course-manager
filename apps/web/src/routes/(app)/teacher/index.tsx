@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -27,10 +27,10 @@ export const Route = createFileRoute("/(app)/teacher/")({
 });
 
 const quickActions = [
-  { icon: ClipboardList, label: "Assignment", color: "bg-blue-100 text-blue-600" },
-  { icon: Megaphone, label: "Announcement", color: "bg-orange-100 text-orange-600" },
-  { icon: MessageSquare, label: "Message", color: "bg-green-100 text-green-600" },
-  { icon: FileBarChart, label: "Report", color: "bg-purple-100 text-purple-600" },
+  { icon: ClipboardList, label: "Assignment", color: "bg-blue-100 text-blue-600", path: "/teacher/courses" },
+  { icon: Megaphone, label: "Announcement", color: "bg-orange-100 text-orange-600", path: "/teacher/courses" },
+  { icon: MessageSquare, label: "Message", color: "bg-green-100 text-green-600", path: "/teacher/students" },
+  { icon: FileBarChart, label: "Report", color: "bg-purple-100 text-purple-600", path: "/teacher/reports" },
 ];
 
 const calendarDays = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -43,18 +43,26 @@ function statusLabel(status: string) {
 }
 
 function TeacherDashboard() {
+  const navigate = useNavigate();
   const { data: schedule = [] } = useTeacherSchedule();
   const { data: deadlines = [] } = useUpcomingDeadlines();
 
   // Map schedule data to display format
-  const todaySchedule = schedule.map((item) => ({
-    id: item.id,
-    time: `${item.startTime} - ${item.endTime}`,
-    course: `${item.courseName}`,
-    room: item.room,
-    students: item.studentCount,
-    status: statusLabel(item.status),
-  }));
+  const todaySchedule = schedule.map((item) => {
+    const start = new Date(item.start_time);
+    const end = new Date(item.end_time);
+    const fmt = (d: Date) => d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+    const now = new Date();
+    const status = end < now ? "Completed" : start <= now ? "In Progress" : "Upcoming";
+    return {
+      id: item.id,
+      time: `${fmt(start)} - ${fmt(end)}`,
+      course: item.course_title,
+      room: item.room || "",
+      students: Number(item.student_count) || 0,
+      status,
+    };
+  });
   return (
     <div className="space-y-6">
       {/* Greeting */}
@@ -131,6 +139,7 @@ function TeacherDashboard() {
                   return (
                     <button
                       key={action.label}
+                      onClick={() => navigate({ to: action.path })}
                       className="flex flex-col items-center gap-2 rounded-xl border border-gray-100 p-4 transition-colors hover:bg-gray-50"
                     >
                       <div
@@ -216,14 +225,14 @@ function TeacherDashboard() {
                     <p className="truncate text-sm font-medium text-gray-900">
                       {item.title}
                     </p>
-                    <p className="text-xs text-gray-500">{item.due}</p>
+                    <p className="text-xs text-gray-500">{new Date(item.due_date).toLocaleString("zh-CN")}</p>
                   </div>
                   <span
                     className={`whitespace-nowrap text-xs font-medium ${
                       item.urgent ? "text-red-500" : "text-gray-400"
                     }`}
                   >
-                    {item.due}
+                    {new Date(item.due_date).toLocaleDateString("zh-CN")}
                   </span>
                 </div>
               ))}
