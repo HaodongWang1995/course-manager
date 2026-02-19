@@ -18,7 +18,9 @@ router.get("/", attachUser, async (req: Request, res: Response) => {
       // Teachers see their own courses
       query = `
         SELECT c.*, u.name as teacher_name,
-          (SELECT COUNT(*) FROM course_schedules cs WHERE cs.course_id = c.id) as lesson_count
+          (SELECT COUNT(*) FROM course_schedules cs WHERE cs.course_id = c.id) as lesson_count,
+          (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.id AND e.status = 'approved') as enrollment_count,
+          (SELECT COUNT(*) FROM course_schedules cs WHERE cs.course_id = c.id AND cs.start_time < NOW()) as completed_lessons
         FROM courses c
         JOIN users u ON c.teacher_id = u.id
         WHERE c.teacher_id = $1
@@ -28,7 +30,9 @@ router.get("/", attachUser, async (req: Request, res: Response) => {
       // Students or public users see all active courses
       query = `
         SELECT c.*, u.name as teacher_name,
-          (SELECT COUNT(*) FROM course_schedules cs WHERE cs.course_id = c.id) as lesson_count
+          (SELECT COUNT(*) FROM course_schedules cs WHERE cs.course_id = c.id) as lesson_count,
+          (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.id AND e.status = 'approved') as enrollment_count,
+          (SELECT COUNT(*) FROM course_schedules cs WHERE cs.course_id = c.id AND cs.start_time < NOW()) as completed_lessons
         FROM courses c
         JOIN users u ON c.teacher_id = u.id
         WHERE c.status = 'active'

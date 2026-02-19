@@ -6,11 +6,6 @@ import {
   CardContent,
   Input,
   Badge,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -22,6 +17,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Progress,
 } from "@course-manager/ui";
 import {
   Plus,
@@ -33,6 +29,7 @@ import {
   Eye,
   BookOpen,
   EyeOff,
+  Users,
 } from "lucide-react";
 import {
   useTeacherCourses,
@@ -41,7 +38,6 @@ import {
   useUpdateCourseStatus,
 } from "@/hooks/use-queries";
 import type { Course } from "@/api/client";
-import { StatCard } from "@/components/stat-card";
 import { EmptyState } from "@/components/empty-state";
 import { FormTextField, FormTextareaField, FormSelectField } from "@/components/form-field";
 import { useForm } from "@tanstack/react-form";
@@ -52,9 +48,9 @@ export const Route = createFileRoute("/(app)/teacher/courses/")({
 });
 
 const statusLabels: Record<string, string> = {
-  active: "已上架",
-  draft: "草稿",
-  archived: "已下架",
+  active: "Active",
+  draft: "Draft",
+  archived: "Archived",
 };
 
 const statusColors: Record<string, string> = {
@@ -63,37 +59,58 @@ const statusColors: Record<string, string> = {
   archived: "bg-amber-50 text-amber-700 border-amber-200",
 };
 
+// Colorful gradient covers for course cards (cycles through by index)
+const coverGradients = [
+  "from-blue-500 to-indigo-600",
+  "from-orange-400 to-red-500",
+  "from-purple-500 to-pink-600",
+  "from-teal-400 to-cyan-600",
+  "from-amber-400 to-orange-500",
+  "from-green-400 to-emerald-600",
+];
+
+// Category → subject code prefix mapping
+const categoryCodeMap: Record<string, string> = {
+  数学: "MAT", math: "MAT",
+  物理: "PHY", physics: "PHY",
+  化学: "CHE", chemistry: "CHE",
+  历史: "HIS", history: "HIS",
+  英语: "ENG", english: "ENG",
+  语文: "CHN", chinese: "CHN",
+  计算机: "CS", computer: "CS",
+  science: "SCI", 科学: "SCI",
+  literature: "LIT", 文学: "LIT",
+};
+
+function getCourseCode(category: string | undefined, idx: number): string {
+  const lowerCat = (category || "").toLowerCase().trim();
+  const prefix =
+    Object.entries(categoryCodeMap).find(([key]) => lowerCat.includes(key))?.[1] ||
+    (category ? category.slice(0, 3).toUpperCase() : "CRS");
+  return `${prefix}${String(101 + idx).padStart(3, "0")}`;
+}
+
+function getCoverGradient(idx: number): string {
+  return coverGradients[idx % coverGradients.length];
+}
+
 function CoursesIndexPage() {
-  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showAddDialog, setShowAddDialog] = useState(false);
 
   const { data: courses = [], isLoading } = useTeacherCourses();
   const addCourseMutation = useAddCourse();
-  const deleteCourseMutation = useDeleteCourse();
 
   const filteredCourses = useMemo(() => {
     return courses.filter((course) => {
       const matchesSearch =
         course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (course.category || "").toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesFilter =
-        filterStatus === "all" || course.status === filterStatus;
-
+      const matchesFilter = filterStatus === "all" || course.status === filterStatus;
       return matchesSearch && matchesFilter;
     });
   }, [courses, searchQuery, filterStatus]);
-
-  const stats = useMemo(() => {
-    const total = courses.length;
-    const active = courses.filter((c) => c.status === "active").length;
-    const draft = courses.filter((c) => c.status === "draft").length;
-    const archived = courses.filter((c) => c.status === "archived").length;
-    return { total, active, draft, archived };
-  }, [courses]);
 
   if (isLoading) {
     return (
@@ -106,169 +123,182 @@ function CoursesIndexPage() {
   return (
     <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
       <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">课程管理</h1>
-          <p className="mt-1 text-sm text-gray-500">管理您的所有课程</p>
-        </div>
-        <DialogTrigger asChild>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            新建课程
-          </Button>
-        </DialogTrigger>
-      </div>
-
-      {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="总课程数" value={stats.total} />
-        <StatCard label="已上架" value={stats.active} color="text-green-600" />
-        <StatCard label="草稿" value={stats.draft} color="text-gray-600" />
-        <StatCard label="已下架" value={stats.archived} color="text-amber-600" />
-      </div>
-
-      {/* Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <Input
-                placeholder="搜索课程名称..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <Filter className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="筛选状态" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">全部课程</SelectItem>
-                <SelectItem value="active">已上架</SelectItem>
-                <SelectItem value="draft">草稿</SelectItem>
-                <SelectItem value="archived">已下架</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="flex gap-2">
-              <Button
-                variant={viewMode === "grid" ? "default" : "outline"}
-                size="icon"
-                onClick={() => setViewMode("grid")}
-              >
-                <div className="grid h-4 w-4 grid-cols-2 gap-0.5">
-                  <div className="h-full w-full rounded-sm bg-current" />
-                  <div className="h-full w-full rounded-sm bg-current" />
-                  <div className="h-full w-full rounded-sm bg-current" />
-                  <div className="h-full w-full rounded-sm bg-current" />
-                </div>
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "outline"}
-                size="icon"
-                onClick={() => setViewMode("list")}
-              >
-                <div className="flex h-4 w-4 flex-col gap-0.5">
-                  <div className="h-0.5 w-full rounded-sm bg-current" />
-                  <div className="h-0.5 w-full rounded-sm bg-current" />
-                  <div className="h-0.5 w-full rounded-sm bg-current" />
-                </div>
-              </Button>
-            </div>
+        {/* Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Courses Management</h1>
+            <p className="mt-1 text-sm text-gray-500">Manage your courses and curriculum</p>
           </div>
-        </CardContent>
-      </Card>
+          <DialogTrigger asChild>
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Create New Course
+            </Button>
+          </DialogTrigger>
+        </div>
 
-      {/* Add Course Dialog */}
+        {/* Search + Filter bar */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="Search courses..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2 shrink-0">
+                <Filter className="h-4 w-4" />
+                Filter
+                {filterStatus !== "all" && (
+                  <Badge className="ml-1 h-5 px-1.5 text-xs bg-blue-600 text-white border-0">
+                    1
+                  </Badge>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              {[
+                { value: "all", label: "All Courses" },
+                { value: "active", label: "Active" },
+                { value: "draft", label: "Draft" },
+                { value: "archived", label: "Archived" },
+              ].map((opt) => (
+                <DropdownMenuItem
+                  key={opt.value}
+                  onClick={() => setFilterStatus(opt.value)}
+                  className={filterStatus === opt.value ? "font-medium text-blue-600" : ""}
+                >
+                  {opt.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-      {/* Courses */}
-      {filteredCourses.length === 0 ? (
-        <EmptyState
-          icon={BookOpen}
-          title="没有找到课程"
-          description={
-            searchQuery || filterStatus !== "all"
-              ? "尝试调整搜索或筛选条件"
-              : "创建您的第一个课程"
-          }
-          action={
-            !searchQuery && filterStatus === "all" ? (
-              <DialogTrigger asChild>
-                <Button className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  新建课程
-                </Button>
-              </DialogTrigger>
-            ) : undefined
-          }
+        {/* Courses Grid */}
+        {filteredCourses.length === 0 && !showAddDialog ? (
+          <EmptyState
+            icon={BookOpen}
+            title="No courses found"
+            description={
+              searchQuery || filterStatus !== "all"
+                ? "Try adjusting your search or filter"
+                : "Create your first course"
+            }
+            action={
+              !searchQuery && filterStatus === "all" ? (
+                <DialogTrigger asChild>
+                  <Button className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Create New Course
+                  </Button>
+                </DialogTrigger>
+              ) : undefined
+            }
+          />
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            {filteredCourses.map((course, idx) => (
+              <CourseGridCard key={course.id} course={course} index={idx} />
+            ))}
+            {/* "Create New Course" placeholder card */}
+            <DialogTrigger asChild>
+              <div className="flex min-h-[240px] cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-200 p-6 text-center transition-colors hover:border-blue-300 hover:bg-blue-50/30">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+                  <Plus className="h-6 w-6 text-gray-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-700">Create New Course</p>
+                  <p className="mt-1 text-xs text-gray-400">Add a new subject to your curriculum</p>
+                </div>
+              </div>
+            </DialogTrigger>
+          </div>
+        )}
+
+        <AddCourseDialogContent
+          onAdd={(data) => {
+            addCourseMutation.mutate(data, {
+              onSuccess: () => setShowAddDialog(false),
+            });
+          }}
+          onClose={() => setShowAddDialog(false)}
+          isLoading={addCourseMutation.isPending}
         />
-      ) : viewMode === "grid" ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredCourses.map((course) => (
-            <CourseGridCard key={course.id} course={course} />
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {filteredCourses.map((course) => (
-            <CourseListItem key={course.id} course={course} />
-          ))}
-        </div>
-      )}
-
-      <AddCourseDialogContent
-        onAdd={(data) => {
-          addCourseMutation.mutate(data, {
-            onSuccess: () => setShowAddDialog(false),
-          });
-        }}
-        onClose={() => setShowAddDialog(false)}
-        isLoading={addCourseMutation.isPending}
-      />
       </div>
     </Dialog>
   );
 }
 
-function CourseGridCard({ course }: { course: Course }) {
+function CourseGridCard({ course, index }: { course: Course; index: number }) {
   const navigate = useNavigate();
+  const gradient = getCoverGradient(index);
+  const courseCode = getCourseCode(course.category, index);
+  const lessonCount = Number(course.lesson_count) || 0;
+  const completedLessons = Number(course.completed_lessons) || 0;
+  const enrollmentCount = Number(course.enrollment_count) || 0;
+  const progress = lessonCount > 0 ? Math.round((completedLessons / lessonCount) * 100) : 0;
 
   return (
-    <div className="group relative">
-      <Card
-        className="cursor-pointer transition-shadow hover:shadow-md"
+    <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+      {/* Colorful gradient cover */}
+      <div
+        className={`relative h-[110px] bg-gradient-to-br ${gradient} cursor-pointer`}
         onClick={() => navigate({ to: `/teacher/courses/${course.id}` })}
       >
-        <CardContent className="p-6">
-          <div className="flex items-start justify-between">
-            <Badge
-              className={`border ${statusColors[course.status]}`}
-              variant="outline"
-            >
-              {statusLabels[course.status]}
-            </Badge>
-            <div className="opacity-0 transition-opacity group-hover:opacity-100">
-              <CourseActionsMenu course={course} />
-            </div>
+        {/* Subject code badge */}
+        <div className="absolute left-3 top-3 rounded px-2 py-0.5 bg-white/20 backdrop-blur-sm">
+          <span className="text-xs font-bold text-white tracking-wide">{courseCode}</span>
+        </div>
+        {/* Actions menu */}
+        <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
+          <div onClick={(e) => e.stopPropagation()}>
+            <CourseActionsMenu course={course} />
           </div>
-          <h3 className="mt-3 text-lg font-semibold text-gray-900">{course.title}</h3>
-          {course.description && (
-            <p className="mt-1 line-clamp-2 text-sm text-gray-500">{course.description}</p>
-          )}
-          <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
-            {course.category && <span>{course.category}</span>}
-            <span>{course.lesson_count} 节课</span>
+        </div>
+        {/* Subtle icon background */}
+        <BookOpen className="absolute bottom-3 right-3 h-12 w-12 text-white/20" />
+      </div>
+
+      {/* Card body */}
+      <div
+        className="cursor-pointer p-4"
+        onClick={() => navigate({ to: `/teacher/courses/${course.id}` })}
+      >
+        <h3 className="text-[15px] font-semibold text-gray-900 leading-snug line-clamp-1">
+          {course.title}
+        </h3>
+        {course.category && (
+          <p className="mt-0.5 text-xs text-gray-400">
+            {course.category}
+          </p>
+        )}
+
+        {/* Student count + Lesson count */}
+        <div className="mt-3 flex items-center gap-4 text-sm text-gray-500">
+          <div className="flex items-center gap-1.5">
+            <Users className="h-3.5 w-3.5 text-gray-400" />
+            <span>{enrollmentCount} Students</span>
           </div>
-          {course.price > 0 && (
-            <div className="mt-2 text-lg font-bold text-blue-600">
-              ¥{Number(course.price).toFixed(2)}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          <div className="flex items-center gap-1.5">
+            <BookOpen className="h-3.5 w-3.5 text-gray-400" />
+            <span>{lessonCount} Lessons</span>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="mt-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-400">Course Progress</span>
+            <span className="text-xs font-semibold text-blue-600">{progress}%</span>
+          </div>
+          <Progress value={progress} className="mt-1.5 h-1.5" />
+        </div>
+      </div>
     </div>
   );
 }

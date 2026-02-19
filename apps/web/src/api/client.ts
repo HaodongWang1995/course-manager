@@ -106,6 +106,8 @@ export interface Course {
   category?: string;
   teacher_name: string;
   lesson_count: number;
+  enrollment_count: number;
+  completed_lessons: number;
   created_at: string;
   updated_at: string;
   schedules?: Schedule[];
