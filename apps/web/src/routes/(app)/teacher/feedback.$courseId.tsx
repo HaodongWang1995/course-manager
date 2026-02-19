@@ -24,6 +24,8 @@ import {
   Italic,
   List,
   LinkIcon,
+  CheckCircle2,
+  Clock,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useFeedbackDraft, useSaveFeedbackDraft, usePublishFeedback } from "@/hooks/use-queries";
@@ -50,7 +52,9 @@ function TeacherFeedbackEditor() {
   const [quoteText, setQuoteText] = useState("");
   const [assignmentTitle, setAssignmentTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
-  const [saveStatus, setSaveStatus] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
 
   // Load draft from DB when available
   useEffect(() => {
@@ -62,6 +66,32 @@ function TeacherFeedbackEditor() {
       setDueDate(draft.due_date || "");
     }
   }, [draft]);
+
+  // Auto-save with 1.5s debounce whenever content changes
+  useEffect(() => {
+    if (!isDirty) return;
+    setSaveStatus("saving");
+    const timer = setTimeout(() => {
+      saveDraftMutation.mutate(
+        {
+          course_id: courseId,
+          summary: feedbackText || undefined,
+          quote: quoteText || undefined,
+          requirements: requirementsText ? requirementsText.split("\n").filter(Boolean) : [],
+          assignment_title: assignmentTitle || undefined,
+          due_date: dueDate || undefined,
+        },
+        {
+          onSuccess: () => {
+            setSaveStatus("saved");
+            setLastSaved(new Date());
+            setIsDirty(false);
+          },
+        },
+      );
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [isDirty, feedbackText, requirementsText, quoteText, assignmentTitle, dueDate, courseId]);
 
   const buildPayload = () => ({
     course_id: courseId,
@@ -75,8 +105,9 @@ function TeacherFeedbackEditor() {
   const handleSaveDraft = () => {
     saveDraftMutation.mutate(buildPayload(), {
       onSuccess: () => {
-        setSaveStatus("草稿已保存");
-        setTimeout(() => setSaveStatus(null), 2000);
+        setSaveStatus("saved");
+        setLastSaved(new Date());
+        setIsDirty(false);
       },
     });
   };
@@ -87,8 +118,9 @@ function TeacherFeedbackEditor() {
         if (data?.id) {
           publishMutation.mutate(data.id);
         }
-        setSaveStatus("已发布");
-        setTimeout(() => setSaveStatus(null), 2000);
+        setSaveStatus("saved");
+        setLastSaved(new Date());
+        setIsDirty(false);
       },
     });
   };
@@ -98,30 +130,55 @@ function TeacherFeedbackEditor() {
       <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900">
                   Advanced Mathematics
                 </h1>
-                <Badge className="bg-amber-50 text-amber-700 border-amber-200">
-                  {saveStatus || (draft?.published ? "已发布" : "Draft Saved")}
+                <Badge className={draft?.published ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"}>
+                  {draft?.published ? "Published" : "Draft"}
                 </Badge>
               </div>
               <p className="mt-1 text-sm text-gray-500">
-                Course ID: {courseId} &middot; Last edited Oct 20, 2023 at 3:45 PM
-                &middot; Session #12
+                Course ID: {courseId} &middot; Session #12
               </p>
             </div>
-            <div className="text-right text-sm text-gray-500">
-              <p>
-                <span className="font-medium text-gray-700">Date:</span> Oct 20,
-                2023
-              </p>
-              <p>
-                <span className="font-medium text-gray-700">Time:</span> 10:00 AM
-                - 11:30 AM
-              </p>
+            <div className="flex flex-col items-end gap-1.5">
+              {/* Save status indicator */}
+              <div className="flex h-6 items-center">
+                {saveStatus === "saving" && (
+                  <span className="flex items-center gap-1.5 text-xs text-gray-400">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gray-400" />
+                    Saving...
+                  </span>
+                )}
+                {saveStatus === "saved" && (
+                  <span className="flex items-center gap-1.5 text-xs text-emerald-600">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    Draft Saved
+                    {lastSaved && (
+                      <span className="text-gray-400">
+                        · {lastSaved.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}
+                      </span>
+                    )}
+                  </span>
+                )}
+                {saveStatus === "idle" && (
+                  <span className="flex items-center gap-1.5 text-xs text-gray-400">
+                    <Clock className="h-3.5 w-3.5" />
+                    Last edited Oct 20, 2023 at 3:45 PM
+                  </span>
+                )}
+              </div>
+              <div className="text-right text-sm text-gray-500">
+                <p>
+                  <span className="font-medium text-gray-700">Date:</span> Oct 20, 2023
+                </p>
+                <p>
+                  <span className="font-medium text-gray-700">Time:</span> 10:00 AM - 11:30 AM
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -182,7 +239,7 @@ function TeacherFeedbackEditor() {
               className="min-h-[120px] w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="Pre-class instructions for students"
               value={requirementsText}
-              onChange={(e) => setRequirementsText(e.target.value)}
+              onChange={(e) => { setRequirementsText(e.target.value); setIsDirty(true); }}
             />
           </CardContent>
         </Card>
@@ -226,7 +283,7 @@ function TeacherFeedbackEditor() {
               className="min-h-[160px] w-full rounded-b-lg rounded-t-none border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="Write your post-class feedback here. Use @mention to tag specific students..."
               value={feedbackText}
-              onChange={(e) => setFeedbackText(e.target.value)}
+              onChange={(e) => { setFeedbackText(e.target.value); setIsDirty(true); }}
             />
           </CardContent>
         </Card>
@@ -290,9 +347,10 @@ function TeacherFeedbackEditor() {
                 type="text"
                 placeholder="e.g. Chapter 4 Problem Set"
                 value={assignmentTitle}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setAssignmentTitle(e.target.value)
-                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setAssignmentTitle(e.target.value);
+                  setIsDirty(true);
+                }}
               />
             </div>
             <div>
@@ -306,9 +364,10 @@ function TeacherFeedbackEditor() {
                   placeholder="mm/dd/yyyy"
                   className="pl-9"
                   value={dueDate}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setDueDate(e.target.value)
-                  }
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setDueDate(e.target.value);
+                    setIsDirty(true);
+                  }}
                 />
               </div>
             </div>
