@@ -5,8 +5,6 @@ import {
   CardHeader,
   CardTitle,
   Badge,
-  Avatar,
-  AvatarFallback,
   Button,
 } from "@course-manager/ui";
 import {
@@ -20,7 +18,10 @@ import {
   ChevronLeft,
   ChevronRight,
   CalendarDays,
+  ChevronDown,
+  GraduationCap,
 } from "lucide-react";
+import { useState, useMemo } from "react";
 import { useTeacherSchedule, useUpcomingDeadlines } from "@/hooks/use-queries";
 
 export const Route = createFileRoute("/(app)/teacher/")({
@@ -34,46 +35,117 @@ const quickActions = [
   { icon: FileBarChart, label: "Report", color: "bg-purple-100 text-purple-600", path: "/teacher/reports" },
 ];
 
-const calendarDays = Array.from({ length: 31 }, (_, i) => i + 1);
-const today = 24;
+const deadlineColors = [
+  "border-l-red-500",
+  "border-l-amber-400",
+  "border-l-blue-500",
+  "border-l-green-500",
+];
 
-function statusLabel(status: string) {
-  if (status === "completed") return "Completed";
-  if (status === "in-progress") return "In Progress";
-  return "Upcoming";
+// Derive a course type label from title/category keywords
+function getCourseType(title: string, lessonTitle?: string): "Lecture" | "Lab" | "Admin" {
+  const text = ((lessonTitle || "") + " " + title).toLowerCase();
+  if (/lab|practical|workshop|experiment/.test(text)) return "Lab";
+  if (/meeting|admin|department|seminar|office/.test(text)) return "Admin";
+  return "Lecture";
 }
+
+const typeStyles: Record<string, string> = {
+  Lecture: "bg-blue-50 text-blue-600 border-blue-100",
+  Lab: "bg-green-50 text-green-600 border-green-100",
+  Admin: "bg-gray-100 text-gray-500 border-gray-200",
+};
 
 function TeacherDashboard() {
   const navigate = useNavigate();
   const { data: schedule = [] } = useTeacherSchedule();
   const { data: deadlines = [] } = useUpcomingDeadlines();
+  const [semester] = useState("Fall Semester 2023");
+  const [showSemesterMenu, setShowSemesterMenu] = useState(false);
+
+  // Mini calendar state
+  const [calMonth, setCalMonth] = useState(() => new Date(2026, 1, 1)); // Feb 2026
+  const today = useMemo(() => new Date(), []);
+
+  const calendarGrid = useMemo(() => {
+    const year = calMonth.getFullYear();
+    const month = calMonth.getMonth();
+    const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    return { firstDay, daysInMonth, year, month };
+  }, [calMonth]);
+
+  const monthLabel = calMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
   // Map schedule data to display format
   const todaySchedule = schedule.map((item) => {
     const start = new Date(item.start_time);
     const end = new Date(item.end_time);
-    const fmt = (d: Date) => d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+    const fmt = (d: Date) =>
+      d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
     const now = new Date();
-    const status = end < now ? "Completed" : start <= now ? "In Progress" : "Upcoming";
+    const isCompleted = end < now;
+    const isInProgress = start <= now && end >= now;
+    const status = isCompleted ? "Finished" : isInProgress ? "Pending Prep" : "Upcoming";
+    const type = getCourseType(item.course_title, item.title);
     return {
       id: item.id,
-      time: `${fmt(start)} - ${fmt(end)}`,
+      startTime: fmt(start),
+      endTime: fmt(end),
       course: item.course_title,
-      room: item.room || "",
+      room: item.room || "TBA",
       students: Number(item.student_count) || 0,
       status,
+      type,
     };
   });
+
+  const statusStyle: Record<string, string> = {
+    Upcoming: "border-blue-200 text-blue-600",
+    "Pending Prep": "border-red-200 bg-red-50 text-red-600",
+    Finished: "border-gray-200 text-gray-400",
+    Scheduled: "border-gray-200 text-gray-500",
+  };
+
   return (
     <div className="space-y-6">
-      {/* Greeting */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Good morning, Professor Smith!
-        </h1>
-        <p className="mt-1 text-gray-500">
-          You have {todaySchedule.length} classes today and {deadlines.filter((d) => d.urgent).length} urgent deadlines.
-        </p>
+      {/* Semester Selector Row */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <div className="relative">
+          <button
+            className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            onClick={() => setShowSemesterMenu(!showSemesterMenu)}
+          >
+            {semester}
+            <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+          </button>
+          {showSemesterMenu && (
+            <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+              {["Spring Semester 2026", "Fall Semester 2025", "Fall Semester 2023"].map((s) => (
+                <button
+                  key={s}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${s === semester ? "font-semibold text-blue-600" : "text-gray-700"}`}
+                  onClick={() => setShowSemesterMenu(false)}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Greeting Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5">
+        <div className="relative z-10">
+          <h2 className="text-xl font-bold text-white">Good morning, Professor Smith!</h2>
+          <p className="mt-1 text-sm text-blue-100">
+            You have {todaySchedule.length} classes today and{" "}
+            {deadlines.filter((d) => d.urgent).length} urgent deadlines.
+          </p>
+        </div>
+        <GraduationCap className="absolute right-4 top-1/2 h-20 w-20 -translate-y-1/2 text-white/15" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -83,48 +155,67 @@ function TeacherDashboard() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Today's Schedule</CardTitle>
-                <span className="text-sm text-gray-500">October 24, 2023</span>
+                <div>
+                  <CardTitle className="text-lg">Today's Schedule</CardTitle>
+                  <p className="mt-0.5 text-xs text-gray-400">
+                    {today.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+                  </p>
+                </div>
+                <button
+                  className="text-sm font-medium text-blue-600 hover:underline"
+                  onClick={() => navigate({ to: "/teacher/calendar" })}
+                >
+                  View Full Calendar →
+                </button>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {todaySchedule.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-4 rounded-lg border border-gray-100 p-4 transition-colors hover:bg-gray-50"
-                >
-                  <div className="flex min-w-[120px] flex-col">
-                    <div className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
-                      <Clock className="h-3.5 w-3.5 text-gray-400" />
-                      {item.time}
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">{item.course}</p>
-                    <div className="mt-1 flex items-center gap-3 text-xs text-gray-500">
-                      <span className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {item.room}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Users className="h-3 w-3" />
-                        {item.students} students
-                      </span>
-                    </div>
-                  </div>
-                  <Badge
-                    variant={
-                      item.status === "Completed"
-                        ? "secondary"
-                        : item.status === "In Progress"
-                          ? "default"
-                          : "outline"
-                    }
+            <CardContent className="space-y-0 divide-y divide-gray-50">
+              {todaySchedule.length === 0 ? (
+                <p className="py-6 text-center text-sm text-gray-400">No classes scheduled for today</p>
+              ) : (
+                todaySchedule.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-4 py-3.5 transition-colors hover:bg-gray-50/50"
                   >
-                    {item.status}
-                  </Badge>
-                </div>
-              ))}
+                    {/* Time */}
+                    <div className="w-[90px] shrink-0">
+                      <p className="text-sm font-semibold text-gray-900">{item.startTime}</p>
+                      <p className="text-xs text-gray-400">{item.endTime}</p>
+                    </div>
+
+                    {/* Course + type badge */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-gray-900 truncate">{item.course}</p>
+                        <span
+                          className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold border ${typeStyles[item.type]}`}
+                        >
+                          {item.type}
+                        </span>
+                      </div>
+                      <div className="mt-0.5 flex items-center gap-3 text-xs text-gray-400">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {item.room}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Users className="h-3 w-3" />
+                          {item.students} Students
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Status badge */}
+                    <Badge
+                      variant="outline"
+                      className={`shrink-0 text-xs ${statusStyle[item.status] || statusStyle.Scheduled}`}
+                    >
+                      {item.status}
+                    </Badge>
+                  </div>
+                ))
+              )}
             </CardContent>
           </Card>
 
@@ -143,14 +234,10 @@ function TeacherDashboard() {
                       onClick={() => navigate({ to: action.path })}
                       className="flex flex-col items-center gap-2 rounded-xl border border-gray-100 p-4 transition-colors hover:bg-gray-50"
                     >
-                      <div
-                        className={`flex h-10 w-10 items-center justify-center rounded-lg ${action.color}`}
-                      >
+                      <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${action.color}`}>
                         <Icon className="h-5 w-5" />
                       </div>
-                      <span className="text-sm font-medium text-gray-700">
-                        {action.label}
-                      </span>
+                      <span className="text-sm font-medium text-gray-700">{action.label}</span>
                     </button>
                   );
                 })}
@@ -167,41 +254,58 @@ function TeacherDashboard() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">
                   <CalendarDays className="mr-2 inline h-4 w-4" />
-                  October 2023
+                  {monthLabel}
                 </CardTitle>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-500">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-gray-500"
+                    onClick={() => setCalMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1))}
+                  >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-500">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-gray-500"
+                    onClick={() => setCalMonth((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1))}
+                  >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-7 gap-1 text-center">
+              <div className="grid grid-cols-7 gap-0.5 text-center">
                 {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
-                  <div
-                    key={d}
-                    className="py-1 text-xs font-medium text-gray-400"
-                  >
+                  <div key={d} className="py-1 text-[11px] font-medium text-gray-400">
                     {d}
                   </div>
                 ))}
-                {/* Empty cells for first day offset (Oct 2023 starts on Sunday) */}
-                {calendarDays.map((day) => (
-                  <button
-                    key={day}
-                    className={`rounded-md py-1.5 text-xs transition-colors ${
-                      day === today
-                        ? "bg-blue-600 font-bold text-white"
-                        : "text-gray-700 hover:bg-gray-100"
-                    }`}
-                  >
-                    {day}
-                  </button>
+                {/* Offset cells */}
+                {Array.from({ length: calendarGrid.firstDay }).map((_, i) => (
+                  <div key={`pad-${i}`} />
                 ))}
+                {Array.from({ length: calendarGrid.daysInMonth }, (_, i) => i + 1).map((day) => {
+                  const isToday =
+                    day === today.getDate() &&
+                    calendarGrid.month === today.getMonth() &&
+                    calendarGrid.year === today.getFullYear();
+                  return (
+                    <button
+                      key={day}
+                      className={`rounded-md py-1 text-xs transition-colors ${
+                        isToday
+                          ? "bg-blue-600 font-bold text-white"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                      onClick={() => navigate({ to: "/teacher/calendar" })}
+                    >
+                      {day}
+                    </button>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -209,34 +313,37 @@ function TeacherDashboard() {
           {/* Upcoming Deadlines */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Upcoming Deadlines</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Upcoming Deadlines</CardTitle>
+                <button className="text-xs font-medium text-blue-600 hover:underline">View All</button>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {deadlines.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-start gap-3 rounded-lg border border-gray-100 p-3"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-[10px] font-bold">
-                      {item.title.slice(0, 3).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="truncate text-sm font-medium text-gray-900">
-                      {item.title}
-                    </p>
-                    <p className="text-xs text-gray-500">{new Date(item.due_date).toLocaleString("zh-CN")}</p>
-                  </div>
-                  <span
-                    className={`whitespace-nowrap text-xs font-medium ${
-                      item.urgent ? "text-red-500" : "text-gray-400"
-                    }`}
-                  >
-                    {new Date(item.due_date).toLocaleDateString("zh-CN")}
-                  </span>
-                </div>
-              ))}
+            <CardContent className="space-y-2">
+              {deadlines.length === 0 ? (
+                <p className="py-4 text-center text-sm text-gray-400">No upcoming deadlines</p>
+              ) : (
+                deadlines.map((item, idx) => {
+                  const colorClass = deadlineColors[idx % deadlineColors.length];
+                  return (
+                    <div
+                      key={item.id || idx}
+                      className={`rounded-lg border-l-4 bg-white px-3 py-2.5 shadow-sm ${colorClass}`}
+                    >
+                      <p className="text-sm font-medium text-gray-900 leading-snug">{item.title}</p>
+                      <p className="mt-0.5 text-xs text-gray-400">
+                        {new Date(item.due_date).toLocaleDateString("en-US", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
+                      </p>
+                    </div>
+                  );
+                })
+              )}
             </CardContent>
           </Card>
         </div>
