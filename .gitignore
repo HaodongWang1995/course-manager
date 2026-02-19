@@ -8,3 +8,17 @@ dist
 .mcp.json
 .DS_Store
 coverage
+
+# Figma assets (use Figma MCP directly instead)
+figma-assets/
+
+# Playwright MCP logs and test artifacts
+.playwright-mcp/
+apps/web/test-results/
+*.png
+
+# TanStack Router build cache
+apps/web/.tanstack/
+
+# Lighthouse
+.lh/
