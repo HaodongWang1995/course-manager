@@ -2,6 +2,40 @@
 
 A modern course management system built as a monorepo, supporting both Teacher and Student roles with responsive mobile/desktop layouts. Features real backend API with JWT authentication, PostgreSQL database, and full CRUD for courses, enrollments, and schedules.
 
+## Baseline Development Requirements
+
+These requirements come from `PRD/PROMP-BASIC.md` and serve as the foundation for every development session.
+
+### Roles & Features
+- **Teacher**: Create/edit/unpublish courses (name, description, price, schedule); review enrollment applications
+- **Student**: Browse course list, view course details & schedule, search/filter, apply for enrollment, check application status
+
+### Mandatory Tech Stack
+| Tool | Purpose | Status |
+|------|---------|--------|
+| TanStack Router + React | Routing | ✅ Done |
+| TanStack Query v5 | Server state / data fetching | ✅ Done |
+| TanStack Form | All form logic + reusable form components | ⚠️ Partial (login, courses; feedback/other forms still use raw inputs) |
+| @lukemorales/query-key-factory | Centralized query key management | ❌ Not added |
+| Figma design | UI must match Figma designs as closely as possible | ⚠️ In progress (see PRD/UI-TODO.md) |
+| PC + H5 responsive layout | Shared layout across all pages | ✅ Done |
+| PostgreSQL (AWS) | Database | ✅ Local; AWS deployment pending |
+| TypeScript | Type safety | ✅ Done |
+| Zod | Form validation | ✅ Done |
+| Oxlint | Linting (replaces ESLint) | ❌ Not configured |
+| oxfmt | Code formatting | ❌ Not configured |
+| Vitest | Unit/integration testing | ✅ Done |
+| Playwright | E2E UI testing (automated tests + MCP for visual verification) | ⚠️ Config exists; test coverage minimal |
+| EditorConfig | `.editorconfig` in project root | ❌ Missing |
+
+### Project Standards
+- Maintain decent test coverage (unit + E2E)
+- Use Playwright MCP server to verify UI styling and interactions after changes
+- Maintain a useful **README.md** at the project root
+- Add **Apache 2.0 LICENSE** file
+- Prepare for GitHub hosting (clean repo, documented)
+- Prepare **AWS deployment configuration** (ECS, EC2, or similar)
+
 ## Tech Stack
 
 ### Frontend
