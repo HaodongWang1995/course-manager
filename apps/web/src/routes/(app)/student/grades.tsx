@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Calculator,
@@ -10,6 +10,13 @@ import {
   ScrollText,
   Trophy,
 } from "lucide-react";
+import {
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  ResponsiveContainer,
+} from "recharts";
 import { useStudentGrades } from "@/hooks/use-queries";
 
 export const Route = createFileRoute("/(app)/student/grades")({
@@ -113,21 +120,30 @@ function StudentGrades() {
             </div>
           </div>
 
-          <div className="mt-6 h-48">
-            <div className="relative h-[192px] rounded-b-md">
-              <div className="absolute inset-0 grid grid-rows-5">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <div key={index} className="border-b border-slate-100" />
-                ))}
-              </div>
-              <div className="absolute inset-x-0 bottom-0 grid px-2 pb-1" style={{ gridTemplateColumns: `repeat(${grades.chartData.length}, 1fr)` }}>
-                {grades.chartData.map((item) => (
-                  <span key={item.subject} className="text-center text-[10px] font-medium uppercase text-slate-500">
-                    {item.subject}
-                  </span>
-                ))}
-              </div>
-            </div>
+          <div className="mt-4 h-52">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart data={grades.chartData} margin={{ top: 8, right: 16, bottom: 8, left: 16 }}>
+                <PolarGrid stroke="#e2e8f0" />
+                <PolarAngleAxis
+                  dataKey="subject"
+                  tick={{ fontSize: 10, fill: "#64748b", fontWeight: 500 }}
+                />
+                <Radar
+                  name="Avg"
+                  dataKey="avg"
+                  stroke="#cbd5e1"
+                  fill="#cbd5e1"
+                  fillOpacity={0.3}
+                />
+                <Radar
+                  name="You"
+                  dataKey="you"
+                  stroke="#137fec"
+                  fill="#137fec"
+                  fillOpacity={0.25}
+                />
+              </RadarChart>
+            </ResponsiveContainer>
           </div>
         </section>
 

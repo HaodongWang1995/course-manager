@@ -16,6 +16,8 @@ import {
   Plus,
   Calendar,
   Eye,
+  TrendingUp,
+  Star,
 } from "lucide-react";
 import {
   BarChart,
@@ -25,9 +27,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
   LineChart,
   Line,
   Legend,
@@ -45,12 +44,6 @@ const performanceData = [
   { course: "Calculus II", avgGrade: 82, students: 41 },
   { course: "Comp Sci 101", avgGrade: 91, students: 31 },
   { course: "Stats 301", avgGrade: 74, students: 28 },
-];
-
-const feedbackPieData = [
-  { name: "Completed", value: 75, color: "#10b981" },
-  { name: "In Progress", value: 15, color: "#f59e0b" },
-  { name: "Not Started", value: 10, color: "#e5e7eb" },
 ];
 
 const attendanceTrendsData = [
@@ -125,29 +118,37 @@ function TeacherReports() {
 
   const kpiCards = [
     {
-      title: "Total Courses",
-      value: stats?.course_count || "0",
-      icon: FileText,
+      title: "Average Grade",
+      value: "B+ (87%)",
+      delta: "+0.4%",
+      deltaUp: true,
+      icon: Star,
       color: "text-blue-600",
       iconBg: "bg-blue-100",
     },
     {
       title: "Active Students",
-      value: stats?.student_count || "0",
+      value: stats?.student_count || "142",
+      delta: "+12",
+      deltaUp: true,
       icon: Users,
       color: "text-emerald-600",
       iconBg: "bg-emerald-100",
     },
     {
-      title: "Total Lessons",
-      value: stats?.schedule_count || "0",
+      title: "Submission Rate",
+      value: "94.5%",
+      delta: "0%",
+      deltaUp: null,
       icon: ClipboardCheck,
       color: "text-violet-600",
       iconBg: "bg-violet-100",
     },
     {
-      title: "Pending Enrollments",
-      value: stats?.pending_enrollments || "0",
+      title: "Feedback Pending",
+      value: stats?.pending_enrollments || "18",
+      delta: "-5%",
+      deltaUp: false,
       icon: MessageSquare,
       color: "text-amber-600",
       iconBg: "bg-amber-100",
@@ -184,13 +185,26 @@ function TeacherReports() {
             <Card key={kpi.title}>
               <CardContent className="p-5">
                 <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">{kpi.title}</p>
-                    <p className="mt-1 text-2xl font-bold text-gray-900">{kpi.value}</p>
-                  </div>
                   <div className={`rounded-lg p-2.5 ${kpi.iconBg}`}>
                     <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
                   </div>
+                  {kpi.deltaUp !== null && (
+                    <span
+                      className={`flex items-center gap-0.5 text-xs font-medium ${
+                        kpi.deltaUp ? "text-emerald-600" : "text-red-500"
+                      }`}
+                    >
+                      <TrendingUp className={`h-3 w-3 ${kpi.deltaUp === false ? "rotate-180" : ""}`} />
+                      {kpi.delta}
+                    </span>
+                  )}
+                  {kpi.deltaUp === null && (
+                    <span className="text-xs font-medium text-gray-400">{kpi.delta}</span>
+                  )}
+                </div>
+                <div className="mt-3">
+                  <p className="text-sm font-medium text-gray-500">{kpi.title}</p>
+                  <p className="mt-1 text-2xl font-bold text-gray-900">{kpi.value}</p>
                 </div>
               </CardContent>
             </Card>
@@ -241,54 +255,33 @@ function TeacherReports() {
             </CardContent>
           </Card>
 
-          {/* Feedback Completion Pie Chart */}
+          {/* Feedback Completion — large % display */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base font-semibold">
                 Feedback Completion
               </CardTitle>
-              <p className="text-sm text-gray-500">Overall feedback status</p>
+              <p className="text-sm text-gray-500">
+                Percentage of graded assignments with feedback
+              </p>
             </CardHeader>
-            <CardContent>
-              <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={feedbackPieData}
-                      cx="50%"
-                      cy="45%"
-                      innerRadius={60}
-                      outerRadius={90}
-                      paddingAngle={4}
-                      dataKey="value"
-                    >
-                      {feedbackPieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: "8px",
-                        border: "1px solid #e5e7eb",
-                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                      }}
-                      formatter={(value: number) => [`${value}%`, ""]}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+            <CardContent className="flex flex-col items-center justify-center py-8">
+              <div className="relative flex h-36 w-36 items-center justify-center rounded-full border-8 border-emerald-500">
+                <div className="absolute inset-0 rounded-full border-8 border-gray-100" style={{ clipPath: "inset(0 0 0 75%)" }} />
+                <div className="text-center">
+                  <p className="text-4xl font-bold text-gray-900 leading-none">75%</p>
+                  <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Completed</p>
+                </div>
               </div>
-              <div className="mt-2 flex items-center justify-center gap-4">
-                {feedbackPieData.map((item) => (
-                  <div key={item.name} className="flex items-center gap-1.5">
-                    <div
-                      className="h-2.5 w-2.5 rounded-full"
-                      style={{ backgroundColor: item.color }}
-                    />
-                    <span className="text-xs text-gray-600">
-                      {item.name} ({item.value}%)
-                    </span>
-                  </div>
-                ))}
+              <div className="mt-6 flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                  <span className="text-sm text-gray-600">Done</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-gray-200" />
+                  <span className="text-sm text-gray-600">Pending</span>
+                </div>
               </div>
             </CardContent>
           </Card>
