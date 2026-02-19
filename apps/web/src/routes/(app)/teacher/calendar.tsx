@@ -46,6 +46,7 @@ const eventColors = [
 function TeacherCalendar() {
   const [view, setView] = useState("week");
   const [showNewEvent, setShowNewEvent] = useState(false);
+  const [currentDate, setCurrentDate] = useState(() => new Date());
   const { data: schedules = [] } = useTeacherSchedule();
   const { data: deadlines = [] } = useUpcomingDeadlines();
 
@@ -77,17 +78,59 @@ function TeacherCalendar() {
     });
   }, [schedules]);
 
-  // Get current week days
-  const now = new Date();
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
-  const weekDays = Array.from({ length: 5 }, (_, i) => {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    return `${dayNamesFull[d.getDay()]} ${d.getDate()}`;
-  });
+  // Monday of the week containing currentDate
+  const monday = useMemo(() => {
+    const d = new Date(currentDate);
+    d.setDate(currentDate.getDate() - ((currentDate.getDay() + 6) % 7));
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, [currentDate]);
 
-  const todayDayIdx = dayIndexMap[now.getDay()] ?? -1;
+  const weekDays = useMemo(() =>
+    Array.from({ length: 5 }, (_, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return `${dayNamesFull[d.getDay()]} ${d.getDate()}`;
+    }),
+    [monday]
+  );
+
+  // Highlight today's column only when the displayed week contains today
+  const todayDayIdx = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diff = Math.round((today.getTime() - monday.getTime()) / 86400000);
+    return diff >= 0 && diff < 5 ? (dayIndexMap[today.getDay()] ?? -1) : -1;
+  }, [monday]);
+
+  // Navigate forward / back by one week (week view) or one day (day view)
+  const navigate = (dir: 1 | -1) => {
+    setCurrentDate((prev) => {
+      const d = new Date(prev);
+      d.setDate(d.getDate() + dir * (view === "week" ? 7 : 1));
+      return d;
+    });
+  };
+
+  // Events that fall within the displayed week (Mon–Fri)
+  const weekEvents = useMemo(() =>
+    calendarEvents.filter((e) => {
+      const diff = Math.round((e.date.getTime() - monday.getTime()) / 86400000);
+      return diff >= 0 && diff < 5;
+    }),
+    [calendarEvents, monday]
+  );
+
+  // Events for the currently selected day (day view)
+  const dayEvents = useMemo(() => {
+    const target = new Date(currentDate);
+    target.setHours(0, 0, 0, 0);
+    return calendarEvents.filter((e) => {
+      const d = new Date(e.date);
+      d.setHours(0, 0, 0, 0);
+      return d.getTime() === target.getTime();
+    });
+  }, [calendarEvents, currentDate]);
 
   return (
     <div className="space-y-6">
@@ -118,19 +161,19 @@ function TeacherCalendar() {
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <button className="rounded-lg p-1 hover:bg-gray-100">
+                  <button className="rounded-lg p-1 hover:bg-gray-100" onClick={() => navigate(-1)}>
                     <ChevronLeft className="h-5 w-5 text-gray-500" />
                   </button>
                   <h2 className="text-lg font-semibold text-gray-900">
                     {view === "day"
-                      ? now.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+                      ? currentDate.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
                       : `${monday.toLocaleDateString("en-US", { month: "long", day: "numeric" })} - ${new Date(monday.getTime() + 4 * 86400000).toLocaleDateString("en-US", { day: "numeric", year: "numeric" })}`}
                   </h2>
-                  <button className="rounded-lg p-1 hover:bg-gray-100">
+                  <button className="rounded-lg p-1 hover:bg-gray-100" onClick={() => navigate(1)}>
                     <ChevronRight className="h-5 w-5 text-gray-500" />
                   </button>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
                   Today
                 </Button>
               </div>
@@ -138,11 +181,11 @@ function TeacherCalendar() {
             <CardContent className="p-0">
               {view === "day" ? (
                 <DayView
-                  events={calendarEvents.filter((e) => e.day === todayDayIdx)}
-                  dayLabel={weekDays[todayDayIdx] || "Today"}
+                  events={dayEvents}
+                  dayLabel={currentDate.toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" })}
                 />
               ) : (
-                <WeekView events={calendarEvents} weekDays={weekDays} todayIdx={todayDayIdx} />
+                <WeekView events={weekEvents} weekDays={weekDays} todayIdx={todayDayIdx} />
               )}
             </CardContent>
           </Card>
