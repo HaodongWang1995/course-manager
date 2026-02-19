@@ -17,6 +17,7 @@ import {
   Settings,
   HelpCircle,
   MessageSquare,
+  FolderOpen,
   Home,
   User,
   LogOut,
@@ -38,11 +39,11 @@ const teacherSidebarItems = [
 
 const studentSidebarItems = [
   { label: "Dashboard", href: "/student", icon: LayoutDashboard },
-  { label: "Schedule", href: "/student/schedule", icon: Calendar },
-  { label: "Courses", href: "/student", icon: BookOpen },
+  { label: "Schedule", href: "/student", icon: Calendar },
+  { label: "Courses", href: "/student/enrollments", icon: BookOpen },
   { label: "Grades", href: "/student/grades", icon: BarChart3 },
-  { label: "Enrollments", href: "/student/enrollments", icon: ClipboardList },
-  { label: "Resources", href: "/student/resources", icon: MessageSquare },
+  { label: "Messages", href: "/student/messages", icon: MessageSquare },
+  { label: "Resources", href: "/student/resources", icon: FolderOpen },
 ];
 
 const teacherSupportItems = [

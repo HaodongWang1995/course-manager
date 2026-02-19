@@ -9,6 +9,9 @@ import {
   AvatarFallback,
   Button,
   Input,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
 } from "@course-manager/ui";
 import {
   Save,
@@ -26,6 +29,7 @@ import {
   LinkIcon,
   CheckCircle2,
   Clock,
+  ChevronDown,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useFeedbackDraft, useSaveFeedbackDraft, usePublishFeedback } from "@/hooks/use-queries";
@@ -52,6 +56,7 @@ function TeacherFeedbackEditor() {
   const [quoteText, setQuoteText] = useState("");
   const [assignmentTitle, setAssignmentTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [requirementsOpen, setRequirementsOpen] = useState(true);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isDirty, setIsDirty] = useState(false);
@@ -224,25 +229,36 @@ function TeacherFeedbackEditor() {
           </CardContent>
         </Card>
 
-        {/* Course Requirements */}
-        <Card className="mb-6">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">
-              Course Requirements
-            </CardTitle>
-            <p className="text-xs text-gray-500">
-              Instructions and prerequisites for students before class
-            </p>
-          </CardHeader>
-          <CardContent>
-            <textarea
-              className="min-h-[120px] w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="Pre-class instructions for students"
-              value={requirementsText}
-              onChange={(e) => { setRequirementsText(e.target.value); setIsDirty(true); }}
-            />
-          </CardContent>
-        </Card>
+        {/* Course Requirements — collapsible (7.2) */}
+        <Collapsible open={requirementsOpen} onOpenChange={setRequirementsOpen} className="mb-6">
+          <Card>
+            <CardHeader className="pb-3">
+              <CollapsibleTrigger asChild>
+                <button className="flex w-full items-center justify-between text-left">
+                  <div>
+                    <CardTitle className="text-sm font-semibold">Course Requirements</CardTitle>
+                    <p className="mt-0.5 text-xs text-gray-500">
+                      Instructions and prerequisites for students before class
+                    </p>
+                  </div>
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 text-gray-400 transition-transform ${requirementsOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+              </CollapsibleTrigger>
+            </CardHeader>
+            <CollapsibleContent>
+              <CardContent>
+                <textarea
+                  className="min-h-[120px] w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="Pre-class instructions for students"
+                  value={requirementsText}
+                  onChange={(e) => { setRequirementsText(e.target.value); setIsDirty(true); }}
+                />
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
         {/* Post-Class Feedback */}
         <Card className="mb-6">

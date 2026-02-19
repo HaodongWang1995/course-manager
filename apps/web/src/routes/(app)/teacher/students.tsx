@@ -61,6 +61,7 @@ function TeacherStudentsDirectory() {
   const [showActiveOnly, setShowActiveOnly] = useState(false);
   const [showAtRisk, setShowAtRisk] = useState(false);
   const [sortBy, setSortBy] = useState("name");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   // Derive students with display fields
   const students = useMemo(() => {
@@ -187,6 +188,12 @@ function TeacherStudentsDirectory() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-5">
+                {/* 5.1: Avg Attendance — large blue number */}
+                <div className="rounded-lg bg-blue-50 px-4 py-3 text-center">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-blue-400">Avg. Attendance</p>
+                  <p className="mt-1 text-3xl font-bold leading-none text-blue-600">{avgAttendance}%</p>
+                  <p className="mt-1 text-[10px] text-blue-400">across all students</p>
+                </div>
                 {/* Enrolled Course Filter */}
                 <div>
                   <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -269,14 +276,9 @@ function TeacherStudentsDirectory() {
             {/* Stats Bar */}
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3">
               <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium uppercase tracking-wider text-gray-500">
-                    Avg Attendance
-                  </span>
-                  <span className="text-lg font-bold text-emerald-600">
-                    {avgAttendance}%
-                  </span>
-                </div>
+                <p className="text-sm text-gray-500">
+                  <span className="font-semibold text-gray-900">{filteredStudents.length}</span> students shown
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" className="gap-1.5">
@@ -290,26 +292,37 @@ function TeacherStudentsDirectory() {
               </div>
             </div>
 
-            {/* Sort Controls */}
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-sm text-gray-500">
-                Showing <span className="font-medium text-gray-900">{filteredStudents.length}</span>{" "}
-                students
-              </p>
-              <div className="flex items-center gap-2">
-                <ArrowUpDown className="h-4 w-4 text-gray-400" />
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            {/* Bulk action bar */}
+            {selectedIds.size > 0 && (
+              <div className="mb-3 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2">
+                <span className="text-sm font-medium text-blue-700">{selectedIds.size} selected</span>
+                <Button variant="outline" size="sm" className="h-7 gap-1 text-xs">
+                  <Download className="h-3 w-3" />
+                  Export
+                </Button>
+                <button
+                  className="ml-auto text-xs text-blue-500 hover:underline"
+                  onClick={() => setSelectedIds(new Set())}
                 >
-                  <option value="name">Sort by: Name (A-Z)</option>
-                  <option value="name-desc">Sort by: Name (Z-A)</option>
-                  <option value="attendance-high">Sort by: Attendance (High)</option>
-                  <option value="attendance-low">Sort by: Attendance (Low)</option>
-                  <option value="id">Sort by: Student ID</option>
-                </select>
+                  Clear
+                </button>
               </div>
+            )}
+
+            {/* Sort Controls */}
+            <div className="mb-3 flex items-center justify-end gap-2">
+              <ArrowUpDown className="h-4 w-4 text-gray-400" />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="name">Sort by: Name (A-Z)</option>
+                <option value="name-desc">Sort by: Name (Z-A)</option>
+                <option value="attendance-high">Sort by: Attendance (High)</option>
+                <option value="attendance-low">Sort by: Attendance (Low)</option>
+                <option value="id">Sort by: Student ID</option>
+              </select>
             </div>
 
             {/* Students Table */}
@@ -318,6 +331,21 @@ function TeacherStudentsDirectory() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200 bg-gray-50/80">
+                      {/* 5.2: Bulk checkbox */}
+                      <th className="w-10 px-4 py-3">
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          checked={selectedIds.size === filteredStudents.length && filteredStudents.length > 0}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedIds(new Set(filteredStudents.map((s) => s.id)));
+                            } else {
+                              setSelectedIds(new Set());
+                            }
+                          }}
+                        />
+                      </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                         Student Name
                       </th>
@@ -339,8 +367,21 @@ function TeacherStudentsDirectory() {
                     {filteredStudents.map((student) => (
                       <tr
                         key={student.id}
-                        className="transition-colors hover:bg-gray-50/50"
+                        className={`transition-colors hover:bg-gray-50/50 ${selectedIds.has(student.id) ? "bg-blue-50/40" : ""}`}
                       >
+                        <td className="w-10 px-4 py-3">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            checked={selectedIds.has(student.id)}
+                            onChange={(e) => {
+                              const next = new Set(selectedIds);
+                              if (e.target.checked) next.add(student.id);
+                              else next.delete(student.id);
+                              setSelectedIds(next);
+                            }}
+                          />
+                        </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-9 w-9">
