@@ -279,9 +279,8 @@ function TeacherCourseDetail() {
                     </div>
                   </div>
                   <Button
-                    variant="ghost"
+                    variant="ghost-destructive"
                     size="icon"
-                    className="text-red-500 hover:text-red-700"
                     onClick={() => {
                       if (window.confirm("确定要删除此课时吗？")) {
                         deleteScheduleMutation.mutate(s.id);

@@ -7,6 +7,7 @@ import {
   Badge,
   Avatar,
   AvatarFallback,
+  Button,
 } from "@course-manager/ui";
 import {
   ClipboardList,
@@ -169,12 +170,12 @@ function TeacherDashboard() {
                   October 2023
                 </CardTitle>
                 <div className="flex gap-1">
-                  <button className="rounded p-1 hover:bg-gray-100">
-                    <ChevronLeft className="h-4 w-4 text-gray-500" />
-                  </button>
-                  <button className="rounded p-1 hover:bg-gray-100">
-                    <ChevronRight className="h-4 w-4 text-gray-500" />
-                  </button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-500">
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-500">
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </CardHeader>

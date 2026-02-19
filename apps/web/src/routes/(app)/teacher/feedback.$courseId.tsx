@@ -256,10 +256,10 @@ function TeacherFeedbackEditor() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600">
+                <Button variant="ghost" size="icon-sm">
                   <Download className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-red-500">
+                <Button variant="ghost-destructive" size="icon-sm">
                   <X className="h-4 w-4" />
                 </Button>
               </div>

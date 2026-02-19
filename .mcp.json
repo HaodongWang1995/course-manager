@@ -1,7 +1,22 @@
 {
+  "mcpServers": {
+    "aws-api": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "awslabs.aws-api-mcp-server@latest"
+      ],
+      "env": {
+        "AWS_REGION": "us-east-1"
+      }
+    },
     "powertools": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "powertools-for-aws-mcp"]
+      "args": [
+        "-y",
+        "powertools-for-aws-mcp"
+      ]
     }
+  }
 }
