@@ -1,0 +1,188 @@
+# Course Manager
+
+A modern course management system with separate Teacher (EduManager) and Student (EduPortal) interfaces. Built as a full-stack TypeScript monorepo with a React frontend and Express/PostgreSQL backend.
+
+## Features
+
+### Teacher (EduManager)
+- Dashboard with today's schedule and upcoming deadlines
+- Calendar (week/day views)
+- Course management — create, edit, publish, unpublish
+- Enrollment review — approve or reject student applications
+- Student directory with attendance tracking
+- Reports and analytics
+- Post-class feedback editor with auto-save
+
+### Student (EduPortal)
+- Weekly schedule view
+- Browse and enroll in courses
+- Gradebook with performance overview
+- Assignment center with priority tracking
+- Resource library
+- Course feedback and materials
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend framework | React 19 + TypeScript |
+| Build tool | Vite 6 |
+| Routing | TanStack Router v1 (file-based) |
+| Server state | TanStack Query v5 |
+| Forms | TanStack Form v1 |
+| Styling | TailwindCSS v4 |
+| UI components | shadcn/ui pattern (Radix UI + CVA) |
+| Icons | Lucide React |
+| Charts | Recharts |
+| Validation | Zod |
+| Backend | Node.js + Express 4 + TypeScript |
+| Database | PostgreSQL (pg driver) |
+| Auth | JWT (jsonwebtoken) + bcryptjs |
+| Testing | Vitest + Supertest + Playwright |
+| Monorepo | pnpm workspaces + Turborepo |
+
+## Project Structure
+
+```
+course-manager/
+├── packages/
+│   └── ui/               # @course-manager/ui — shared component library
+├── apps/
+│   ├── api/              # @course-manager/api — Express REST API (port 3001)
+│   └── web/              # @course-manager/web — React frontend (port 5173)
+└── PRD/                  # Product requirements and design docs
+```
+
+## Prerequisites
+
+- Node.js 18+
+- pnpm 9+
+- PostgreSQL 14+
+
+## Getting Started
+
+### 1. Install dependencies
+
+```bash
+pnpm install
+```
+
+### 2. Configure the API environment
+
+```bash
+cp apps/api/.env.example apps/api/.env
+```
+
+Edit `apps/api/.env`:
+
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/course_manager
+JWT_SECRET=your-secret-key-here
+PORT=3001
+```
+
+### 3. Set up the database
+
+```bash
+# Create the database
+createdb course_manager
+
+# Run migrations
+psql course_manager < apps/api/sql/001_init.sql
+psql course_manager < apps/api/sql/002_enrollments.sql
+```
+
+### 4. Start development servers
+
+```bash
+# Start both API and web in parallel
+pnpm dev
+```
+
+- Frontend: http://localhost:5173
+- API: http://localhost:3001
+
+## Demo Accounts
+
+| Role | Email | Password |
+|------|-------|----------|
+| Teacher | demoui@example.com | password123 |
+| Student | demostudent@example.com | password123 |
+
+Register a new account at `/login` to create your own.
+
+## Commands
+
+```bash
+# Development (all packages)
+pnpm dev
+
+# Build all packages
+pnpm build
+
+# Type checking
+pnpm typecheck
+
+# Run all tests
+pnpm test
+
+# Run tests with coverage
+pnpm test:coverage
+
+# Lint
+pnpm lint
+
+# Run E2E tests (requires running dev server)
+cd apps/web && pnpm e2e
+
+# Clean build artifacts
+pnpm clean
+```
+
+## API Endpoints
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/auth/register` | No | Register (teacher/student) |
+| POST | `/api/auth/login` | No | Login, returns JWT |
+| GET | `/api/auth/me` | Yes | Current user info |
+| GET | `/api/courses` | Yes | List courses |
+| GET | `/api/courses/:id` | Yes | Course detail + schedules |
+| POST | `/api/courses` | Teacher | Create course |
+| PUT | `/api/courses/:id` | Teacher | Update course |
+| DELETE | `/api/courses/:id` | Teacher | Delete course |
+| PATCH | `/api/courses/:id/status` | Teacher | Publish/unpublish |
+| GET | `/api/courses/:id/schedules` | Yes | List schedules |
+| POST | `/api/courses/:id/schedules` | Teacher | Create schedule |
+| PUT | `/api/schedules/:id` | Teacher | Update schedule |
+| DELETE | `/api/schedules/:id` | Teacher | Delete schedule |
+| POST | `/api/enrollments` | Student | Apply for enrollment |
+| GET | `/api/enrollments` | Yes | My enrollments |
+| PATCH | `/api/enrollments/:id/review` | Teacher | Approve/reject |
+| DELETE | `/api/enrollments/:id` | Student | Cancel enrollment |
+| GET | `/api/health` | No | Health check |
+
+## Deployment
+
+### AWS (recommended)
+
+The application is designed for deployment on AWS:
+
+- **Frontend**: S3 + CloudFront (static hosting)
+- **API**: ECS Fargate (containerized)
+- **Database**: RDS PostgreSQL
+
+See `PRD/TODO-REQUIREMENTS.md` for deployment configuration tasks.
+
+### Environment variables for production
+
+```env
+DATABASE_URL=postgresql://...rds.amazonaws.com:5432/course_manager
+JWT_SECRET=<strong-random-secret>
+PORT=3001
+NODE_ENV=production
+```
+
+## License
+
+Apache 2.0 — see [LICENSE](./LICENSE) for details.
