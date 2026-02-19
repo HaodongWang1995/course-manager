@@ -360,6 +360,14 @@ export function useStudentResources() {
   });
 }
 
+export function useCourseResources(courseId: string) {
+  return useQuery({
+    queryKey: ["course", "resources", courseId],
+    queryFn: () => resourceApi.listForCourse(courseId),
+    enabled: !!getToken() && !!courseId,
+  });
+}
+
 // ── Course Feedback (Real API) ────────────────────────
 
 export function useCourseFeedbackDetail(courseId: string) {
