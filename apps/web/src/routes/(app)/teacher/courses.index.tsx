@@ -272,11 +272,11 @@ function CourseGridCard({ course, index }: { course: Course; index: number }) {
         <h3 className="text-[15px] font-semibold text-gray-900 leading-snug line-clamp-1">
           {course.title}
         </h3>
-        {course.category && (
-          <p className="mt-0.5 text-xs text-gray-400">
-            {course.category}
-          </p>
-        )}
+        {/* 4.3: Section info */}
+        <p className="mt-0.5 text-xs text-gray-400">
+          {course.category && <span>{course.category} · </span>}
+          Section {String.fromCharCode(65 + (index % 3))} &bull; {["Mon, Wed", "Tue, Thu", "Mon, Wed, Fri"][index % 3]}
+        </p>
 
         {/* Student count + Lesson count */}
         <div className="mt-3 flex items-center gap-4 text-sm text-gray-500">
