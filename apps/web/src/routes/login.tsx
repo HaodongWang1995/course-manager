@@ -34,6 +34,12 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
+  const [role, setRole] = useState<"student" | "teacher">("student");
+
+  function selectRole(r: "student" | "teacher") {
+    setRole(r);
+    registerForm.setFieldValue("role", r);
+  }
 
   const loginForm = useForm({
     defaultValues: { email: "", password: "" },
@@ -69,7 +75,6 @@ function LoginPage() {
   });
 
   const isLoading = loginMutation.isPending || registerMutation.isPending;
-  const role = registerForm.getFieldValue("role");
 
   return (
     <div className="flex min-h-screen flex-col lg:items-center lg:justify-center bg-white lg:bg-gradient-to-br lg:from-blue-50 lg:via-white lg:to-indigo-50">
@@ -103,7 +108,7 @@ function LoginPage() {
             <div className="mt-3 grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => registerForm.setFieldValue("role", "student")}
+                onClick={() => selectRole("student")}
                 className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 py-5 transition-all ${
                   role === "student"
                     ? "border-[#137FEC] bg-blue-50/50"
@@ -124,7 +129,7 @@ function LoginPage() {
               </button>
               <button
                 type="button"
-                onClick={() => registerForm.setFieldValue("role", "teacher")}
+                onClick={() => selectRole("teacher")}
                 className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 py-5 transition-all ${
                   role === "teacher"
                     ? "border-[#137FEC] bg-blue-50/50"
@@ -403,7 +408,7 @@ function LoginPage() {
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={() => registerForm.setFieldValue("role", "student")}
+                  onClick={() => selectRole("student")}
                   className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 py-4 transition-all ${
                     role === "student"
                       ? "border-[#137FEC] bg-blue-50/50"
@@ -424,7 +429,7 @@ function LoginPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => registerForm.setFieldValue("role", "teacher")}
+                  onClick={() => selectRole("teacher")}
                   className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 py-4 transition-all ${
                     role === "teacher"
                       ? "border-[#137FEC] bg-blue-50/50"
