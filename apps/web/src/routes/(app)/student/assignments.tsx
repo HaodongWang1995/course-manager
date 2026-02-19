@@ -124,35 +124,34 @@ function StudentAssignments() {
 
       {/* Priority Hero - Due Soon */}
       {urgentAssignment && (
-        <Card className="border-red-200 bg-gradient-to-br from-red-50 to-orange-50">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <AlertTriangle className="h-4 w-4 text-red-500" />
-              <span className="text-xs font-semibold uppercase tracking-wide text-red-600">
-                Due Soon
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500">{urgentAssignment.course}</p>
-                <h3 className="mt-0.5 text-lg font-bold text-gray-900">
-                  {urgentAssignment.title}
-                </h3>
-                <div className="mt-1.5 flex items-center gap-1.5 text-xs text-red-600">
-                  <Clock className="h-3.5 w-3.5" />
-                  <span className="font-medium">{urgentAssignment.dueLabel}</span>
-                </div>
-              </div>
-              <button
-                onClick={() => handleAction(urgentAssignment.id, urgentAssignment.status)}
-                className="flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 transition-colors"
-              >
-                <Upload className="h-4 w-4" />
-                Submit
-              </button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-indigo-700 to-violet-800 p-5 shadow-lg">
+          {/* Background texture overlay */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
+          {/* Due urgency badge - top right */}
+          <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-red-500 px-2.5 py-1 shadow-sm">
+            <AlertTriangle className="h-3 w-3 text-white" />
+            <span className="text-[11px] font-bold text-white">{urgentAssignment.dueLabel}</span>
+          </div>
+          {/* Content */}
+          <p className="text-xs font-semibold uppercase tracking-widest text-blue-200">
+            {urgentAssignment.course}
+          </p>
+          <h3 className="mt-1.5 text-xl font-bold leading-snug text-white pr-28">
+            {urgentAssignment.title}
+          </h3>
+          <div className="mt-1.5 flex items-center gap-1.5 text-xs text-blue-200">
+            <Clock className="h-3.5 w-3.5" />
+            <span>Priority Assignment</span>
+          </div>
+          {/* Submit button */}
+          <button
+            onClick={() => handleAction(urgentAssignment.id, urgentAssignment.status)}
+            className="mt-4 flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-indigo-700 shadow-md transition-all hover:bg-blue-50 active:scale-[0.98]"
+          >
+            <Upload className="h-4 w-4" />
+            Submit Now
+          </button>
+        </div>
       )}
 
       {/* This Week */}
