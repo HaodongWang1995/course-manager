@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card, CardContent, Badge, Button } from "@course-manager/ui";
 import {
   ArrowLeft,
@@ -63,12 +63,12 @@ function StudentFeedbackDetail() {
     return (
       <div className="mx-auto max-w-lg space-y-5 pb-24">
         <div className="flex items-center gap-3">
-          <a
-            href="/student"
+          <Link
+            to="/student"
             className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
           >
             <ArrowLeft className="h-4 w-4 text-gray-600" />
-          </a>
+          </Link>
           <h1 className="text-lg font-bold text-gray-900">Feedback Detail</h1>
         </div>
         <Card>

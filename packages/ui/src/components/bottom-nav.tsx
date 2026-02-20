@@ -1,5 +1,6 @@
 "use client";
 
+import { Link } from "@tanstack/react-router";
 import { cn } from "../lib/utils";
 import { type LucideIcon } from "lucide-react";
 
@@ -31,9 +32,9 @@ export function BottomNav({ items, activeHref, className }: BottomNavProps) {
           const Icon = item.icon;
 
           return (
-            <a
+            <Link
               key={item.href}
-              href={item.href}
+              to={item.href}
               className={cn(
                 "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-center transition-colors",
                 isActive ? "text-[#137fec]" : "text-slate-400 hover:text-slate-600"
@@ -48,7 +49,7 @@ export function BottomNav({ items, activeHref, className }: BottomNavProps) {
               >
                 {item.label}
               </span>
-            </a>
+            </Link>
           );
         })}
       </div>

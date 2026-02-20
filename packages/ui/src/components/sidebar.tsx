@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { cn } from "../lib/utils";
 import { ChevronDown, type LucideIcon } from "lucide-react";
 
@@ -40,8 +41,8 @@ function NavItem({
   const Icon = item.icon;
 
   return (
-    <a
-      href={item.href}
+    <Link
+      to={item.href}
       className={cn(
         "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
         isActive
@@ -53,7 +54,7 @@ function NavItem({
         className={cn("h-5 w-5 shrink-0", isActive ? "text-[#137fec]" : "text-slate-400")}
       />
       <span>{item.label}</span>
-    </a>
+    </Link>
   );
 }
 
