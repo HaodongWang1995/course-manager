@@ -164,15 +164,46 @@ pnpm clean
 
 ## Deployment
 
-### AWS (recommended)
+### Local Docker Compose
 
-The application is designed for deployment on AWS:
+Run the full stack (API + web + PostgreSQL) with a single command:
 
-- **Frontend**: S3 + CloudFront (static hosting)
-- **API**: ECS Fargate (containerized)
-- **Database**: RDS PostgreSQL
+```bash
+docker compose up --build
+```
 
-See `PRD/TODO-REQUIREMENTS.md` for deployment configuration tasks.
+- Frontend: http://localhost
+- API: http://localhost:3001
+
+The `docker-compose.yml` at the project root wires up all three services and runs SQL migrations automatically on first boot.
+
+### AWS (recommended architecture)
+
+| Component | Service |
+|-----------|---------|
+| Frontend | S3 + CloudFront (serve the Vite static build) |
+| API | ECS Fargate (uses `apps/api/Dockerfile`) |
+| Database | RDS PostgreSQL |
+
+**Build and push the API image:**
+
+```bash
+# Authenticate to ECR
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin <account>.dkr.ecr.us-east-1.amazonaws.com
+
+docker build -f apps/api/Dockerfile -t course-manager-api .
+docker tag course-manager-api:latest <account>.dkr.ecr.us-east-1.amazonaws.com/course-manager-api:latest
+docker push <account>.dkr.ecr.us-east-1.amazonaws.com/course-manager-api:latest
+```
+
+**Build and deploy the frontend to S3:**
+
+```bash
+VITE_API_URL=https://api.yourdomain.com pnpm --filter @course-manager/web build
+aws s3 sync apps/web/dist s3://your-bucket-name --delete
+aws cloudfront create-invalidation --distribution-id YOUR_DIST_ID --paths "/*"
+```
 
 ### Environment variables for production
 

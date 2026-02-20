@@ -47,13 +47,12 @@ Items are grouped by priority.
 
 ### 7. AWS Deployment Configuration
 **Requirement**: "prepare this to be deployed to AWS afterwards"
-**Status**: ❌ No deployment configuration exists (no Dockerfile, no ECS task definition, no CDK/Terraform)
-**TODO**:
-- Add `Dockerfile` for the API server (`apps/api/Dockerfile`)
-- Add `Dockerfile` for the web frontend (`apps/web/Dockerfile`) or configure for static hosting (S3 + CloudFront)
-- Add `docker-compose.yml` for local development with PostgreSQL
-- Add deployment documentation in README.md
-- Consider: AWS ECS (API) + S3/CloudFront (frontend) + RDS (PostgreSQL)
+**Status**: ✅ Done — Docker setup complete:
+  - `apps/api/Dockerfile` (multi-stage: builder + node:22-alpine runtime)
+  - `apps/web/Dockerfile` (multi-stage: builder + nginx static server)
+  - `docker-compose.yml` (API + web + PostgreSQL with auto-migration)
+  - `.dockerignore` at project root
+  - README.md updated with Docker Compose + AWS deployment instructions (ECS Fargate for API, S3+CloudFront for web, RDS for DB)
 
 ---
 
