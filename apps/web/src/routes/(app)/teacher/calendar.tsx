@@ -34,6 +34,15 @@ const hours = Array.from({ length: 10 }, (_, i) => i + 8); // 8 AM to 5 PM
 const dayNamesFull = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+// PostgreSQL TIMESTAMP is serialized with a "Z" by res.json(), but the stored
+// value represents the teacher's local wall-clock time (entered via datetime-local).
+// Stripping the timezone suffix prevents the browser from applying UTC→local
+// conversion and keeps the time as originally intended.
+function parseLocalTime(isoStr: string): Date {
+  const normalized = isoStr.replace(/Z$/, "").replace(/[+-]\d{2}:\d{2}$/, "");
+  return new Date(normalized);
+}
+
 const eventColors = [
   "bg-blue-100 border-blue-300 text-blue-800",
   "bg-green-100 border-green-300 text-green-800",
@@ -74,8 +83,8 @@ function TeacherCalendar() {
   const calendarEvents = useMemo(() =>
     schedules.map((s) => {
       const colorIdx = courseColorMap.get(s.course_id) ?? 0;
-      const start = new Date(s.start_time);
-      const end = new Date(s.end_time);
+      const start = parseLocalTime(s.start_time);
+      const end = parseLocalTime(s.end_time);
       const dayOfWeek = start.getDay(); // 0=Sun ... 6=Sat
       const startHour = start.getHours() + start.getMinutes() / 60;
       const duration = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
@@ -138,7 +147,7 @@ function TeacherCalendar() {
   // Events that fall within the displayed week (Sun–Sat)
   const weekEvents = useMemo(() =>
     calendarEvents.filter((e) => {
-      const diff = Math.round((e.date.getTime() - sunday.getTime()) / 86400000);
+      const diff = Math.floor((e.date.getTime() - sunday.getTime()) / 86400000);
       return diff >= 0 && diff < 7;
     }),
     [calendarEvents, sunday]
