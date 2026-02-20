@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 const API_URL =
   process.env.E2E_API_URL ||
@@ -35,6 +35,28 @@ async function createCourse(request: Parameters<typeof test>[0]["request"], toke
     throw new Error(`Create course failed: ${res.status()} ${text}`);
   }
   return (await res.json()) as { id: string; title: string };
+}
+
+async function applyEnrollment(request: Parameters<typeof test>[0]["request"], token: string, courseId: string) {
+  const res = await request.post(`${API_URL}/api/enrollments`, {
+    data: { course_id: courseId },
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok()) {
+    const text = await res.text();
+    throw new Error(`Enrollment apply failed: ${res.status()} ${text}`);
+  }
+  return (await res.json()) as { id: string; status: string };
+}
+
+/** Log in via the UI login page and wait for redirect. */
+async function loginViaUI(page: Page, email: string, password: string, role: "teacher" | "student") {
+  await page.goto("/login");
+  await page.getByLabel("邮箱").fill(email);
+  await page.getByLabel("密码").fill(password);
+  // The second button is the login submit (first is register tab/toggle)
+  await page.getByRole("button", { name: "登录" }).nth(1).click();
+  await expect(page).toHaveURL(new RegExp(`/${role}`));
 }
 
 test.describe("PRD E2E", () => {
@@ -95,5 +117,88 @@ test.describe("PRD E2E", () => {
     await page.getByRole("button", { name: /创建课程/ }).click();
 
     await expect(page.getByText(title)).toBeVisible();
+  });
+
+  test("Student can log in, view course detail, and apply for enrollment", async ({ page, request }) => {
+    // Setup: create teacher + active course via API
+    const teacher = await registerOrLogin(request, {
+      name: "Enroll Teacher",
+      email: `teacher.enroll+${Date.now()}@example.com`,
+      password: "password123",
+      role: "teacher",
+    });
+    const courseTitle = `Enroll Course ${Date.now()}`;
+    const course = await createCourse(request, teacher.token, {
+      title: courseTitle,
+      description: "A course for enrollment E2E",
+      price: 0,
+      status: "active",
+    });
+
+    // Register student
+    const student = await registerOrLogin(request, {
+      name: "E2E Student",
+      email: `student.enroll+${Date.now()}@example.com`,
+      password: "password123",
+      role: "student",
+    });
+
+    // Log in via UI
+    await loginViaUI(page, student.user.email, "password123", "student");
+
+    // Navigate directly to the course detail page
+    await page.goto(`/student/courses/${course.id}`);
+    await expect(page.getByRole("heading", { name: courseTitle })).toBeVisible();
+
+    // Open enrollment dialog
+    await page.getByRole("button", { name: "申请选课" }).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByText(`申请加入「${courseTitle}」`)).toBeVisible();
+
+    // Submit enrollment
+    await page.getByRole("button", { name: "提交申请" }).click();
+
+    // Confirm success state
+    await expect(page.getByText("申请已提交！")).toBeVisible();
+  });
+
+  test("Teacher can review (approve) a pending enrollment", async ({ page, request }) => {
+    // Setup: teacher + active course + student enrollment via API
+    const teacher = await registerOrLogin(request, {
+      name: "Review Teacher",
+      email: `teacher.review+${Date.now()}@example.com`,
+      password: "password123",
+      role: "teacher",
+    });
+    const courseTitle = `Review Course ${Date.now()}`;
+    const course = await createCourse(request, teacher.token, {
+      title: courseTitle,
+      status: "active",
+    });
+
+    const student = await registerOrLogin(request, {
+      name: "Review Student",
+      email: `student.review+${Date.now()}@example.com`,
+      password: "password123",
+      role: "student",
+    });
+    await applyEnrollment(request, student.token, course.id);
+
+    // Log in as teacher via UI
+    await loginViaUI(page, teacher.user.email, "password123", "teacher");
+
+    // Go to enrollments page
+    await page.goto("/teacher/enrollments");
+    await expect(page.getByText("Enrollment Management")).toBeVisible();
+
+    // The student's enrollment should appear as Pending
+    await expect(page.getByText(student.user.name)).toBeVisible();
+    await expect(page.getByText("Pending")).toBeVisible();
+
+    // Approve the enrollment
+    await page.getByRole("button", { name: "Approve" }).first().click();
+
+    // Status should update to Approved
+    await expect(page.getByText("Approved")).toBeVisible();
   });
 });

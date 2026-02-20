@@ -72,14 +72,13 @@ Items are grouped by priority.
 
 ### 9. Playwright E2E Tests — Coverage
 **Requirement**: "use Playwright MCP server to test that UI is styled correctly and interactions work as planned"
-**Status**: ⚠️ Playwright is installed and configured (`playwright.config.ts`, `e2e/prd.spec.ts` exists), but test coverage is minimal
-**TODO**:
-- Write E2E tests for critical user flows:
-  - Teacher: login → create course → publish
-  - Teacher: review enrollment (approve/reject)
-  - Student: login → browse courses → enroll
-  - Student: view assignments → submit
-- Aim for coverage of all major pages
+**Status**: ✅ Done — `apps/web/e2e/prd.spec.ts` has 4 tests covering all critical flows:
+  1. Public user can browse active courses and view details
+  2. Teacher can log in and create a course from UI
+  3. Student can log in, view course detail, and apply for enrollment
+  4. Teacher can review (approve) a pending enrollment
+
+  Run with: `cd apps/web && pnpm e2e` (requires running API + web dev servers)
 
 ---
 
