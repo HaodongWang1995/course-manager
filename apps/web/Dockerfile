@@ -21,8 +21,9 @@ RUN pnpm install --frozen-lockfile
 COPY apps/web ./apps/web
 COPY packages/ui ./packages/ui
 
-# Build args for runtime API URL (injected at build time)
-ARG VITE_API_URL=http://localhost:3001
+# VITE_API_URL defaults to empty so the frontend uses relative /api/ paths
+# proxied by nginx to the api container
+ARG VITE_API_URL=""
 ENV VITE_API_URL=$VITE_API_URL
 
 # Build static assets
@@ -34,8 +35,8 @@ FROM nginx:alpine AS runtime
 # Copy built assets
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
 
-# SPA fallback: route all requests to index.html
-RUN printf 'server {\n  listen 80;\n  root /usr/share/nginx/html;\n  index index.html;\n  location / {\n    try_files $uri $uri/ /index.html;\n  }\n}\n' \
+# nginx: serve SPA + proxy /api/ to api container
+RUN printf 'server {\n  listen 80;\n  root /usr/share/nginx/html;\n  index index.html;\n\n  location /api/ {\n    proxy_pass http://api:3001;\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n  }\n\n  location / {\n    try_files $uri $uri/ /index.html;\n  }\n}\n' \
     > /etc/nginx/conf.d/default.conf
 
 EXPOSE 80

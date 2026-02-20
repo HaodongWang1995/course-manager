@@ -1,12 +1,11 @@
 services:
   postgres:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: course_manager
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./apps/api/sql/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql
@@ -21,13 +20,14 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-    ports:
-      - "3001:3001"
+    restart: unless-stopped
+    # No host port mapping - accessed only via nginx internal network
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/course_manager
-      JWT_SECRET: local-dev-secret-change-in-production
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
       PORT: "3001"
       NODE_ENV: production
+      CORS_ORIGIN: http://16.144.22.5
     depends_on:
       postgres:
         condition: service_healthy
@@ -36,6 +36,7 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
     ports:
       - "80:80"
     depends_on:
