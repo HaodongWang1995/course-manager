@@ -14,7 +14,9 @@ import {
   Mail,
   FileText,
   ExternalLink,
+  CheckCircle,
 } from "lucide-react";
+import { useState } from "react";
 
 export const Route = createFileRoute("/(app)/student/support")({
   component: StudentSupport,
@@ -79,19 +81,62 @@ function StudentSupport() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Send us a message</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Input placeholder="Subject" />
-          <textarea
-            className="flex min-h-[100px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Describe your issue or question..."
-          />
-          <Button>Send Message</Button>
-        </CardContent>
-      </Card>
+      <ContactForm />
     </div>
+  );
+}
+
+function ContactForm() {
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const handleSend = () => {
+    if (!subject.trim() || !body.trim()) return;
+    setSent(true);
+    setSubject("");
+    setBody("");
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Send us a message</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {sent ? (
+          <div className="flex items-center gap-3 rounded-lg bg-emerald-50 px-4 py-3">
+            <CheckCircle className="h-5 w-5 shrink-0 text-emerald-500" />
+            <div>
+              <p className="text-sm font-medium text-emerald-700">消息已发送</p>
+              <p className="text-xs text-emerald-600">我们会在 1-2 个工作日内回复您</p>
+            </div>
+            <button
+              className="ml-auto text-xs text-emerald-600 hover:underline"
+              onClick={() => setSent(false)}
+            >
+              再发一条
+            </button>
+          </div>
+        ) : (
+          <>
+            <Input
+              placeholder="Subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            />
+            <textarea
+              className="flex min-h-[100px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Describe your issue or question..."
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+            />
+            <Button onClick={handleSend} disabled={!subject.trim() || !body.trim()}>
+              Send Message
+            </Button>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }

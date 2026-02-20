@@ -53,8 +53,10 @@ function getAttendanceBg(rate: number) {
   return "bg-red-50";
 }
 
+const PAGE_SIZE = 20;
+
 function TeacherStudentsDirectory() {
-  const { data: rawStudents = [] } = useTeacherStudents();
+  const { data: rawStudents = [], isLoading } = useTeacherStudents();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("all");
   const [selectedYear, setSelectedYear] = useState("all");
@@ -62,6 +64,7 @@ function TeacherStudentsDirectory() {
   const [showAtRisk, setShowAtRisk] = useState(false);
   const [sortBy, setSortBy] = useState("name");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Derive students with display fields
   const students = useMemo(() => {
@@ -137,6 +140,10 @@ function TeacherStudentsDirectory() {
 
     return result;
   }, [students, searchQuery, selectedCourse, selectedYear, showActiveOnly, showAtRisk, sortBy]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredStudents.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedStudents = filteredStudents.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   const avgAttendance = students.length
     ? (students.reduce((sum, s) => sum + s.attendance, 0) / students.length).toFixed(1)
@@ -364,7 +371,20 @@ function TeacherStudentsDirectory() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {filteredStudents.map((student) => (
+                    {isLoading ? (
+                      <tr>
+                        <td colSpan={6} className="py-12 text-center text-sm text-gray-500">
+                          加载中...
+                        </td>
+                      </tr>
+                    ) : paginatedStudents.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-12 text-center text-sm text-gray-500">
+                          {students.length === 0 ? "暂无学生数据（尚无学生报名课程）" : "没有符合条件的学生"}
+                        </td>
+                      </tr>
+                    ) : null}
+                    {paginatedStudents.map((student) => (
                       <tr
                         key={student.id}
                         className={`transition-colors hover:bg-gray-50/50 ${selectedIds.has(student.id) ? "bg-blue-50/40" : ""}`}
@@ -457,37 +477,55 @@ function TeacherStudentsDirectory() {
             </Card>
 
             {/* Pagination */}
-            <div className="mt-4 flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3">
-              <p className="text-sm text-gray-600">
-                Showing <span className="font-medium">1</span> to{" "}
-                <span className="font-medium">{filteredStudents.length}</span> of{" "}
-                <span className="font-medium">{students.length}</span> results
-              </p>
-              <div className="flex items-center gap-1">
-                <Button variant="outline" size="sm" disabled>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  className="h-8 w-8 bg-blue-600 p-0 text-white hover:bg-blue-700"
-                >
-                  1
-                </Button>
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                  2
-                </Button>
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                  3
-                </Button>
-                <span className="px-1 text-gray-400">...</span>
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                  24
-                </Button>
-                <Button variant="outline" size="sm">
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+            {totalPages > 1 && (
+              <div className="mt-4 flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3">
+                <p className="text-sm text-gray-600">
+                  第 <span className="font-medium">{(safePage - 1) * PAGE_SIZE + 1}</span>–
+                  <span className="font-medium">{Math.min(safePage * PAGE_SIZE, filteredStudents.length)}</span> 条，
+                  共 <span className="font-medium">{filteredStudents.length}</span> 条
+                </p>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={safePage <= 1}
+                    onClick={() => setCurrentPage(safePage - 1)}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((p) => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1)
+                    .reduce<(number | "...")[]>((acc, p, idx, arr) => {
+                      if (idx > 0 && (p as number) - (arr[idx - 1] as number) > 1) acc.push("...");
+                      acc.push(p);
+                      return acc;
+                    }, [])
+                    .map((item, idx) =>
+                      item === "..." ? (
+                        <span key={`ellipsis-${idx}`} className="px-1 text-gray-400">...</span>
+                      ) : (
+                        <Button
+                          key={item}
+                          size="sm"
+                          variant={item === safePage ? "default" : "outline"}
+                          className="h-8 w-8 p-0"
+                          onClick={() => setCurrentPage(item as number)}
+                        >
+                          {item}
+                        </Button>
+                      )
+                    )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={safePage >= totalPages}
+                    onClick={() => setCurrentPage(safePage + 1)}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

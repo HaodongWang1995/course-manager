@@ -28,6 +28,7 @@ import {
   useCourseAttachments,
 } from "@/hooks/use-queries";
 import { getToken } from "@/api/client";
+import { formatLocalDateTime, formatLocalTime } from "@/lib/time";
 
 export const Route = createFileRoute("/courses/$courseId")({
   component: PublicCourseDetail,
@@ -182,11 +183,9 @@ function PublicCourseDetail() {
                     <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-gray-500">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3.5 w-3.5" />
-                        {new Date(schedule.start_time).toLocaleString("zh-CN")}{" "}
+                        {formatLocalDateTime(schedule.start_time)}{" "}
                         -{" "}
-                        {new Date(schedule.end_time).toLocaleTimeString(
-                          "zh-CN",
-                        )}
+                        {formatLocalTime(schedule.end_time)}
                       </span>
                       {schedule.room && (
                         <span className="flex items-center gap-1">

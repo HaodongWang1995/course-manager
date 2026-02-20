@@ -45,6 +45,7 @@ import {
 import { useForm } from "@tanstack/react-form";
 import { scheduleFormValidator } from "@/lib/schemas";
 import { FormTextField, FormDateTimeField } from "@/components/form-field";
+import { formatLocalDateTime, formatLocalTime } from "@/lib/time";
 
 export const Route = createFileRoute("/(app)/teacher/courses/$courseId")({
   component: TeacherCourseDetail,
@@ -276,8 +277,8 @@ function TeacherCourseDetail() {
                     <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-gray-500">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3.5 w-3.5" />
-                        {new Date(s.start_time).toLocaleString("zh-CN")} -{" "}
-                        {new Date(s.end_time).toLocaleTimeString("zh-CN")}
+                        {formatLocalDateTime(s.start_time)} -{" "}
+                        {formatLocalTime(s.end_time)}
                       </span>
                       {s.room && (
                         <span className="flex items-center gap-1">

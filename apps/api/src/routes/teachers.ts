@@ -15,7 +15,7 @@ router.get("/students", authRequired, teacherOnly, async (req: Request, res: Res
        FROM enrollments e
        JOIN users u ON u.id = e.student_id
        JOIN courses c ON c.id = e.course_id
-       WHERE c.teacher_id = $1 AND e.status = 'approved'
+       WHERE c.teacher_id = $1 AND e.status IN ('approved', 'pending')
        GROUP BY u.id, u.name, u.email, u.avatar
        ORDER BY u.name`,
       [teacherId],
