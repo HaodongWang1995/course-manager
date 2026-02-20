@@ -40,20 +40,22 @@ function StudentAssignments() {
 
   const filtered = useMemo(() => {
     return assignments.filter((a) => {
+      const st = a.status || a.submission_status || "";
+      const course = a.course || a.course_title || "";
       const matchesSearch = !searchQuery ||
         a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        a.course.toLowerCase().includes(searchQuery.toLowerCase());
+        course.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesFilter =
         activeFilter === "All" ||
-        (activeFilter === "To Do" && (a.status === "todo")) ||
-        (activeFilter === "In Progress" && a.status === "in-progress") ||
-        (activeFilter === "Completed" && a.status === "completed");
+        (activeFilter === "To Do" && st === "todo") ||
+        (activeFilter === "In Progress" && st === "in-progress") ||
+        (activeFilter === "Completed" && st === "completed");
       return matchesSearch && matchesFilter;
     });
   }, [assignments, searchQuery, activeFilter]);
 
-  const todoCount = assignments.filter((a) => a.status === "todo").length;
-  const urgentAssignment = assignments.find((a) => a.urgent && a.status === "todo");
+  const todoCount = assignments.filter((a) => (a.status || a.submission_status) === "todo").length;
+  const urgentAssignment = assignments.find((a) => a.urgent && (a.status || a.submission_status) === "todo");
 
   const filterTabs = [
     { label: "All", count: null },
@@ -145,7 +147,7 @@ function StudentAssignments() {
           </div>
           {/* Submit button */}
           <button
-            onClick={() => handleAction(urgentAssignment.id, urgentAssignment.status)}
+            onClick={() => handleAction(urgentAssignment.id, urgentAssignment.status || urgentAssignment.submission_status || "")}
             className="mt-4 flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-indigo-700 shadow-md transition-all hover:bg-blue-50 active:scale-[0.98]"
           >
             <Upload className="h-4 w-4" />
@@ -165,9 +167,11 @@ function StudentAssignments() {
 
         <div className="space-y-3">
           {filtered.map((assignment) => {
-            const action = getAction(assignment.status);
+            const assignmentStatus = assignment.status || assignment.submission_status || "";
+            const action = getAction(assignmentStatus);
+            const courseTitle = assignment.course || assignment.course_title || "";
             const colorKey = Object.keys(courseColors).find((k) =>
-              assignment.course.includes(k) || k.includes(assignment.course)
+              courseTitle.includes(k) || k.includes(courseTitle)
             );
             const courseColor = courseColors[colorKey || ""] || "bg-gray-500";
 
@@ -184,19 +188,19 @@ function StudentAssignments() {
                       {/* Course + Status */}
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-xs font-medium text-gray-500">
-                          {assignment.course}
+                          {courseTitle}
                         </span>
-                        {assignment.status === "in-progress" && (
+                        {assignmentStatus === "in-progress" && (
                           <Badge variant="default" className="bg-blue-100 text-blue-700 border-none text-[10px]">
                             In Progress
                           </Badge>
                         )}
-                        {assignment.status === "completed" && (
+                        {assignmentStatus === "completed" && (
                           <Badge variant="success" className="text-[10px]">
                             Done
                           </Badge>
                         )}
-                        {assignment.status === "late" && (
+                        {assignmentStatus === "late" && (
                           <Badge variant="destructive" className="text-[10px]">
                             Late
                           </Badge>
@@ -242,11 +246,11 @@ function StudentAssignments() {
 
                         {action && (
                           <button
-                            onClick={() => handleAction(assignment.id, assignment.status)}
+                            onClick={() => handleAction(assignment.id, assignmentStatus)}
                             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                              assignment.status === "late"
+                              assignmentStatus === "late"
                                 ? "bg-red-600 text-white hover:bg-red-700"
-                                : assignment.status === "in-progress"
+                                : assignmentStatus === "in-progress"
                                   ? "bg-blue-600 text-white hover:bg-blue-700"
                                   : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
                             }`}
@@ -255,7 +259,7 @@ function StudentAssignments() {
                           </button>
                         )}
 
-                        {assignment.status === "completed" && (
+                        {assignmentStatus === "completed" && (
                           <div className="flex items-center gap-1 text-xs font-medium text-green-600">
                             <CheckCircle2 className="h-3.5 w-3.5" />
                             <span>Submitted</span>

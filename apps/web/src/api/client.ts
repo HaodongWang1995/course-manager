@@ -293,7 +293,13 @@ export interface Assignment {
 
 export interface StudentAssignment extends Assignment {
   submission_status: string;
+  status?: string;
   submitted_at?: string;
+  urgent?: boolean;
+  dueLabel?: string;
+  course?: string;
+  progress?: number;
+  filesAttached?: number;
 }
 
 export const assignmentApi = {

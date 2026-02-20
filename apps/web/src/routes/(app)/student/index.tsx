@@ -517,6 +517,8 @@ function CourseDetailPanel({
   );
 }
 
+type CourseColorEntry = { bg: string; border: string; text: string; solid: string };
+
 // ── Mobile Schedule View ───────────────────────────────
 function MobileScheduleView({
   morningEvents,
@@ -527,7 +529,7 @@ function MobileScheduleView({
 }: {
   morningEvents: ScheduleEvent[];
   afternoonEvents: ScheduleEvent[];
-  courseColors: typeof courseColors;
+  courseColors: CourseColorEntry[];
   onGoToFeedback: (courseId: string) => void;
   onViewCourse: (courseId: string) => void;
 }) {
@@ -631,7 +633,7 @@ function ListScheduleView({
   selectedEventId,
 }: {
   events: ScheduleEvent[];
-  courseColors: typeof courseColors;
+  courseColors: CourseColorEntry[];
   onSelectEvent: (event: ScheduleEvent) => void;
   selectedEventId?: string;
 }) {

@@ -27,7 +27,7 @@ Items are grouped by priority.
 
 ### 4. oxfmt (code formatter)
 **Requirement**: "oxfmt"
-**Status**: ⚠️ Skipped — oxfmt is part of the oxc project but not production-ready; no standard formatter configured yet. Consider Biome or Prettier as alternative.
+**Status**: ⚠️ Skipped — oxfmt is part of the oxc project but not production-ready as of 2026-02. De-prioritized; existing code style is consistent without a dedicated formatter tool.
 
 ---
 
@@ -62,9 +62,7 @@ Items are grouped by priority.
   - `routes/login.tsx` ✅
   - `routes/(app)/teacher/courses.$courseId.tsx` ✅
   - `routes/(app)/teacher/courses.index.tsx` (create course dialog) ✅
-  - `routes/(app)/teacher/feedback.$courseId.tsx` ✅ (requirements, feedback, homework refactored)
-
-  Minor: `routes/(app)/student/assignments.tsx` search input — acceptable, not a form submission.
+  - `routes/(app)/teacher/feedback.$courseId.tsx` ✅ (requirements, feedback, homework)
 
 ---
 
@@ -100,8 +98,8 @@ For reference, requirements from PROMP-BASIC that ARE already met:
 |-------------|---------------|
 | TanStack Router + React | `apps/web/src/routes/` with file-based routing |
 | TanStack Query v5 | `apps/web/src/hooks/use-queries.ts` |
-| TanStack Form (partial) | `login.tsx`, `courses.$courseId.tsx`, `courses.index.tsx` |
-| Follow Figma design | UI-TODO.md tracking — in progress |
+| TanStack Form | `login.tsx`, `courses.$courseId.tsx`, `courses.index.tsx`, `feedback.$courseId.tsx` |
+| Follow Figma design | UI-TODO.md — **46/46 items ✅ complete** |
 | PC + H5 layout | Desktop sidebar + mobile bottom nav, `lg:` breakpoint |
 | PostgreSQL | `apps/api/src/db.ts` with pg driver |
 | TypeScript | All packages configured |

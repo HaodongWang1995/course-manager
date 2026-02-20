@@ -55,12 +55,12 @@ function StudentResources() {
 
   const filteredFeatured = useMemo(() => {
     if (!resources) return [];
-    return resources.featured.filter((item) => matchesCategory(item.course, activeCategory));
+    return resources.featured.filter((item) => matchesCategory(item.course_title || "", activeCategory));
   }, [resources, activeCategory]);
 
   const filteredAll = useMemo(() => {
     if (!resources) return [];
-    return resources.all.filter((item) => matchesCategory(item.course || "", activeCategory));
+    return resources.all.filter((item) => matchesCategory(item.course_title || "", activeCategory));
   }, [resources, activeCategory]);
 
   if (isLoading || !resources) {
@@ -135,24 +135,26 @@ function StudentResources() {
             <h2 className="mb-4 text-lg font-bold text-slate-900">Recent &amp; Featured</h2>
             <div className="grid grid-cols-2 gap-3">
               {filteredFeatured.map((item) => {
-                const Icon = typeIcons[item.type] || FileText;
-                const gradient = getCoverGradient(item.course);
+                const Icon = typeIcons[item.file_type || ""] || FileText;
+                const gradient = getCoverGradient(item.course_title || "");
                 return (
                   <article
-                    key={item.title}
+                    key={item.id}
                     className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm"
                   >
                     {/* Cover thumbnail */}
                     <div className={`relative flex h-24 items-center justify-center bg-gradient-to-br ${gradient}`}>
                       <Icon className="h-8 w-8 text-white/80" />
-                      <span className="absolute right-2 top-2 rounded-full bg-white/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white backdrop-blur-sm">
-                        {item.type}
-                      </span>
+                      {item.file_type && (
+                        <span className="absolute right-2 top-2 rounded-full bg-white/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white backdrop-blur-sm">
+                          {item.file_type}
+                        </span>
+                      )}
                     </div>
                     {/* Card body */}
                     <div className="p-3">
                       <h3 className="line-clamp-2 text-xs font-bold leading-4 text-slate-900">{item.title}</h3>
-                      <p className="mt-1 text-[10px] leading-[15px] text-slate-400">{item.course} &middot; {item.meta}</p>
+                      <p className="mt-1 text-[10px] leading-[15px] text-slate-400">{item.course_title}{item.file_size ? ` · ${item.file_size}` : ""}</p>
                       <button
                         type="button"
                         className="mt-2 flex items-center gap-1 text-[10px] font-semibold text-[#137fec] hover:underline"
@@ -175,10 +177,10 @@ function StudentResources() {
             <h2 className="mb-4 text-lg font-bold text-slate-900">All Resources</h2>
             <div className="space-y-3">
               {filteredAll.map((item) => {
-                const Icon = typeIcons[item.type] || FileText;
+                const Icon = typeIcons[item.file_type || ""] || FileText;
                 return (
                   <article
-                    key={item.title}
+                    key={item.id}
                     className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-[17px] shadow-sm"
                   >
                     <div className="flex items-center gap-3">
@@ -187,7 +189,7 @@ function StudentResources() {
                       </div>
                       <div>
                         <h3 className="text-sm font-bold leading-5 text-slate-900">{item.title}</h3>
-                        <p className="text-[10px] leading-[15px] text-slate-400">{item.meta}</p>
+                        <p className="text-[10px] leading-[15px] text-slate-400">{item.file_size}</p>
                       </div>
                     </div>
                     <button
