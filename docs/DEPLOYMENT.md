@@ -8,8 +8,9 @@
 4. [启动开发服务](#启动开发服务)
 5. [构建生产版本](#构建生产版本)
 6. [生产环境部署](#生产环境部署)
-7. [环境变量说明](#环境变量说明)
-8. [常见问题](#常见问题)
+7. [文件存储（Cloudflare R2）](#文件存储cloudflare-r2)
+8. [环境变量说明](#环境变量说明)
+9. [常见问题](#常见问题)
 
 ---
 
@@ -91,12 +92,27 @@ psql -U postgres -d course_manager -f apps/api/sql/002_enrollments.sql
 
 ### 数据库表结构
 
-| 表名 | 说明 |
-|------|------|
-| `users` | 用户表（teacher/student 角色） |
-| `courses` | 课程表（关联 teacher_id） |
-| `course_schedules` | 课程日程表（关联 course_id） |
-| `enrollments` | 选课记录表（student_id + course_id 唯一） |
+按顺序执行所有迁移文件：
+
+```bash
+psql -U postgres -d course_manager -f apps/api/sql/001_init.sql
+psql -U postgres -d course_manager -f apps/api/sql/002_enrollments.sql
+psql -U postgres -d course_manager -f apps/api/sql/003_features.sql
+# 004_attachments.sql — 附件功能（待实现）
+```
+
+| 表名 | 迁移文件 | 说明 |
+|------|----------|------|
+| `users` | 001 | 用户表（teacher/student 角色） |
+| `courses` | 001 | 课程表（关联 teacher_id） |
+| `course_schedules` | 001 | 课程日程表（关联 course_id） |
+| `enrollments` | 002 | 选课记录表（student_id + course_id 唯一） |
+| `assignments` | 003 | 作业表 |
+| `grades` | 003 | 成绩表 |
+| `resources` | 003 | 课程资源表 |
+| `feedback` | 003 | 课后反馈表 |
+| `deadlines` | 003 | 教师待办/截止日期表 |
+| `attachments` | 004（待实现） | 课程/课节附件表，关联 R2 文件 |
 
 ---
 
@@ -256,6 +272,63 @@ server {
 
 ---
 
+## 文件存储（Cloudflare R2）
+
+课程附件（PDF、PPT、课件等）存储于 Cloudflare R2，不经过 API 服务器（浏览器直传）。
+
+### 为什么选 Cloudflare R2
+
+| 方案 | 免费存储 | 出站流量 | 适合场景 |
+|------|----------|----------|----------|
+| AWS S3 | 5 GB（12 个月） | $0.09/GB | 企业级，生态最完整 |
+| **Cloudflare R2** | **10 GB 永久** | **$0 永久免费** | 教育平台、文件下载多 ✅ |
+| Backblaze B2 | 10 GB 永久 | 免费 3× 月均 | 存储成本最低 |
+
+R2 选型理由：课程平台有大量学生下载行为，出站流量免费是核心优势。R2 兼容 S3 API，使用 `@aws-sdk/client-s3` 即可。
+
+### 配置步骤
+
+1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com) → R2 → 创建 bucket（名称：`course-manager-files`）
+2. R2 → 管理 API Tokens → 创建 Token（权限：Object Read & Write）
+3. 配置 bucket CORS：
+
+```json
+[
+  {
+    "AllowedOrigins": ["https://your-domain.com", "http://localhost:5173"],
+    "AllowedMethods": ["GET", "PUT"],
+    "AllowedHeaders": ["*"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+4. 在 API 环境变量中添加（见下方[环境变量说明](#环境变量说明)）
+
+### 上传流程（Presigned URL 直传）
+
+```
+浏览器 ──1. 请求 presign──> API ──2. 生成 presigned PUT URL──> R2
+浏览器 ──3. 直接 PUT 文件──────────────────────────────────────> R2
+浏览器 ──4. confirm 元数据──> API ──5. 写入 PostgreSQL
+```
+
+API 服务器不处理文件内容，仅生成签名 URL 和保存元数据，不影响服务器带宽。
+
+### 本地开发
+
+本地开发可继续使用 Cloudflare R2（免费额度足够），或配置 [MinIO](https://min.io/) 作为本地 S3 兼容存储：
+
+```bash
+# 使用 Docker 运行本地 MinIO
+docker run -p 9000:9000 -p 9001:9001 \
+  -e MINIO_ROOT_USER=minioadmin \
+  -e MINIO_ROOT_PASSWORD=minioadmin \
+  minio/minio server /data --console-address ":9001"
+```
+
+---
+
 ## 环境变量说明
 
 ### 后端 (`apps/api/.env`)
@@ -266,6 +339,11 @@ server {
 | `DATABASE_URL` | 是 | - | PostgreSQL 连接字符串 |
 | `JWT_SECRET` | 是 | - | JWT 签名密钥，生产环境用强随机值 |
 | `CORS_ORIGIN` | 否 | `localhost:5173-5176` | 允许的前端域名，逗号分隔 |
+| `R2_ACCOUNT_ID` | 附件功能 | - | Cloudflare Account ID |
+| `R2_ACCESS_KEY_ID` | 附件功能 | - | R2 API Token Access Key ID |
+| `R2_SECRET_ACCESS_KEY` | 附件功能 | - | R2 API Token Secret Access Key |
+| `R2_BUCKET_NAME` | 附件功能 | `course-manager-files` | R2 Bucket 名称 |
+| `R2_PUBLIC_URL` | 附件功能 | - | R2 公开访问域名（如 `https://pub-xxx.r2.dev`） |
 
 ### 前端 (`apps/web/.env`)
 
