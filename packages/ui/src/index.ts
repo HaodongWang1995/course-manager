@@ -1,4 +1,5 @@
 // Components
+export * from "./components/attachment-list";
 export * from "./components/auth-loading";
 export * from "./components/avatar";
 export * from "./components/badge";
@@ -9,6 +10,7 @@ export * from "./components/checkbox";
 export * from "./components/collapsible";
 export * from "./components/dialog";
 export * from "./components/dropdown-menu";
+export * from "./components/file-upload-zone";
 export * from "./components/input";
 export * from "./components/kpi-card";
 export * from "./components/label";

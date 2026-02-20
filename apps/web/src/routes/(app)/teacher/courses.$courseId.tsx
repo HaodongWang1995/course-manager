@@ -19,6 +19,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  FileUploadZone,
+  AttachmentList,
 } from "@course-manager/ui";
 import {
   ArrowLeft,
@@ -28,6 +30,7 @@ import {
   Plus,
   Trash2,
   Save,
+  Paperclip,
 } from "lucide-react";
 import {
   useCourseDetail,
@@ -35,6 +38,9 @@ import {
   useUpdateCourseStatus,
   useAddSchedule,
   useDeleteSchedule,
+  useCourseAttachments,
+  useUploadAttachment,
+  useDeleteAttachment,
 } from "@/hooks/use-queries";
 import { useForm } from "@tanstack/react-form";
 import { scheduleFormValidator } from "@/lib/schemas";
@@ -64,6 +70,9 @@ function TeacherCourseDetail() {
   const statusMutation = useUpdateCourseStatus();
   const addScheduleMutation = useAddSchedule();
   const deleteScheduleMutation = useDeleteSchedule();
+  const { data: attachments = [] } = useCourseAttachments(courseId);
+  const uploadMutation = useUploadAttachment();
+  const deleteAttachmentMutation = useDeleteAttachment();
 
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState("");
@@ -293,6 +302,31 @@ function TeacherCourseDetail() {
               ))}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Attachments */}
+      <Card>
+        <CardHeader className="flex flex-row items-center gap-2">
+          <Paperclip className="h-5 w-5 text-gray-500" />
+          <CardTitle>课程附件 ({attachments.length})</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <FileUploadZone
+            accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.mp4,.zip"
+            maxSizeMB={50}
+            uploading={uploadMutation.isPending}
+            onFileSelect={(files) => {
+              for (const file of files) {
+                uploadMutation.mutate({ file, courseId });
+              }
+            }}
+          />
+          <AttachmentList
+            attachments={attachments}
+            onDelete={(id) => deleteAttachmentMutation.mutate(id)}
+            isDeleting={deleteAttachmentMutation.isPending}
+          />
         </CardContent>
       </Card>
 

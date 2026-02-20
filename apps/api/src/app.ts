@@ -9,6 +9,7 @@ import assignmentRoutes from "./routes/assignments.js";
 import gradeRoutes from "./routes/grades.js";
 import resourceRoutes from "./routes/resources.js";
 import feedbackRoutes from "./routes/feedback.js";
+import attachmentRoutes from "./routes/attachments.js";
 
 const app: Express = express();
 
@@ -57,5 +58,6 @@ app.use("/api", assignmentRoutes);
 app.use("/api/grades", gradeRoutes);
 app.use("/api", resourceRoutes);
 app.use("/api/feedback", feedbackRoutes);
+app.use("/api", attachmentRoutes);
 
 export default app;

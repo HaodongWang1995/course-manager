@@ -431,6 +431,62 @@ export const feedbackApi = {
   },
 };
 
+// ── Attachments ─────────────────────────────────────
+
+export interface Attachment {
+  id: string;
+  course_id?: string;
+  schedule_id?: string;
+  uploader_id: string;
+  filename: string;
+  file_key: string;
+  file_type?: string;
+  file_size?: number;
+  download_url?: string;
+  created_at: string;
+}
+
+export const attachmentApi = {
+  presign(data: {
+    filename: string;
+    content_type: string;
+    file_size?: number;
+    course_id?: string;
+    schedule_id?: string;
+  }) {
+    return request<{ upload_url: string; file_key: string }>("/api/attachments/presign", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  confirm(data: {
+    file_key: string;
+    filename: string;
+    file_size?: number;
+    file_type?: string;
+    course_id?: string;
+    schedule_id?: string;
+  }) {
+    return request<Attachment>("/api/attachments/confirm", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  listByCourse(courseId: string) {
+    return request<Attachment[]>(`/api/courses/${courseId}/attachments`);
+  },
+
+  listBySchedule(scheduleId: string) {
+    return request<Attachment[]>(`/api/schedules/${scheduleId}/attachments`);
+  },
+
+  delete(id: string) {
+    return request<{ success: boolean }>(`/api/attachments/${id}`, { method: "DELETE" });
+  },
+};
+
 // ── Schedules ─────────────────────────────────────
 
 export const scheduleApi = {

@@ -9,6 +9,7 @@ import {
   gradeApi,
   resourceApi,
   feedbackApi,
+  attachmentApi,
   setToken,
   clearToken,
   getToken,
@@ -25,6 +26,7 @@ import {
   studentKeys,
   courseKeys,
   feedbackKeys,
+  attachmentKeys,
 } from "@/lib/query-keys";
 
 // ── Auth (Real API) ──────────────────────────────────
@@ -419,6 +421,82 @@ export function usePublishFeedback() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: teacherKeys.feedbackDraft._def });
       queryClient.invalidateQueries({ queryKey: feedbackKeys._def });
+    },
+  });
+}
+
+// ── Attachments (Real API) ────────────────────────────
+
+export function useCourseAttachments(courseId: string) {
+  return useQuery({
+    queryKey: attachmentKeys.byCourse(courseId).queryKey,
+    queryFn: () => attachmentApi.listByCourse(courseId),
+    enabled: !!courseId && !!getToken(),
+  });
+}
+
+export function useScheduleAttachments(scheduleId: string) {
+  return useQuery({
+    queryKey: attachmentKeys.bySchedule(scheduleId).queryKey,
+    queryFn: () => attachmentApi.listBySchedule(scheduleId),
+    enabled: !!scheduleId && !!getToken(),
+  });
+}
+
+export function useDeleteAttachment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => attachmentApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: attachmentKeys._def });
+    },
+  });
+}
+
+export function useUploadAttachment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      file: File;
+      courseId?: string;
+      scheduleId?: string;
+    }) => {
+      const { file, courseId, scheduleId } = params;
+
+      // Step 1: Get presigned PUT URL from API
+      const { upload_url, file_key } = await attachmentApi.presign({
+        filename: file.name,
+        content_type: file.type || "application/octet-stream",
+        file_size: file.size,
+        course_id: courseId,
+        schedule_id: scheduleId,
+      });
+
+      // Step 2: Upload directly to R2 (skip for stub URLs in dev/test)
+      if (!upload_url.startsWith("stub://")) {
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("PUT", upload_url);
+          xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+          xhr.onload = () =>
+            xhr.status < 300 ? resolve() : reject(new Error(`Upload failed: ${xhr.status}`));
+          xhr.onerror = () => reject(new Error("Upload network error"));
+          xhr.send(file);
+        });
+      }
+
+      // Step 3: Confirm metadata with API
+      return attachmentApi.confirm({
+        file_key,
+        filename: file.name,
+        file_size: file.size,
+        file_type: file.type || undefined,
+        course_id: courseId,
+        schedule_id: scheduleId,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: attachmentKeys._def });
     },
   });
 }

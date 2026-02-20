@@ -15,6 +15,7 @@ import {
   DialogFooter,
   Input,
   Label,
+  AttachmentList,
 } from "@course-manager/ui";
 import {
   ArrowLeft,
@@ -26,8 +27,14 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  Paperclip,
 } from "lucide-react";
-import { useCourseDetail, useMyEnrollments, useApplyEnrollment } from "@/hooks/use-queries";
+import {
+  useCourseDetail,
+  useMyEnrollments,
+  useApplyEnrollment,
+  useCourseAttachments,
+} from "@/hooks/use-queries";
 
 export const Route = createFileRoute("/(app)/student/courses/$courseId")({
   component: StudentCourseDetail,
@@ -45,6 +52,7 @@ function StudentCourseDetail() {
   const { data: course, isLoading } = useCourseDetail(courseId);
   const { data: enrollments = [] } = useMyEnrollments();
   const applyMutation = useApplyEnrollment();
+  const { data: attachments = [] } = useCourseAttachments(courseId);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [note, setNote] = useState("");
   const [applied, setApplied] = useState(false);
@@ -210,6 +218,21 @@ function StudentCourseDetail() {
                 </div>
               ))}
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Attachments */}
+      {attachments.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Paperclip className="h-5 w-5" />
+              课程附件
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AttachmentList attachments={attachments} />
           </CardContent>
         </Card>
       )}

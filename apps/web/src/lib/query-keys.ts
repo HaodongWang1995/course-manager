@@ -53,10 +53,20 @@ export const feedbackKeys = createQueryKeys("feedback", {
   }),
 });
 
+export const attachmentKeys = createQueryKeys("attachment", {
+  byCourse: (courseId: string) => ({
+    queryKey: [courseId],
+  }),
+  bySchedule: (scheduleId: string) => ({
+    queryKey: [scheduleId],
+  }),
+});
+
 export const queryKeys = mergeQueryKeys(
   authKeys,
   teacherKeys,
   studentKeys,
   courseKeys,
   feedbackKeys,
+  attachmentKeys,
 );
