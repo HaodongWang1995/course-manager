@@ -10,12 +10,56 @@ import {
   Separator,
 } from "@course-manager/ui";
 import { User, Bell, Shield, Palette } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useCurrentUser, useUpdateProfile, useUpdatePassword } from "@/hooks/use-queries";
 
 export const Route = createFileRoute("/(app)/teacher/settings")({
   component: TeacherSettings,
 });
 
 function TeacherSettings() {
+  const { data: user } = useCurrentUser();
+
+  const [name, setName] = useState("");
+  const [profileMsg, setProfileMsg] = useState("");
+
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [pwMsg, setPwMsg] = useState("");
+
+  const profileMutation = useUpdateProfile();
+  const passwordMutation = useUpdatePassword();
+
+  useEffect(() => {
+    if (user) setName(user.name);
+  }, [user]);
+
+  const handleSaveProfile = async () => {
+    setProfileMsg("");
+    profileMutation.mutate(
+      { name },
+      {
+        onSuccess: () => setProfileMsg("保存成功"),
+        onError: (e) => setProfileMsg(e.message || "保存失败"),
+      },
+    );
+  };
+
+  const handleUpdatePassword = async () => {
+    setPwMsg("");
+    passwordMutation.mutate(
+      { current_password: currentPw, new_password: newPw },
+      {
+        onSuccess: () => {
+          setPwMsg("密码已更新");
+          setCurrentPw("");
+          setNewPw("");
+        },
+        onError: (e) => setPwMsg(e.message || "更新失败"),
+      },
+    );
+  };
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
@@ -36,20 +80,28 @@ function TeacherSettings() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>Display Name</Label>
-            <Input placeholder="Your name" defaultValue="Professor Smith" />
+            <Input
+              placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label>Email</Label>
-            <Input type="email" placeholder="Email" defaultValue="smith@edu.com" disabled />
-          </div>
-          <div className="space-y-2">
-            <Label>Bio</Label>
-            <textarea
-              className="flex min-h-[80px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Tell students about yourself..."
+            <Input
+              type="email"
+              value={user?.email ?? ""}
+              disabled
             />
           </div>
-          <Button>Save Changes</Button>
+          {profileMsg && (
+            <p className={`text-sm ${profileMsg === "保存成功" ? "text-emerald-600" : "text-red-600"}`}>
+              {profileMsg}
+            </p>
+          )}
+          <Button onClick={handleSaveProfile} disabled={profileMutation.isPending || !name.trim()}>
+            {profileMutation.isPending ? "保存中..." : "Save Changes"}
+          </Button>
         </CardContent>
       </Card>
 
@@ -69,7 +121,11 @@ function TeacherSettings() {
           ].map((item) => (
             <label key={item.label} className="flex items-center justify-between">
               <span className="text-sm text-gray-700">{item.label}</span>
-              <input type="checkbox" defaultChecked={item.defaultChecked} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+              <input
+                type="checkbox"
+                defaultChecked={item.defaultChecked}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600"
+              />
             </label>
           ))}
         </CardContent>
@@ -86,13 +142,34 @@ function TeacherSettings() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>Current Password</Label>
-            <Input type="password" placeholder="Enter current password" />
+            <Input
+              type="password"
+              placeholder="Enter current password"
+              value={currentPw}
+              onChange={(e) => setCurrentPw(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label>New Password</Label>
-            <Input type="password" placeholder="Enter new password" />
+            <Input
+              type="password"
+              placeholder="Enter new password (min. 6 chars)"
+              value={newPw}
+              onChange={(e) => setNewPw(e.target.value)}
+            />
           </div>
-          <Button variant="outline">Update Password</Button>
+          {pwMsg && (
+            <p className={`text-sm ${pwMsg === "密码已更新" ? "text-emerald-600" : "text-red-600"}`}>
+              {pwMsg}
+            </p>
+          )}
+          <Button
+            variant="outline"
+            onClick={handleUpdatePassword}
+            disabled={passwordMutation.isPending || !currentPw || !newPw}
+          >
+            {passwordMutation.isPending ? "更新中..." : "Update Password"}
+          </Button>
         </CardContent>
       </Card>
 

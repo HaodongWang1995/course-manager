@@ -124,4 +124,70 @@ router.get("/me", authRequired, async (req: Request, res: Response) => {
   }
 });
 
+// PUT /api/auth/profile
+router.put("/profile", authRequired, async (req: Request, res: Response) => {
+  try {
+    const { name } = req.body;
+
+    if (!name || !name.trim()) {
+      res.status(400).json({ error: "姓名不能为空" });
+      return;
+    }
+
+    const result = await pool.query(
+      "UPDATE users SET name = $1, updated_at = NOW() WHERE id = $2 RETURNING id, email, name, role, avatar, created_at",
+      [name.trim(), req.user!.userId]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Update profile error:", err);
+    res.status(500).json({ error: "服务器错误" });
+  }
+});
+
+// PUT /api/auth/password
+router.put("/password", authRequired, async (req: Request, res: Response) => {
+  try {
+    const { current_password, new_password } = req.body;
+
+    if (!current_password || !new_password) {
+      res.status(400).json({ error: "请填写当前密码和新密码" });
+      return;
+    }
+
+    if (new_password.length < 6) {
+      res.status(400).json({ error: "新密码至少需要6位" });
+      return;
+    }
+
+    const result = await pool.query(
+      "SELECT password_hash FROM users WHERE id = $1",
+      [req.user!.userId]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: "用户不存在" });
+      return;
+    }
+
+    const valid = await bcrypt.compare(current_password, result.rows[0].password_hash);
+    if (!valid) {
+      res.status(401).json({ error: "当前密码错误" });
+      return;
+    }
+
+    const newHash = await bcrypt.hash(new_password, 10);
+    await pool.query(
+      "UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2",
+      [newHash, req.user!.userId]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Update password error:", err);
+    res.status(500).json({ error: "服务器错误" });
+  }
+});
+
 export default router;

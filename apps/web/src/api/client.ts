@@ -91,6 +91,20 @@ export const authApi = {
   me() {
     return request<User>("/api/auth/me");
   },
+
+  updateProfile(data: { name: string }) {
+    return request<User>("/api/auth/profile", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  },
+
+  updatePassword(data: { current_password: string; new_password: string }) {
+    return request<{ success: boolean }>("/api/auth/password", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  },
 };
 
 // ── Courses ───────────────────────────────────────

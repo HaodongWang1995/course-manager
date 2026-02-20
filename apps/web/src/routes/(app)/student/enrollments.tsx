@@ -1,11 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
   Badge,
   Button,
 } from "@course-manager/ui";
-import { Clock, CheckCircle, XCircle, Trash2, ClipboardList } from "lucide-react";
+import { Clock, CheckCircle, XCircle, Trash2, ClipboardList, Search } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { useState } from "react";
 import { useMyEnrollments, useCancelEnrollment } from "@/hooks/use-queries";
@@ -43,6 +43,7 @@ const statusConfig = {
 };
 
 function StudentEnrollments() {
+  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("");
   const { data: enrollments = [], isLoading } = useMyEnrollments(
     statusFilter ? { status: statusFilter } : undefined
@@ -58,11 +59,21 @@ function StudentEnrollments() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">My Enrollments</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Track your course enrollment applications
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">My Enrollments</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Track your course enrollment applications
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          className="shrink-0 gap-2"
+          onClick={() => navigate({ to: "/courses" })}
+        >
+          <Search className="h-4 w-4" />
+          浏览全部课程
+        </Button>
       </div>
 
       {/* Status Tabs */}
@@ -90,6 +101,12 @@ function StudentEnrollments() {
           icon={ClipboardList}
           title="No enrollments found"
           description="Browse courses and apply to get started"
+          action={
+            <Button onClick={() => navigate({ to: "/courses" })} className="gap-2">
+              <Search className="h-4 w-4" />
+              浏览全部课程
+            </Button>
+          }
         />
       ) : (
         <div className="space-y-3">

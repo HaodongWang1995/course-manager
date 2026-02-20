@@ -19,7 +19,6 @@ import {
   MessageSquare,
   FolderOpen,
   Home,
-  User,
   LogOut,
 } from "lucide-react";
 import { useAuthGuard, useAuthLogout } from "@/hooks/use-auth-guard";
@@ -38,7 +37,6 @@ const teacherSidebarItems = [
 ];
 
 const studentSidebarItems = [
-  { label: "Dashboard", href: "/student", icon: LayoutDashboard },
   { label: "Schedule", href: "/student", icon: Calendar },
   { label: "Courses", href: "/student/enrollments", icon: BookOpen },
   { label: "Grades", href: "/student/grades", icon: BarChart3 },
@@ -59,8 +57,8 @@ const studentSupportItems = [
 const studentBottomNavItems = [
   { label: "Home", href: "/student", icon: Home },
   { label: "Grades", href: "/student/grades", icon: BarChart3 },
-  { label: "Schedule", href: "/student/schedule", icon: Calendar },
-  { label: "Profile", href: "/student/profile", icon: User },
+  { label: "Schedule", href: "/student", icon: Calendar },
+  { label: "Settings", href: "/student/settings", icon: Settings },
 ];
 
 function AppLayout() {
@@ -79,18 +77,6 @@ function AppLayout() {
   const appName = isTeacherRoute ? "EduManager" : "EduPortal";
   const userRoleLabel = isTeacherRoute ? "老师" : "学生";
   const topBarPlaceholder = isTeacherRoute ? "搜索课程、学生..." : "搜索课程、资源...";
-  const isGradesImmersive = isStudent && location.pathname === "/student/grades";
-
-  if (isGradesImmersive) {
-    return (
-      <div className="flex h-screen bg-[#eff6ff]">
-        <main className="flex-1 overflow-y-auto pb-20">
-          <Outlet />
-        </main>
-        <BottomNav items={studentBottomNavItems} activeHref={location.pathname} />
-      </div>
-    );
-  }
 
   return (
     <div className="flex h-screen bg-gray-50">

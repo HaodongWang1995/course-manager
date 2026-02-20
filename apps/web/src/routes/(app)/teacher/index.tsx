@@ -22,7 +22,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 import { useState, useMemo } from "react";
-import { useTeacherSchedule, useUpcomingDeadlines } from "@/hooks/use-queries";
+import { useTeacherSchedule, useUpcomingDeadlines, useCurrentUser } from "@/hooks/use-queries";
 
 export const Route = createFileRoute("/(app)/teacher/")({
   component: TeacherDashboard,
@@ -56,8 +56,16 @@ const typeStyles: Record<string, string> = {
   Admin: "bg-gray-100 text-gray-500 border-gray-200",
 };
 
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
 function TeacherDashboard() {
   const navigate = useNavigate();
+  const { data: user } = useCurrentUser();
   const { data: schedule = [] } = useTeacherSchedule();
   const { data: deadlines = [] } = useUpcomingDeadlines();
   const [semester] = useState("Fall Semester 2023");
@@ -139,7 +147,7 @@ function TeacherDashboard() {
       {/* Greeting Banner */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5">
         <div className="relative z-10">
-          <h2 className="text-xl font-bold text-white">Good morning, Professor Smith!</h2>
+          <h2 className="text-xl font-bold text-white">{getGreeting()}, {user?.name ?? ""}!</h2>
           <p className="mt-1 text-sm text-blue-100">
             You have {todaySchedule.length} classes today and{" "}
             {deadlines.filter((d) => d.urgent).length} urgent deadlines.

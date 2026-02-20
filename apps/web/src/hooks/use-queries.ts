@@ -80,6 +80,23 @@ export function useLogout() {
   });
 }
 
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { name: string }) => authApi.updateProfile(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.me.queryKey });
+    },
+  });
+}
+
+export function useUpdatePassword() {
+  return useMutation({
+    mutationFn: (data: { current_password: string; new_password: string }) =>
+      authApi.updatePassword(data),
+  });
+}
+
 // ── Courses (Real API) ────────────────────────────────
 
 export function useTeacherCourses(params?: { search?: string; category?: string; status?: string }) {
