@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useForm } from "@tanstack/react-form";
+import { supportSchema } from "@/lib/schemas";
 
 export const Route = createFileRoute("/(app)/teacher/support")({
   component: TeacherSupport,
@@ -92,24 +94,21 @@ function TeacherSupport() {
 
 function ContactForm() {
   const { t } = useTranslation();
-  const [subject, setSubject] = useState("");
-  const [body, setBody] = useState("");
   const [sent, setSent] = useState(false);
 
-  const handleSend = () => {
-    if (!subject.trim() || !body.trim()) return;
-    setSent(true);
-    setSubject("");
-    setBody("");
-  };
+  const form = useForm({
+    defaultValues: { subject: "", body: "" },
+    validators: { onChange: supportSchema },
+    onSubmit: () => {
+      setSent(true);
+      form.reset();
+    },
+  });
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t("support.contactTitle")}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {sent ? (
+  if (sent) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
           <div className="flex items-center gap-3 rounded-lg bg-emerald-50 px-4 py-3">
             <CheckCircle className="h-5 w-5 shrink-0 text-emerald-500" />
             <div>
@@ -123,24 +122,50 @@ function ContactForm() {
               {t("support.sendAnother")}
             </button>
           </div>
-        ) : (
-          <>
-            <Input
-              placeholder={t("support.subjectPlaceholder")}
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-            />
-            <textarea
-              className="flex min-h-[100px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={t("support.messagePlaceholder")}
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-            />
-            <Button onClick={handleSend} disabled={!subject.trim() || !body.trim()}>
-              {t("support.send")}
-            </Button>
-          </>
-        )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">{t("support.contactTitle")}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form
+          onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}
+          className="space-y-4"
+        >
+          <form.Field name="subject">
+            {(field) => (
+              <Input
+                placeholder={t("support.subjectPlaceholder")}
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+              />
+            )}
+          </form.Field>
+          <form.Field name="body">
+            {(field) => (
+              <textarea
+                className="flex min-h-[100px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder={t("support.messagePlaceholder")}
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+              />
+            )}
+          </form.Field>
+          <form.Subscribe selector={(s) => s.canSubmit}>
+            {(canSubmit) => (
+              <Button type="submit" disabled={!canSubmit}>
+                {t("support.send")}
+              </Button>
+            )}
+          </form.Subscribe>
+        </form>
       </CardContent>
     </Card>
   );

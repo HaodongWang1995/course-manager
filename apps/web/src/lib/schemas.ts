@@ -67,3 +67,35 @@ export function scheduleFormValidator({ value }: { value: unknown }) {
   }
   return undefined;
 }
+
+export const profileSchema = z.object({
+  name: z.string().min(1, "请输入姓名"),
+});
+
+export const passwordSchema = z.object({
+  current_password: z.string().min(1, "请输入当前密码"),
+  new_password: z.string().min(6, "新密码至少6位"),
+});
+
+export const newEventSchema = z.object({
+  course_id: z.string().min(1, "请选择课程"),
+  title: z.string().optional(),
+  start_time: z.string().min(1, "请选择开始时间"),
+  end_time: z.string().min(1, "请选择结束时间"),
+  room: z.string().optional(),
+});
+
+export function newEventFormValidator({ value }: { value: unknown }) {
+  const base = zodToFieldErrors(newEventSchema, value);
+  if (base) return base;
+  const v = value as z.infer<typeof newEventSchema>;
+  if (v.start_time && v.end_time && v.end_time <= v.start_time) {
+    return { fields: { end_time: "结束时间必须晚于开始时间" } };
+  }
+  return undefined;
+}
+
+export const supportSchema = z.object({
+  subject: z.string().min(1, "请输入主题"),
+  body: z.string().min(1, "请输入内容"),
+});

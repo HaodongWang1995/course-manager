@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
+import { useForm } from "@tanstack/react-form";
+import { newEventFormValidator } from "@/lib/schemas";
 import {
   Card,
   CardContent,
@@ -459,73 +461,135 @@ function MonthView({
 function NewEventDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const { data: courses = [] } = useTeacherCourses();
   const addScheduleMutation = useAddSchedule();
-  const [courseId, setCourseId] = useState("");
-  const [title, setTitle] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [room, setRoom] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!courseId || !startTime || !endTime) return;
-    addScheduleMutation.mutate(
-      { courseId, data: { title: title || undefined, start_time: startTime, end_time: endTime, room: room || undefined } },
-      {
-        onSuccess: () => {
-          onOpenChange(false);
-          setCourseId("");
-          setTitle("");
-          setStartTime("");
-          setEndTime("");
-          setRoom("");
+  const form = useForm({
+    defaultValues: { course_id: "", title: "", start_time: "", end_time: "", room: "" },
+    validators: { onChange: newEventFormValidator },
+    onSubmit: ({ value }) => {
+      addScheduleMutation.mutate(
+        {
+          courseId: value.course_id,
+          data: {
+            title: value.title || undefined,
+            start_time: value.start_time,
+            end_time: value.end_time,
+            room: value.room || undefined,
+          },
         },
-      }
-    );
-  };
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+            form.reset();
+          },
+        }
+      );
+    },
+  });
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) form.reset(); }}>
       <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>New Event</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label>Course</Label>
-            <Select value={courseId} onValueChange={setCourseId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a course" />
-              </SelectTrigger>
-              <SelectContent>
-                {courses.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Title (optional)</Label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Lesson title" />
-          </div>
+        <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }} className="space-y-4">
+          {/* Course select */}
+          <form.Field name="course_id">
+            {(field) => (
+              <div className="space-y-2">
+                <Label>Course <span className="text-red-400">*</span></Label>
+                <Select value={field.state.value} onValueChange={(v) => field.handleChange(v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a course" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {courses.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-xs text-red-500">{String(field.state.meta.errors[0])}</p>
+                )}
+              </div>
+            )}
+          </form.Field>
+
+          {/* Title */}
+          <form.Field name="title">
+            {(field) => (
+              <div className="space-y-2">
+                <Label>Title (optional)</Label>
+                <Input
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  placeholder="Lesson title"
+                />
+              </div>
+            )}
+          </form.Field>
+
+          {/* Start / End time */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Start Time <span className="text-red-400">*</span></Label>
-              <Input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>End Time <span className="text-red-400">*</span></Label>
-              <Input type="datetime-local" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
-            </div>
+            <form.Field name="start_time">
+              {(field) => (
+                <div className="space-y-2">
+                  <Label>Start Time <span className="text-red-400">*</span></Label>
+                  <Input
+                    type="datetime-local"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                  />
+                  {field.state.meta.errors.length > 0 && (
+                    <p className="text-xs text-red-500">{String(field.state.meta.errors[0])}</p>
+                  )}
+                </div>
+              )}
+            </form.Field>
+            <form.Field name="end_time">
+              {(field) => (
+                <div className="space-y-2">
+                  <Label>End Time <span className="text-red-400">*</span></Label>
+                  <Input
+                    type="datetime-local"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                  />
+                  {field.state.meta.errors.length > 0 && (
+                    <p className="text-xs text-red-500">{String(field.state.meta.errors[0])}</p>
+                  )}
+                </div>
+              )}
+            </form.Field>
           </div>
-          <div className="space-y-2">
-            <Label>Room (optional)</Label>
-            <Input value={room} onChange={(e) => setRoom(e.target.value)} placeholder="e.g. A-301" />
-          </div>
+
+          {/* Room */}
+          <form.Field name="room">
+            {(field) => (
+              <div className="space-y-2">
+                <Label>Room (optional)</Label>
+                <Input
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  placeholder="e.g. A-301"
+                />
+              </div>
+            )}
+          </form.Field>
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={!courseId || !startTime || !endTime || addScheduleMutation.isPending}>
-              {addScheduleMutation.isPending ? "Creating..." : "Create Event"}
-            </Button>
+            <form.Subscribe selector={(s) => s.canSubmit}>
+              {(canSubmit) => (
+                <Button type="submit" disabled={!canSubmit || addScheduleMutation.isPending}>
+                  {addScheduleMutation.isPending ? "Creating..." : "Create Event"}
+                </Button>
+              )}
+            </form.Subscribe>
           </DialogFooter>
         </form>
       </DialogContent>

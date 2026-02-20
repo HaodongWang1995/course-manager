@@ -201,4 +201,125 @@ test.describe("PRD E2E", () => {
     // Status should update to Approved
     await expect(page.getByText("Approved")).toBeVisible();
   });
+
+  test("Teacher can update display name in settings", async ({ page, request }) => {
+    const teacher = await registerOrLogin(request, {
+      name: "Settings Teacher",
+      email: `teacher.settings+${Date.now()}@example.com`,
+      password: "password123",
+      role: "teacher",
+    });
+
+    await loginViaUI(page, teacher.user.email, "password123", "teacher");
+    await page.goto("/teacher/settings");
+
+    // Profile form is visible
+    await expect(page.getByRole("heading", { name: /设置|Settings/ })).toBeVisible();
+
+    // Clear and update display name
+    const nameInput = page.locator("#profile-name");
+    await nameInput.clear();
+    await nameInput.fill("Updated Teacher Name");
+
+    await page.getByRole("button", { name: /保存更改|Save Changes/ }).click();
+
+    // Success message appears
+    await expect(page.getByText(/保存成功|Saved successfully/)).toBeVisible();
+  });
+
+  test("Teacher can create a schedule (New Event) from calendar", async ({ page, request }) => {
+    const teacher = await registerOrLogin(request, {
+      name: "Calendar Teacher",
+      email: `teacher.cal+${Date.now()}@example.com`,
+      password: "password123",
+      role: "teacher",
+    });
+    await createCourse(request, teacher.token, {
+      title: `Cal Course ${Date.now()}`,
+      status: "active",
+    });
+
+    await loginViaUI(page, teacher.user.email, "password123", "teacher");
+    await page.goto("/teacher/calendar");
+
+    await page.getByRole("button", { name: "New Event" }).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+
+    // Select a course
+    await page.getByRole("combobox").click();
+    await page.getByRole("option").first().click();
+
+    // Set start and end times via datetime-local inputs
+    const [startInput, endInput] = await page.locator('input[type="datetime-local"]').all();
+    await startInput.fill("2026-06-01T09:00");
+    await endInput.fill("2026-06-01T10:00");
+
+    await page.getByRole("button", { name: "Create Event" }).click();
+
+    // Dialog closes on success
+    await expect(page.getByRole("dialog")).not.toBeVisible({ timeout: 5000 });
+  });
+
+  test("Student can view enrollment list and filter by status", async ({ page, request }) => {
+    const teacher = await registerOrLogin(request, {
+      name: "Filter Teacher",
+      email: `teacher.filter+${Date.now()}@example.com`,
+      password: "password123",
+      role: "teacher",
+    });
+    const course = await createCourse(request, teacher.token, {
+      title: `Filter Course ${Date.now()}`,
+      status: "active",
+    });
+
+    const student = await registerOrLogin(request, {
+      name: "Filter Student",
+      email: `student.filter+${Date.now()}@example.com`,
+      password: "password123",
+      role: "student",
+    });
+    await applyEnrollment(request, student.token, course.id);
+
+    await loginViaUI(page, student.user.email, "password123", "student");
+    await page.goto("/student/enrollments");
+
+    // Enrollment appears in "All" view
+    await expect(page.getByText(course.title)).toBeVisible();
+
+    // Filter to "Pending" tab
+    await page.getByRole("button", { name: /待审核|Pending/ }).click();
+    await expect(page.getByText(course.title)).toBeVisible();
+
+    // Filter to "Approved" tab - course should not appear (still pending)
+    await page.getByRole("button", { name: /已通过|Approved/ }).click();
+    await expect(page.getByText(course.title)).not.toBeVisible();
+  });
+
+  test("Teacher students page shows enrolled students", async ({ page, request }) => {
+    const teacher = await registerOrLogin(request, {
+      name: "Students Teacher",
+      email: `teacher.students+${Date.now()}@example.com`,
+      password: "password123",
+      role: "teacher",
+    });
+    const course = await createCourse(request, teacher.token, {
+      title: `Students Course ${Date.now()}`,
+      status: "active",
+    });
+
+    const student = await registerOrLogin(request, {
+      name: "Enrolled Student",
+      email: `student.students+${Date.now()}@example.com`,
+      password: "password123",
+      role: "student",
+    });
+    await applyEnrollment(request, student.token, course.id);
+
+    await loginViaUI(page, teacher.user.email, "password123", "teacher");
+    await page.goto("/teacher/students");
+
+    // Student who applied appears in the list
+    await expect(page.getByText(student.user.name)).toBeVisible();
+    await expect(page.getByText(student.user.email)).toBeVisible();
+  });
 });
