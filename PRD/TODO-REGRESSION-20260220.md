@@ -12,13 +12,13 @@
 - **影响**：Save Changes / Update Password 按钮未连接真实 API，修改无效
 - **修复方向**：从 `/api/auth/me` 获取当前用户信息填充表单；Save Changes 调用 PUT `/api/auth/profile`；Update Password 调用 PUT `/api/auth/password`
 
-### BUG-02：教师端查看学生列表为空（用户反馈同步）
+### ✅ BUG-02：教师端查看学生列表为空（用户反馈同步）— 已修复
 - **页面**：`/teacher/students`
 - **现象**：有学生提交了选课申请，但 Students 页面显示 0 条记录，且分页错误地显示 24 页
 - **根本原因**：Students 页是完全的 mock 静态 UI，未连接 `/api/enrollments` 或学生查询 API
 - **修复方向**：通过 `GET /api/enrollments?course_id=...` 或新增 `GET /api/students` 接口，展示真实选课学生列表；修复分页逻辑（0 条数据不应显示分页）
 
-### BUG-03：课时时间显示时区不一致
+### ✅ BUG-03：课时时间显示时区不一致 — 已修复
 - **页面**：`/teacher/courses/$courseId`（课程详情）vs `/teacher/calendar`
 - **现象**：输入 09:00，课程详情页显示 17:00:00（多 8 小时），日历页显示 09:00 AM
 - **根本原因**：PostgreSQL 返回的 ISO 时间字符串被浏览器视为 UTC，`toLocaleString("zh-CN")` 自动转换为本地时间（UTC+8），而日历组件用了不同的解析方式
@@ -48,12 +48,12 @@
 - **现象**：空状态文案"Browse courses and apply to get started"但无跳转按钮，学生无法从 app 内导航到 `/courses` 浏览课程
 - **修复方向**：在空状态或页面顶部添加"浏览全部课程"按钮，跳转至 `/courses`
 
-### UI-02：Messages 页为全 mock 静态数据
+### ✅ UI-02：Messages 页为全 mock 静态数据 — 已修复（替换为"即将推出"占位页）
 - **页面**：`/student/messages`
 - **现象**：显示假老师（Prof. Zhang Wei）和假消息，无真实 API 支持
 - **修复方向**：属于未实现功能，暂时隐藏侧边栏"Messages"菜单项，或替换为"即将推出"占位页
 
-### UI-03：Reports 页为全 mock 静态数据
+### ✅ UI-03：Reports 页为全 mock 静态数据 — 已修复（KPI 连接真实数据，图表占位）
 - **页面**：`/teacher/reports`
 - **现象**：图表数据（Math 101 / Physics 202）和报告列表（Oct 2023）均为硬编码 mock，KPI 数值与真实数据无关
 - **修复方向**：连接真实 API 数据，或隐藏虚假数字，仅展示结构占位
@@ -63,7 +63,7 @@
 - **现象**：标题固定显示 "Good morning, Professor Smith!"，不使用当前登录用户的姓名
 - **修复方向**：从 TanStack Query 的 `useCurrentUser()` 获取 `name` 字段，动态拼接问候语；问候语时段（morning/afternoon/evening）也应根据系统时间动态判断
 
-### UI-05：Support 页为纯静态 UI
+### ✅ UI-05：Support 页为纯静态 UI — 已修复（Send Message 提交后显示成功确认）
 - **页面**：`/teacher/support`、`/student/support`
 - **现象**：FAQ、Send Message 表单均无后端支持
 - **修复方向**：可接受为展示页，但 Send Message 至少应有提交反馈或 toast 提示
@@ -86,7 +86,7 @@
   - `packages/ui` 内的组件文字通过 props 传入（`uploadText`、`emptyText` 等），由调用方负责传入 i18n 翻译后的字符串
   - Settings 页语言切换持久化到 `localStorage`，刷新后保持
 
-### FEAT-02：教师端学生列表连接真实数据
+### ✅ FEAT-02：教师端学生列表连接真实数据 — 已实现（同 BUG-02）
 - 同 BUG-02，单独作为功能需求跟踪
 - 需要后端新增 `GET /api/teacher/students` 接口，返回所有向该教师课程申请选课的学生信息
 
