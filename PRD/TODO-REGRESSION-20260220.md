@@ -6,7 +6,7 @@
 
 ## 🐛 Bug（功能性问题）
 
-### BUG-01：Settings 页显示硬编码 mock 数据
+### ✅ BUG-01：Settings 页显示硬编码 mock 数据 — 已修复
 - **页面**：`/teacher/settings`（学生端同理）
 - **现象**：Profile 区域显示 "Professor Smith" / "smith@edu.com"，与实际登录用户无关
 - **影响**：Save Changes / Update Password 按钮未连接真实 API，修改无效
@@ -24,17 +24,17 @@
 - **根本原因**：PostgreSQL 返回的 ISO 时间字符串被浏览器视为 UTC，`toLocaleString("zh-CN")` 自动转换为本地时间（UTC+8），而日历组件用了不同的解析方式
 - **修复方向**：统一时间存储策略（建议存储为带时区的 TIMESTAMPTZ，或前端存入时加上 +08:00 偏移）；所有页面统一用相同的时间格式化函数
 
-### BUG-04：公开课程列表 `/courses/$courseId` 路由缺失
+### ✅ BUG-04：公开课程列表 `/courses/$courseId` 路由缺失 — 已修复
 - **页面**：`/courses`（公开课程浏览页）
 - **现象**：点击课程卡片后 URL 变为 `/courses/$courseId`，但页面无跳转，仍停留在列表页（路由未定义）
 - **修复方向**：新增公开课程详情路由 `apps/web/src/routes/courses.$courseId.tsx`，或在点击时重定向至 `/student/courses/$courseId`（需登录）
 
-### BUG-05：学生端 Dashboard 和 Schedule 导航项同时高亮
+### ✅ BUG-05：学生端 Dashboard 和 Schedule 导航项同时高亮 — 已修复
 - **页面**：学生侧边栏
 - **现象**：Dashboard 和 Schedule 两个菜单项都指向 `/student`，导致其中一个被选中时另一个也亮起（或两个都亮）
 - **修复方向**：二选一 —— 删除多余的 Schedule 菜单项（当前 Dashboard 本身就是日程视图），或将 Schedule 单独拆分为一个路由 `/student/schedule`
 
-### BUG-06：学生成绩页 `/student/grades` 使用了不同的布局组件
+### ✅ BUG-06：学生成绩页 `/student/grades` 使用了不同的布局组件 — 已修复
 - **页面**：`/student/grades`
 - **现象**：成绩页使用底部导航（Home / Grades / Schedule / Profile），与其他学生页面使用的侧边栏+顶栏布局完全不同；且底部导航中的 Schedule 指向 `/student/schedule`、Profile 指向 `/student/profile`（均不存在）
 - **修复方向**：将成绩页纳入统一的学生 layout（`apps/web/src/routes/(app)/student/route.tsx`），移除独立的底部导航
@@ -43,7 +43,7 @@
 
 ## ⚠️ UI / 体验问题
 
-### UI-01：学生端 app 内无法浏览可选课程
+### ✅ UI-01：学生端 app 内无法浏览可选课程 — 已修复
 - **页面**：`/student/enrollments`
 - **现象**：空状态文案"Browse courses and apply to get started"但无跳转按钮，学生无法从 app 内导航到 `/courses` 浏览课程
 - **修复方向**：在空状态或页面顶部添加"浏览全部课程"按钮，跳转至 `/courses`
@@ -58,7 +58,7 @@
 - **现象**：图表数据（Math 101 / Physics 202）和报告列表（Oct 2023）均为硬编码 mock，KPI 数值与真实数据无关
 - **修复方向**：连接真实 API 数据，或隐藏虚假数字，仅展示结构占位
 
-### UI-04：Dashboard 欢迎语硬编码 "Professor Smith"
+### ✅ UI-04：Dashboard 欢迎语硬编码 "Professor Smith" — 已修复
 - **页面**：`/teacher`（教师 Dashboard）
 - **现象**：标题固定显示 "Good morning, Professor Smith!"，不使用当前登录用户的姓名
 - **修复方向**：从 TanStack Query 的 `useCurrentUser()` 获取 `name` 字段，动态拼接问候语；问候语时段（morning/afternoon/evening）也应根据系统时间动态判断
