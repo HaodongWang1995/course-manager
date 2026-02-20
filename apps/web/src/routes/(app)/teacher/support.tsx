@@ -17,12 +17,13 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/(app)/teacher/support")({
   component: TeacherSupport,
 });
 
-const faqs = [
+const teacherFaqKeys = [
   { q: "How do I create a new course?", a: "Go to Courses > click 'New Course' button > fill in the course details and submit." },
   { q: "How do I manage enrollments?", a: "Navigate to Enrollments from the sidebar. You can approve or reject student enrollment requests." },
   { q: "How do I add schedules to a course?", a: "Open a course detail page and click 'Add Schedule' to create class sessions." },
@@ -30,13 +31,13 @@ const faqs = [
 ];
 
 function TeacherSupport() {
+  const { t } = useTranslation();
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Help & Support</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Get help with using EduManager
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900">{t("support.title")}</h1>
+        <p className="mt-1 text-sm text-gray-500">{t("support.teacherSubtitle")}</p>
       </div>
 
       {/* Quick Links */}
@@ -67,11 +68,11 @@ function TeacherSupport() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <HelpCircle className="h-4 w-4" />
-            Frequently Asked Questions
+            {t("support.faq")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {faqs.map((faq, idx) => (
+          {teacherFaqKeys.map((faq, idx) => (
             <details key={idx} className="group rounded-lg border border-gray-100 p-3">
               <summary className="cursor-pointer text-sm font-medium text-gray-900 list-none flex items-center justify-between">
                 {faq.q}
@@ -90,13 +91,13 @@ function TeacherSupport() {
 }
 
 function ContactForm() {
+  const { t } = useTranslation();
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [sent, setSent] = useState(false);
 
   const handleSend = () => {
     if (!subject.trim() || !body.trim()) return;
-    // Simulate sending (no real API yet)
     setSent(true);
     setSubject("");
     setBody("");
@@ -105,38 +106,38 @@ function ContactForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Send us a message</CardTitle>
+        <CardTitle className="text-base">{t("support.contactTitle")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {sent ? (
           <div className="flex items-center gap-3 rounded-lg bg-emerald-50 px-4 py-3">
             <CheckCircle className="h-5 w-5 shrink-0 text-emerald-500" />
             <div>
-              <p className="text-sm font-medium text-emerald-700">消息已发送</p>
-              <p className="text-xs text-emerald-600">我们会在 1-2 个工作日内回复您</p>
+              <p className="text-sm font-medium text-emerald-700">{t("support.sentTitle")}</p>
+              <p className="text-xs text-emerald-600">{t("support.sentDesc")}</p>
             </div>
             <button
               className="ml-auto text-xs text-emerald-600 hover:underline"
               onClick={() => setSent(false)}
             >
-              再发一条
+              {t("support.sendAnother")}
             </button>
           </div>
         ) : (
           <>
             <Input
-              placeholder="Subject"
+              placeholder={t("support.subjectPlaceholder")}
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
             />
             <textarea
               className="flex min-h-[100px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Describe your issue or question..."
+              placeholder={t("support.messagePlaceholder")}
               value={body}
               onChange={(e) => setBody(e.target.value)}
             />
             <Button onClick={handleSend} disabled={!subject.trim() || !body.trim()}>
-              Send Message
+              {t("support.send")}
             </Button>
           </>
         )}

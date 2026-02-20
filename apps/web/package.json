@@ -19,9 +19,11 @@
     "@tanstack/react-form": "^1.28.0",
     "@tanstack/react-query": "^5.62.0",
     "@tanstack/react-router": "^1.92.0",
+    "i18next": "^25.8.12",
     "lucide-react": "^0.460.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-i18next": "^16.5.4",
     "recharts": "^2.15.0",
     "zod": "3"
   },

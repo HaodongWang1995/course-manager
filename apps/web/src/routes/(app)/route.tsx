@@ -22,47 +22,15 @@ import {
   LogOut,
 } from "lucide-react";
 import { useAuthGuard, useAuthLogout } from "@/hooks/use-auth-guard";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/(app)")({
   component: AppLayout,
 });
 
-const teacherSidebarItems = [
-  { label: "Dashboard", href: "/teacher", icon: LayoutDashboard },
-  { label: "Calendar", href: "/teacher/calendar", icon: Calendar },
-  { label: "Courses", href: "/teacher/courses", icon: BookOpen },
-  { label: "Students", href: "/teacher/students", icon: Users },
-  { label: "Enrollments", href: "/teacher/enrollments", icon: ClipboardList },
-  { label: "Reports", href: "/teacher/reports", icon: BarChart3 },
-];
-
-const studentSidebarItems = [
-  { label: "Schedule", href: "/student", icon: Calendar },
-  { label: "Courses", href: "/student/enrollments", icon: BookOpen },
-  { label: "Grades", href: "/student/grades", icon: BarChart3 },
-  { label: "Messages", href: "/student/messages", icon: MessageSquare },
-  { label: "Resources", href: "/student/resources", icon: FolderOpen },
-];
-
-const teacherSupportItems = [
-  { label: "Settings", href: "/teacher/settings", icon: Settings },
-  { label: "Support", href: "/teacher/support", icon: HelpCircle },
-];
-
-const studentSupportItems = [
-  { label: "Settings", href: "/student/settings", icon: Settings },
-  { label: "Support", href: "/student/support", icon: HelpCircle },
-];
-
-const studentBottomNavItems = [
-  { label: "Home", href: "/student", icon: Home },
-  { label: "Grades", href: "/student/grades", icon: BarChart3 },
-  { label: "Schedule", href: "/student", icon: Calendar },
-  { label: "Settings", href: "/student/settings", icon: Settings },
-];
-
 function AppLayout() {
   const location = useLocation();
+  const { t } = useTranslation();
   const isTeacherRoute = location.pathname.startsWith("/teacher");
   const role = isTeacherRoute ? "teacher" : "student";
   const { user, isLoading, isAuthed } = useAuthGuard(role);
@@ -72,6 +40,41 @@ function AppLayout() {
   if (!isAuthed || !user) return null;
 
   const isStudent = role === "student";
+
+  const teacherSidebarItems = [
+    { label: t("nav.dashboard"), href: "/teacher", icon: LayoutDashboard },
+    { label: t("nav.calendar"), href: "/teacher/calendar", icon: Calendar },
+    { label: t("nav.courses"), href: "/teacher/courses", icon: BookOpen },
+    { label: t("nav.students"), href: "/teacher/students", icon: Users },
+    { label: t("nav.enrollments"), href: "/teacher/enrollments", icon: ClipboardList },
+    { label: t("nav.reports"), href: "/teacher/reports", icon: BarChart3 },
+  ];
+
+  const studentSidebarItems = [
+    { label: t("nav.schedule"), href: "/student", icon: Calendar },
+    { label: t("nav.courses"), href: "/student/enrollments", icon: BookOpen },
+    { label: t("nav.grades"), href: "/student/grades", icon: BarChart3 },
+    { label: t("nav.messages"), href: "/student/messages", icon: MessageSquare },
+    { label: t("nav.resources"), href: "/student/resources", icon: FolderOpen },
+  ];
+
+  const teacherSupportItems = [
+    { label: t("nav.settings"), href: "/teacher/settings", icon: Settings },
+    { label: t("nav.support"), href: "/teacher/support", icon: HelpCircle },
+  ];
+
+  const studentSupportItems = [
+    { label: t("nav.settings"), href: "/student/settings", icon: Settings },
+    { label: t("nav.support"), href: "/student/support", icon: HelpCircle },
+  ];
+
+  const studentBottomNavItems = [
+    { label: t("nav.home"), href: "/student", icon: Home },
+    { label: t("nav.grades"), href: "/student/grades", icon: BarChart3 },
+    { label: t("nav.schedule"), href: "/student", icon: Calendar },
+    { label: t("nav.settings"), href: "/student/settings", icon: Settings },
+  ];
+
   const sidebarItems = isTeacherRoute ? teacherSidebarItems : studentSidebarItems;
   const supportItems = isTeacherRoute ? teacherSupportItems : studentSupportItems;
   const appName = isTeacherRoute ? "EduManager" : "EduPortal";

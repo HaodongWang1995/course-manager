@@ -1,0 +1,120 @@
+{
+  "nav": {
+    "schedule": "Schedule",
+    "courses": "Courses",
+    "grades": "Grades",
+    "messages": "Messages",
+    "resources": "Resources",
+    "settings": "Settings",
+    "support": "Support",
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
+    "students": "Students",
+    "enrollments": "Enrollments",
+    "reports": "Reports",
+    "home": "Home"
+  },
+  "enrollments": {
+    "title": "My Enrollments",
+    "subtitle": "Track your course enrollment applications",
+    "browseAll": "Browse All Courses",
+    "filter": {
+      "all": "All",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "loading": "Loading...",
+    "empty": {
+      "title": "No enrollments found",
+      "description": "Browse courses and apply to get started"
+    },
+    "teacher": "Teacher: ",
+    "note": "Note: ",
+    "reason": "Reason: ",
+    "applied": "Applied: "
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account preferences",
+    "profile": {
+      "title": "Profile",
+      "displayName": "Display Name",
+      "email": "Email",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell students about yourself...",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "saveSuccess": "Saved successfully",
+      "saveFailed": "Save failed"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "teacher": {
+        "enrollments": "Email notifications for new enrollments",
+        "messages": "Push notifications for messages",
+        "weekly": "Weekly report summary"
+      },
+      "student": {
+        "enrollments": "Email notifications for enrollment updates",
+        "messages": "Push notifications for new messages",
+        "grades": "Grade update alerts"
+      }
+    },
+    "security": {
+      "title": "Security",
+      "currentPassword": "Current Password",
+      "currentPasswordPlaceholder": "Enter current password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter new password (min. 6 chars)",
+      "update": "Update Password",
+      "updating": "Updating...",
+      "updateSuccess": "Password updated"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "language": "Language",
+      "languageDesc": "Choose your preferred language",
+      "theme": "Theme",
+      "themeDesc": "Select your preferred theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "support": {
+    "title": "Help & Support",
+    "teacherSubtitle": "Get help with using EduManager",
+    "studentSubtitle": "Get help with using EduPortal",
+    "faq": "Frequently Asked Questions",
+    "contactTitle": "Send us a message",
+    "subjectPlaceholder": "Subject",
+    "messagePlaceholder": "Describe your issue or question...",
+    "send": "Send Message",
+    "sentTitle": "Message sent",
+    "sentDesc": "We will reply within 1-2 business days",
+    "sendAnother": "Send another"
+  },
+  "upload": {
+    "prompt": "Drag & drop or click to upload",
+    "maxSize": "Max {{mb}}MB",
+    "uploading": "Uploading...",
+    "tooLarge": "File too large, max {{mb}}MB"
+  },
+  "attachments": {
+    "empty": "No attachments yet"
+  },
+  "common": {
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "search": "Search",
+    "comingSoon": "Coming Soon",
+    "backToList": "Back to List"
+  }
+}
