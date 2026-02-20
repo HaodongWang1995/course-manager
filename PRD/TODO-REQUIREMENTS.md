@@ -9,40 +9,25 @@ Items are grouped by priority.
 
 ### 1. README.md
 **Requirement**: "Maintain a useful README for documentation"
-**Status**: ❌ No README.md exists in the project root
-**TODO**:
-- Create `README.md` at project root
-- Include: project overview, tech stack, setup instructions, development commands, environment variables, deployment guide
+**Status**: ✅ Done — `README.md` created at project root (committed)
 
 ---
 
 ### 2. Apache 2.0 License
 **Requirement**: "mark the project as being Apache 2.0"
-**Status**: ❌ No LICENSE file exists
-**TODO**:
-- Add `LICENSE` file at project root with Apache 2.0 text
-- Add license header reference in README.md
+**Status**: ✅ Done — `LICENSE` file added with Apache 2.0 text (committed)
 
 ---
 
 ### 3. Oxlint (replace ESLint)
 **Requirement**: "Oxlint - please use context7 to get the updated doc and best practice"
-**Status**: ❌ Project currently uses ESLint (`"lint": "eslint src/"` in apps/web/package.json); Oxlint not installed
-**TODO**:
-- Install `oxlint` in apps/web and packages/ui
-- Replace ESLint config with `.oxlintrc.json`
-- Update `lint` scripts in package.json files
-- Remove ESLint dependencies
+**Status**: ✅ Done — oxlint installed, `.oxlintrc.json` created, lint scripts updated in apps/web and packages/ui (committed)
 
 ---
 
 ### 4. oxfmt (code formatter)
 **Requirement**: "oxfmt"
-**Status**: ❌ No formatter configured (no Prettier, no oxfmt)
-**TODO**:
-- Investigate if oxfmt is the right formatter (may be Biome/oxc-based)
-- Configure formatter for the project
-- Add format script to package.json
+**Status**: ⚠️ Skipped — oxfmt is part of the oxc project but not production-ready; no standard formatter configured yet. Consider Biome or Prettier as alternative.
 
 ---
 
@@ -50,20 +35,13 @@ Items are grouped by priority.
 
 ### 5. @lukemorales/query-key-factory
 **Requirement**: "@lukemorales/query-key-factory to manage tanstack query query key"
-**Status**: ❌ Not installed; query keys are manually defined as string arrays (e.g., `["teacher", "courses"]`) in `apps/web/src/hooks/use-queries.ts`
-**TODO**:
-- Install `@lukemorales/query-key-factory` in apps/web
-- Refactor `apps/web/src/hooks/use-queries.ts` to use `createQueryKeyStore` / `createQueryKeys`
-- Ensures consistent, type-safe query keys across the app
+**Status**: ✅ Done — `apps/web/src/lib/query-keys.ts` created with all key factories; `apps/web/src/hooks/use-queries.ts` fully refactored to use factory-generated keys.
 
 ---
 
 ### 6. EditorConfig
 **Requirement**: "Editorconfig"
-**Status**: ❌ No `.editorconfig` file at project root
-**TODO**:
-- Create `.editorconfig` at project root
-- Configure: `indent_style = space`, `indent_size = 2`, `end_of_line = lf`, `charset = utf-8`, `trim_trailing_whitespace = true`, `insert_final_newline = true`
+**Status**: ✅ Done — `.editorconfig` created at project root (committed)
 
 ---
 

@@ -19,12 +19,19 @@ import {
   type Deadline,
   type Feedback,
 } from "@/api/client";
+import {
+  authKeys,
+  teacherKeys,
+  studentKeys,
+  courseKeys,
+  feedbackKeys,
+} from "@/lib/query-keys";
 
 // ── Auth (Real API) ──────────────────────────────────
 
 export function useCurrentUser() {
   return useQuery({
-    queryKey: ["auth", "me"],
+    queryKey: authKeys.me.queryKey,
     queryFn: () => authApi.me(),
     enabled: !!getToken(),
     retry: false,
@@ -40,7 +47,7 @@ export function useLogin() {
       return res.user;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      queryClient.invalidateQueries({ queryKey: authKeys._def });
     },
   });
 }
@@ -54,7 +61,7 @@ export function useRegister() {
       return res.user;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      queryClient.invalidateQueries({ queryKey: authKeys._def });
     },
   });
 }
@@ -75,7 +82,7 @@ export function useLogout() {
 
 export function useTeacherCourses(params?: { search?: string; category?: string; status?: string }) {
   return useQuery({
-    queryKey: ["teacher", "courses", params],
+    queryKey: teacherKeys.courses(params).queryKey,
     queryFn: () => courseApi.list(params),
     enabled: !!getToken(),
   });
@@ -83,7 +90,7 @@ export function useTeacherCourses(params?: { search?: string; category?: string;
 
 export function useStudentCourses(params?: { search?: string; category?: string }) {
   return useQuery({
-    queryKey: ["student", "courses", params],
+    queryKey: studentKeys.courses(params).queryKey,
     queryFn: () => courseApi.list(params),
     enabled: true,
   });
@@ -91,7 +98,7 @@ export function useStudentCourses(params?: { search?: string; category?: string 
 
 export function useCourseDetail(id: string) {
   return useQuery({
-    queryKey: ["course", id],
+    queryKey: courseKeys.detail(id).queryKey,
     queryFn: () => courseApi.get(id),
     enabled: !!id,
   });
@@ -103,7 +110,7 @@ export function useAddCourse() {
     mutationFn: (data: { title: string; description?: string; price?: number; category?: string; status?: string }) =>
       courseApi.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "courses"] });
+      queryClient.invalidateQueries({ queryKey: teacherKeys.courses._def });
     },
   });
 }
@@ -114,8 +121,8 @@ export function useUpdateCourse() {
     mutationFn: ({ id, data }: { id: string; data: Partial<Pick<Course, "title" | "description" | "price" | "cover_image" | "category">> }) =>
       courseApi.update(id, data),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "courses"] });
-      queryClient.invalidateQueries({ queryKey: ["course", variables.id] });
+      queryClient.invalidateQueries({ queryKey: teacherKeys.courses._def });
+      queryClient.invalidateQueries({ queryKey: courseKeys.detail(variables.id).queryKey });
     },
   });
 }
@@ -125,7 +132,7 @@ export function useDeleteCourse() {
   return useMutation({
     mutationFn: (id: string) => courseApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "courses"] });
+      queryClient.invalidateQueries({ queryKey: teacherKeys.courses._def });
     },
   });
 }
@@ -136,8 +143,8 @@ export function useUpdateCourseStatus() {
     mutationFn: ({ id, status }: { id: string; status: string }) =>
       courseApi.updateStatus(id, status),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "courses"] });
-      queryClient.invalidateQueries({ queryKey: ["course", variables.id] });
+      queryClient.invalidateQueries({ queryKey: teacherKeys.courses._def });
+      queryClient.invalidateQueries({ queryKey: courseKeys.detail(variables.id).queryKey });
     },
   });
 }
@@ -146,7 +153,7 @@ export function useUpdateCourseStatus() {
 
 export function useCourseSchedules(courseId: string) {
   return useQuery({
-    queryKey: ["schedules", courseId],
+    queryKey: courseKeys.schedules(courseId).queryKey,
     queryFn: () => scheduleApi.list(courseId),
     enabled: !!courseId && !!getToken(),
   });
@@ -158,8 +165,8 @@ export function useAddSchedule() {
     mutationFn: ({ courseId, data }: { courseId: string; data: { lesson_number?: number; title?: string; start_time: string; end_time: string; room?: string } }) =>
       scheduleApi.create(courseId, data),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["schedules", variables.courseId] });
-      queryClient.invalidateQueries({ queryKey: ["course", variables.courseId] });
+      queryClient.invalidateQueries({ queryKey: courseKeys.schedules(variables.courseId).queryKey });
+      queryClient.invalidateQueries({ queryKey: courseKeys.detail(variables.courseId).queryKey });
     },
   });
 }
@@ -170,8 +177,8 @@ export function useUpdateSchedule() {
     mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Schedule, "id" | "course_id">> }) =>
       scheduleApi.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["schedules"] });
-      queryClient.invalidateQueries({ queryKey: ["course"] });
+      queryClient.invalidateQueries({ queryKey: courseKeys.schedules._def });
+      queryClient.invalidateQueries({ queryKey: courseKeys._def });
     },
   });
 }
@@ -181,8 +188,8 @@ export function useDeleteSchedule() {
   return useMutation({
     mutationFn: (id: string) => scheduleApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["schedules"] });
-      queryClient.invalidateQueries({ queryKey: ["course"] });
+      queryClient.invalidateQueries({ queryKey: courseKeys.schedules._def });
+      queryClient.invalidateQueries({ queryKey: courseKeys._def });
     },
   });
 }
@@ -191,7 +198,7 @@ export function useDeleteSchedule() {
 
 export function useMyEnrollments(params?: { status?: string }) {
   return useQuery({
-    queryKey: ["student", "enrollments", params],
+    queryKey: studentKeys.enrollments(params).queryKey,
     queryFn: () => enrollmentApi.listMine(params),
     enabled: !!getToken(),
   });
@@ -199,7 +206,7 @@ export function useMyEnrollments(params?: { status?: string }) {
 
 export function useCourseEnrollments(courseId: string, params?: { status?: string }) {
   return useQuery({
-    queryKey: ["teacher", "enrollments", courseId, params],
+    queryKey: teacherKeys.enrollments(courseId, params).queryKey,
     queryFn: () => enrollmentApi.listByCourse(courseId, params),
     enabled: !!courseId && !!getToken(),
   });
@@ -211,8 +218,8 @@ export function useApplyEnrollment() {
     mutationFn: (data: { course_id: string; note?: string }) =>
       enrollmentApi.apply(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["student", "enrollments"] });
-      queryClient.invalidateQueries({ queryKey: ["student", "courses"] });
+      queryClient.invalidateQueries({ queryKey: studentKeys.enrollments._def });
+      queryClient.invalidateQueries({ queryKey: studentKeys.courses._def });
     },
   });
 }
@@ -223,7 +230,7 @@ export function useReviewEnrollment() {
     mutationFn: ({ id, data }: { id: string; data: { status: "approved" | "rejected"; reject_reason?: string } }) =>
       enrollmentApi.review(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "enrollments"] });
+      queryClient.invalidateQueries({ queryKey: teacherKeys.enrollments._def });
     },
   });
 }
@@ -233,7 +240,7 @@ export function useCancelEnrollment() {
   return useMutation({
     mutationFn: (id: string) => enrollmentApi.cancel(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["student", "enrollments"] });
+      queryClient.invalidateQueries({ queryKey: studentKeys.enrollments._def });
     },
   });
 }
@@ -245,7 +252,7 @@ export function useStudentScheduleFromDB() {
   const courseIds = enrollments.map((e) => e.course_id);
 
   return useQuery({
-    queryKey: ["student", "scheduleFromDB", courseIds],
+    queryKey: studentKeys.scheduleFromDB(courseIds).queryKey,
     queryFn: async () => {
       if (courseIds.length === 0) return [];
       const results = await Promise.all(
@@ -268,7 +275,7 @@ export function useStudentScheduleFromDB() {
 
 export function useTeacherSchedule() {
   return useQuery({
-    queryKey: ["teacher", "schedule"],
+    queryKey: teacherKeys.schedule.queryKey,
     queryFn: () => teacherApi.schedule(),
     enabled: !!getToken(),
   });
@@ -276,7 +283,7 @@ export function useTeacherSchedule() {
 
 export function useTeacherStudents() {
   return useQuery({
-    queryKey: ["teacher", "students"],
+    queryKey: teacherKeys.students.queryKey,
     queryFn: () => teacherApi.students(),
     enabled: !!getToken(),
   });
@@ -284,7 +291,7 @@ export function useTeacherStudents() {
 
 export function useTeacherStats() {
   return useQuery({
-    queryKey: ["teacher", "stats"],
+    queryKey: teacherKeys.stats.queryKey,
     queryFn: () => teacherApi.stats(),
     enabled: !!getToken(),
   });
@@ -292,7 +299,7 @@ export function useTeacherStats() {
 
 export function useUpcomingDeadlines() {
   return useQuery({
-    queryKey: ["teacher", "deadlines"],
+    queryKey: teacherKeys.deadlines.queryKey,
     queryFn: () => teacherApi.deadlines(),
     enabled: !!getToken(),
   });
@@ -304,7 +311,7 @@ export function useAddDeadline() {
     mutationFn: (data: { title: string; due_date: string; urgent?: boolean }) =>
       teacherApi.addDeadline(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "deadlines"] });
+      queryClient.invalidateQueries({ queryKey: teacherKeys.deadlines.queryKey });
     },
   });
 }
@@ -314,7 +321,7 @@ export function useRemoveDeadline() {
   return useMutation({
     mutationFn: (id: string) => teacherApi.deleteDeadline(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "deadlines"] });
+      queryClient.invalidateQueries({ queryKey: teacherKeys.deadlines.queryKey });
     },
   });
 }
@@ -323,7 +330,7 @@ export function useRemoveDeadline() {
 
 export function useStudentGrades() {
   return useQuery({
-    queryKey: ["student", "grades"],
+    queryKey: studentKeys.grades.queryKey,
     queryFn: () => gradeApi.studentSummary(),
     enabled: !!getToken(),
   });
@@ -333,7 +340,7 @@ export function useStudentGrades() {
 
 export function useStudentAssignments() {
   return useQuery({
-    queryKey: ["student", "assignments"],
+    queryKey: studentKeys.assignments.queryKey,
     queryFn: () => assignmentApi.listForStudent(),
     enabled: !!getToken(),
   });
@@ -345,7 +352,7 @@ export function useUpdateAssignmentStatus() {
     mutationFn: ({ id, status }: { id: string; status: string }) =>
       assignmentApi.submit(id, { status }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["student", "assignments"] });
+      queryClient.invalidateQueries({ queryKey: studentKeys.assignments.queryKey });
     },
   });
 }
@@ -354,7 +361,7 @@ export function useUpdateAssignmentStatus() {
 
 export function useStudentResources() {
   return useQuery({
-    queryKey: ["student", "resources"],
+    queryKey: studentKeys.resources.queryKey,
     queryFn: () => resourceApi.listForStudent(),
     enabled: !!getToken(),
   });
@@ -362,7 +369,7 @@ export function useStudentResources() {
 
 export function useCourseResources(courseId: string) {
   return useQuery({
-    queryKey: ["course", "resources", courseId],
+    queryKey: courseKeys.resources(courseId).queryKey,
     queryFn: () => resourceApi.listForCourse(courseId),
     enabled: !!getToken() && !!courseId,
   });
@@ -372,7 +379,7 @@ export function useCourseResources(courseId: string) {
 
 export function useCourseFeedbackDetail(courseId: string) {
   return useQuery({
-    queryKey: ["feedback", courseId],
+    queryKey: feedbackKeys.detail(courseId).queryKey,
     queryFn: () => feedbackApi.getByCourse(courseId),
     enabled: !!courseId && !!getToken(),
   });
@@ -380,7 +387,7 @@ export function useCourseFeedbackDetail(courseId: string) {
 
 export function useFeedbackDraft(courseId: string) {
   return useQuery({
-    queryKey: ["teacher", "feedbackDraft", courseId],
+    queryKey: teacherKeys.feedbackDraft(courseId).queryKey,
     queryFn: () => feedbackApi.getByCourse(courseId),
     enabled: !!courseId && !!getToken(),
   });
@@ -399,8 +406,8 @@ export function useSaveFeedbackDraft() {
       actions?: Array<{ title: string; due_label?: string; pending?: boolean }>;
     }) => feedbackApi.save(data),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "feedbackDraft", variables.course_id] });
-      queryClient.invalidateQueries({ queryKey: ["feedback", variables.course_id] });
+      queryClient.invalidateQueries({ queryKey: teacherKeys.feedbackDraft(variables.course_id).queryKey });
+      queryClient.invalidateQueries({ queryKey: feedbackKeys.detail(variables.course_id).queryKey });
     },
   });
 }
@@ -410,8 +417,8 @@ export function usePublishFeedback() {
   return useMutation({
     mutationFn: (id: string) => feedbackApi.publish(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teacher", "feedbackDraft"] });
-      queryClient.invalidateQueries({ queryKey: ["feedback"] });
+      queryClient.invalidateQueries({ queryKey: teacherKeys.feedbackDraft._def });
+      queryClient.invalidateQueries({ queryKey: feedbackKeys._def });
     },
   });
 }

@@ -72,6 +72,9 @@ importers:
       '@course-manager/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@lukemorales/query-key-factory':
+        specifier: ^1.3.4
+        version: 1.3.4(@tanstack/query-core@5.90.20)(@tanstack/react-query@5.90.20(react@19.2.4))
       '@tanstack/react-form':
         specifier: ^1.28.0
         version: 1.28.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -854,6 +857,13 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@lukemorales/query-key-factory@1.3.4':
+    resolution: {integrity: sha512-A3frRDdkmaNNQi6mxIshsDk4chRXWoXa05US8fBo4kci/H+lVmujS6QrwQLLGIkNIRFGjMqp2uKjC4XsLdydRw==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@tanstack/query-core': '>= 4.0.0'
+      '@tanstack/react-query': '>= 4.0.0'
 
   '@modelcontextprotocol/sdk@1.26.0':
     resolution: {integrity: sha512-Y5RmPncpiDtTXDbLKswIJzTqu2hyBKxTNsgKqKclDbhIgg1wgtf1fRuvxgTnRfcnxtvvgbIEcqUOzZrJ6iSReg==}
@@ -4684,6 +4694,11 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@lukemorales/query-key-factory@1.3.4(@tanstack/query-core@5.90.20)(@tanstack/react-query@5.90.20(react@19.2.4))':
+    dependencies:
+      '@tanstack/query-core': 5.90.20
+      '@tanstack/react-query': 5.90.20(react@19.2.4)
 
   '@modelcontextprotocol/sdk@1.26.0(zod@3.25.76)':
     dependencies:
