@@ -20,9 +20,12 @@ beforeEach(() => {
 });
 
 describe("GET /api/courses", () => {
-  it("returns 401 without auth", async () => {
+  it("returns active courses without auth (public browse)", async () => {
+    // GET /api/courses uses attachUser (optional auth) — public users see active courses
+    mockPool.query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
     const res = await request(app).get("/api/courses");
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([]);
   });
 
   it("returns teacher's own courses", async () => {
