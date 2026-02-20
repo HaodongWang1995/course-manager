@@ -59,18 +59,13 @@ Items are grouped by priority.
 
 ### 8. TanStack Form — Complete Coverage
 **Requirement**: "tanstack form for form logic and form component for reusability"
-**Status**: ⚠️ Partial — TanStack Form is installed and used in:
+**Status**: ✅ Done — TanStack Form used in all major forms:
   - `routes/login.tsx` ✅
   - `routes/(app)/teacher/courses.$courseId.tsx` ✅
   - `routes/(app)/teacher/courses.index.tsx` (create course dialog) ✅
+  - `routes/(app)/teacher/feedback.$courseId.tsx` ✅ (requirements, feedback, homework refactored)
 
-  Still using raw controlled `<textarea>` / `<input>` in:
-  - `routes/(app)/teacher/feedback.$courseId.tsx` — requirements, feedback, homework fields
-  - `routes/(app)/student/assignments.tsx` — search input (minor, acceptable)
-
-**TODO**:
-- Refactor `feedback.$courseId.tsx` textarea/input fields to use TanStack Form
-- Ensure all user-facing forms use the reusable `FormField` component from `apps/web/src/components/form-field.tsx`
+  Minor: `routes/(app)/student/assignments.tsx` search input — acceptable, not a form submission.
 
 ---
 

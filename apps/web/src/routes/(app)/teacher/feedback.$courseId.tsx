@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useForm } from "@tanstack/react-form";
 import {
   Card,
   CardContent,
@@ -8,7 +9,6 @@ import {
   Avatar,
   AvatarFallback,
   Button,
-  Input,
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useFeedbackDraft, useSaveFeedbackDraft, usePublishFeedback } from "@/hooks/use-queries";
+import { FormTextField, FormTextareaField } from "@/components/form-field";
 
 export const Route = createFileRoute("/(app)/teacher/feedback/$courseId")({
   component: TeacherFeedbackEditor,
@@ -51,26 +52,32 @@ function TeacherFeedbackEditor() {
   const { data: draft } = useFeedbackDraft(courseId);
   const saveDraftMutation = useSaveFeedbackDraft();
   const publishMutation = usePublishFeedback();
-  const [requirementsText, setRequirementsText] = useState("");
-  const [feedbackText, setFeedbackText] = useState("");
-  const [quoteText, setQuoteText] = useState("");
-  const [assignmentTitle, setAssignmentTitle] = useState("");
-  const [dueDate, setDueDate] = useState("");
+
   const [requirementsOpen, setRequirementsOpen] = useState(true);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isDirty, setIsDirty] = useState(false);
 
+  const form = useForm({
+    defaultValues: {
+      requirements: "",
+      feedback: "",
+      assignmentTitle: "",
+      dueDate: "",
+    },
+  });
+
   // Load draft from DB when available
   useEffect(() => {
     if (draft) {
-      setRequirementsText((draft.requirements || []).join("\n"));
-      setFeedbackText(draft.summary || "");
-      setQuoteText(draft.quote || "");
-      setAssignmentTitle(draft.assignment_title || "");
-      setDueDate(draft.due_date || "");
+      form.setFieldValue("requirements", (draft.requirements || []).join("\n"));
+      form.setFieldValue("feedback", draft.summary || "");
+      form.setFieldValue("assignmentTitle", draft.assignment_title || "");
+      form.setFieldValue("dueDate", draft.due_date || "");
     }
   }, [draft]);
+
+  const values = form.state.values;
 
   // Auto-save with 1.5s debounce whenever content changes
   useEffect(() => {
@@ -80,11 +87,11 @@ function TeacherFeedbackEditor() {
       saveDraftMutation.mutate(
         {
           course_id: courseId,
-          summary: feedbackText || undefined,
-          quote: quoteText || undefined,
-          requirements: requirementsText ? requirementsText.split("\n").filter(Boolean) : [],
-          assignment_title: assignmentTitle || undefined,
-          due_date: dueDate || undefined,
+          summary: values.feedback || undefined,
+          quote: undefined,
+          requirements: values.requirements ? values.requirements.split("\n").filter(Boolean) : [],
+          assignment_title: values.assignmentTitle || undefined,
+          due_date: values.dueDate || undefined,
         },
         {
           onSuccess: () => {
@@ -96,15 +103,15 @@ function TeacherFeedbackEditor() {
       );
     }, 1500);
     return () => clearTimeout(timer);
-  }, [isDirty, feedbackText, requirementsText, quoteText, assignmentTitle, dueDate, courseId]);
+  }, [isDirty, values.feedback, values.requirements, values.assignmentTitle, values.dueDate, courseId]);
 
   const buildPayload = () => ({
     course_id: courseId,
-    summary: feedbackText || undefined,
-    quote: quoteText || undefined,
-    requirements: requirementsText ? requirementsText.split("\n").filter(Boolean) : [],
-    assignment_title: assignmentTitle || undefined,
-    due_date: dueDate || undefined,
+    summary: values.feedback || undefined,
+    quote: undefined,
+    requirements: values.requirements ? values.requirements.split("\n").filter(Boolean) : [],
+    assignment_title: values.assignmentTitle || undefined,
+    due_date: values.dueDate || undefined,
   });
 
   const handleSaveDraft = () => {
@@ -129,6 +136,8 @@ function TeacherFeedbackEditor() {
       },
     });
   };
+
+  const markDirty = () => setIsDirty(true);
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -229,7 +238,7 @@ function TeacherFeedbackEditor() {
           </CardContent>
         </Card>
 
-        {/* Course Requirements — collapsible (7.2) */}
+        {/* Course Requirements — collapsible */}
         <Collapsible open={requirementsOpen} onOpenChange={setRequirementsOpen} className="mb-6">
           <Card>
             <CardHeader className="pb-3">
@@ -249,12 +258,18 @@ function TeacherFeedbackEditor() {
             </CardHeader>
             <CollapsibleContent>
               <CardContent>
-                <textarea
-                  className="min-h-[120px] w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="Pre-class instructions for students"
-                  value={requirementsText}
-                  onChange={(e) => { setRequirementsText(e.target.value); setIsDirty(true); }}
-                />
+                <form.Field name="requirements">
+                  {(field) => (
+                    <div onChange={markDirty}>
+                      <FormTextareaField
+                        label=""
+                        placeholder="Pre-class instructions for students"
+                        rows={5}
+                        field={field}
+                      />
+                    </div>
+                  )}
+                </form.Field>
               </CardContent>
             </CollapsibleContent>
           </Card>
@@ -295,12 +310,18 @@ function TeacherFeedbackEditor() {
                 Mention
               </Button>
             </div>
-            <textarea
-              className="min-h-[160px] w-full rounded-b-lg rounded-t-none border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="Write your post-class feedback here. Use @mention to tag specific students..."
-              value={feedbackText}
-              onChange={(e) => { setFeedbackText(e.target.value); setIsDirty(true); }}
-            />
+            <form.Field name="feedback">
+              {(field) => (
+                <div onChange={markDirty}>
+                  <FormTextareaField
+                    label=""
+                    placeholder="Write your post-class feedback here. Use @mention to tag specific students..."
+                    rows={7}
+                    field={field}
+                  />
+                </div>
+              )}
+            </form.Field>
           </CardContent>
         </Card>
 
@@ -355,38 +376,37 @@ function TeacherFeedbackEditor() {
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                Assignment Title
-              </label>
-              <Input
-                type="text"
-                placeholder="e.g. Chapter 4 Problem Set"
-                value={assignmentTitle}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setAssignmentTitle(e.target.value);
-                  setIsDirty(true);
-                }}
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                Due Date
-              </label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="mm/dd/yyyy"
-                  className="pl-9"
-                  value={dueDate}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setDueDate(e.target.value);
-                    setIsDirty(true);
-                  }}
-                />
-              </div>
-            </div>
+            <form.Field name="assignmentTitle">
+              {(field) => (
+                <div onChange={markDirty}>
+                  <FormTextField
+                    label="Assignment Title"
+                    placeholder="e.g. Chapter 4 Problem Set"
+                    field={field}
+                  />
+                </div>
+              )}
+            </form.Field>
+            <form.Field name="dueDate">
+              {(field) => (
+                <div onChange={markDirty}>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Due Date</label>
+                    <div className="relative">
+                      <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                      <input
+                        type="text"
+                        placeholder="mm/dd/yyyy"
+                        value={field.state.value ?? ""}
+                        onChange={(e) => { field.handleChange(e.target.value); markDirty(); }}
+                        onBlur={field.handleBlur}
+                        className="flex w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </form.Field>
           </CardContent>
         </Card>
 
@@ -400,7 +420,7 @@ function TeacherFeedbackEditor() {
               disabled={saveDraftMutation.isPending}
             >
               <Save className="h-4 w-4" />
-              {saveDraftMutation.isPending ? "保存中..." : "Save Draft"}
+              {saveDraftMutation.isPending ? "Saving..." : "Save Draft"}
             </Button>
             <Button
               className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700"
@@ -408,7 +428,7 @@ function TeacherFeedbackEditor() {
               disabled={publishMutation.isPending}
             >
               <Send className="h-4 w-4" />
-              {publishMutation.isPending ? "发布中..." : "Save and Publish"}
+              {publishMutation.isPending ? "Publishing..." : "Save and Publish"}
             </Button>
           </div>
         </div>
