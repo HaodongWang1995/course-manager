@@ -719,6 +719,8 @@
   "teacherReports": {
     "title": "报告与分析",
     "subtitle": "课程与学生数据概览",
+    "loading": "加载中...",
+    "noData": "暂无数据",
     "kpi": {
       "totalCourses": "总课程数",
       "activeCourses": "进行中课程",
@@ -727,15 +729,20 @@
       "totalLessons": "课程总课时"
     },
     "charts": {
-      "gradeDistribution": "成绩分布",
-      "attendanceTrend": "出勤率趋势",
-      "comingSoon": "图表分析功能即将上线"
+      "gradeDistribution": "课程状态",
+      "attendanceTrend": "选课概览",
+      "active": "进行中",
+      "inactive": "未开课",
+      "approved": "已批准",
+      "pending": "待审核"
     },
     "reportList": {
-      "title": "报告列表",
-      "autoGenDesc": "自动生成的课程分析报告将在此处显示",
-      "comingSoon": "报告生成功能正在开发中",
-      "stayTuned": "敬请期待"
+      "title": "关键指标",
+      "autoGenDesc": "基于课程与选课数据自动计算的关键绩效指标",
+      "avgStudents": "平均每门活跃课程学生数",
+      "activeRate": "课程活跃率",
+      "avgLessons": "平均每门课程课时数",
+      "approvalRate": "选课批准率"
     }
   },
   "studentGrades": {

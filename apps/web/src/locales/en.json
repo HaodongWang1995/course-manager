@@ -719,6 +719,8 @@
   "teacherReports": {
     "title": "Reports & Analytics",
     "subtitle": "Overview of your courses and students",
+    "loading": "Loading...",
+    "noData": "No data available",
     "kpi": {
       "totalCourses": "Total Courses",
       "activeCourses": "Active Courses",
@@ -727,15 +729,20 @@
       "totalLessons": "Total Lessons"
     },
     "charts": {
-      "gradeDistribution": "Grade Distribution",
-      "attendanceTrend": "Attendance Trend",
-      "comingSoon": "Charts feature coming soon"
+      "gradeDistribution": "Course Status",
+      "attendanceTrend": "Enrollment Overview",
+      "active": "Active",
+      "inactive": "Inactive",
+      "approved": "Approved",
+      "pending": "Pending"
     },
     "reportList": {
-      "title": "Report List",
-      "autoGenDesc": "Automatically generated course analytics reports will appear here",
-      "comingSoon": "Report generation is in development",
-      "stayTuned": "Stay tuned"
+      "title": "Key Insights",
+      "autoGenDesc": "Key performance metrics derived from your course and enrollment data",
+      "avgStudents": "Avg Students / Active Course",
+      "activeRate": "Active Course Rate",
+      "avgLessons": "Avg Lessons / Course",
+      "approvalRate": "Enrollment Approval Rate"
     }
   },
   "studentGrades": {
