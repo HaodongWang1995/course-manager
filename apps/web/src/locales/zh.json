@@ -44,6 +44,10 @@
       "signUpLink": "注册",
       "hasAccount": "已有账号？",
       "loginLink": "登录"
+    },
+    "errors": {
+      "loginFailed": "登录失败",
+      "registerFailed": "注册失败"
     }
   },
   "enrollments": {
@@ -219,7 +223,10 @@
     "confirm": "确认",
     "search": "搜索",
     "comingSoon": "即将推出",
-    "backToList": "返回列表"
+    "backToList": "返回列表",
+    "logout": "退出登录",
+    "searchTeacher": "搜索课程、学生...",
+    "searchStudent": "搜索课程、资源..."
   },
   "landing": {
     "nav": {
@@ -406,6 +413,11 @@
       "statusOptions": {
         "active": "立即上架",
         "draft": "保存为草稿"
+      },
+      "placeholders": {
+        "title": "例如：线性代数",
+        "description": "简要介绍课程内容和目标...",
+        "category": "例如：数学"
       },
       "submit": "创建课程",
       "submitting": "创建中...",

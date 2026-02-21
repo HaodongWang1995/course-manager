@@ -71,7 +71,7 @@ export function CreateCourseDialog({
               field={field}
               label={t("createDialog.fields.title")}
               required
-              placeholder="例如: 线性代数"
+              placeholder={t("createDialog.placeholders.title")}
               autoFocus
             />
           )}
@@ -82,7 +82,7 @@ export function CreateCourseDialog({
             <FormTextareaField
               field={field}
               label={t("createDialog.fields.description")}
-              placeholder="简要介绍课程内容和目标..."
+              placeholder={t("createDialog.placeholders.description")}
             />
           )}
         </form.Field>
@@ -106,7 +106,7 @@ export function CreateCourseDialog({
               <FormTextField
                 field={field}
                 label={t("createDialog.fields.category")}
-                placeholder="例如: 数学"
+                placeholder={t("createDialog.placeholders.category")}
               />
             )}
           </form.Field>

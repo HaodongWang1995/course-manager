@@ -79,8 +79,8 @@ function AppLayout() {
   const sidebarItems = isTeacherRoute ? teacherSidebarItems : studentSidebarItems;
   const supportItems = isTeacherRoute ? teacherSupportItems : studentSupportItems;
   const appName = isTeacherRoute ? "EduManager" : "EduPortal";
-  const userRoleLabel = isTeacherRoute ? "老师" : "学生";
-  const topBarPlaceholder = isTeacherRoute ? "搜索课程、学生..." : "搜索课程、资源...";
+  const userRoleLabel = isTeacherRoute ? t("auth.role.teacher") : t("auth.role.student");
+  const topBarPlaceholder = isTeacherRoute ? t("common.searchTeacher") : t("common.searchStudent");
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -89,7 +89,7 @@ function AppLayout() {
           items={sidebarItems}
           sections={[
             { items: sidebarItems },
-            { title: "Support", items: supportItems },
+            { title: t("nav.support"), items: supportItems },
           ]}
           activeHref={location.pathname}
           user={{
@@ -108,7 +108,7 @@ function AppLayout() {
               <button
                 onClick={handleLogout}
                 className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                title="退出登录"
+                title={t("common.logout")}
               >
                 <LogOut className="h-4 w-4" />
               </button>
@@ -121,7 +121,7 @@ function AppLayout() {
             <button
               onClick={handleLogout}
               className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-              title="退出登录"
+              title={t("common.logout")}
             >
               <LogOut className="h-4 w-4" />
             </button>

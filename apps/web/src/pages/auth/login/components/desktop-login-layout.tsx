@@ -47,7 +47,7 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
       setError("");
       loginMutation.mutate(value, {
         onSuccess: (user) => onSuccess(user.role),
-        onError: (err) => setError(err.message || "登录失败"),
+        onError: (err) => setError(err.message || t("errors.loginFailed")),
       });
     },
   });
@@ -64,7 +64,7 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
       setError("");
       registerMutation.mutate({ ...value, role }, {
         onSuccess: (user) => onSuccess(user.role),
-        onError: (err) => setError(err.message || "注册失败"),
+        onError: (err) => setError(err.message || t("errors.registerFailed")),
       });
     },
   });

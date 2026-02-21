@@ -23,11 +23,6 @@ import {
 import { useDeleteCourse, useUpdateCourseStatus } from "@/hooks/use-queries";
 import type { Course } from "@/api/client";
 
-const statusLabels: Record<string, string> = {
-  active: "Active",
-  draft: "Draft",
-  archived: "Archived",
-};
 
 const statusColors: Record<string, string> = {
   active: "bg-green-50 text-green-700 border-green-200",
@@ -216,6 +211,7 @@ export function CourseGridCard({ course, index }: { course: Course; index: numbe
 
 export function CourseListItem({ course }: { course: Course }) {
   const navigate = useNavigate();
+  const { t } = useTranslation("teacherCourses");
 
   return (
     <Card
@@ -230,7 +226,7 @@ export function CourseListItem({ course }: { course: Course }) {
                 className={`border ${statusColors[course.status]}`}
                 variant="outline"
               >
-                {statusLabels[course.status]}
+                {{ active: t("filters.active"), draft: t("filters.draft"), archived: t("filters.archived") }[course.status] || course.status}
               </Badge>
               <h3 className="text-lg font-semibold text-gray-900">{course.title}</h3>
             </div>
@@ -239,7 +235,7 @@ export function CourseListItem({ course }: { course: Course }) {
             )}
             <div className="mt-3 flex items-center gap-6 text-sm text-gray-500">
               {course.category && <span>{course.category}</span>}
-              <span>{course.lesson_count} 节课</span>
+              <span>{t("card.lessons", { count: course.lesson_count })}</span>
               {course.price > 0 && (
                 <span className="font-medium text-blue-600">
                   ¥{Number(course.price).toFixed(2)}

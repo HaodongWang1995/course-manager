@@ -44,6 +44,10 @@
       "signUpLink": "Sign Up",
       "hasAccount": "Already have an account?",
       "loginLink": "Login"
+    },
+    "errors": {
+      "loginFailed": "Login failed",
+      "registerFailed": "Registration failed"
     }
   },
   "enrollments": {
@@ -219,7 +223,10 @@
     "confirm": "Confirm",
     "search": "Search",
     "comingSoon": "Coming Soon",
-    "backToList": "Back to List"
+    "backToList": "Back to List",
+    "logout": "Logout",
+    "searchTeacher": "Search courses, students...",
+    "searchStudent": "Search courses, resources..."
   },
   "landing": {
     "nav": {
@@ -406,6 +413,11 @@
       "statusOptions": {
         "active": "Active (Publish now)",
         "draft": "Draft (Save)"
+      },
+      "placeholders": {
+        "title": "e.g. Linear Algebra",
+        "description": "Brief introduction to course content and goals...",
+        "category": "e.g. Math"
       },
       "submit": "Create Course",
       "submitting": "Creating...",
