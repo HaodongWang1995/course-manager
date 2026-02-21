@@ -20,12 +20,6 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import { supportSchema } from "@/lib/schemas";
 
-const teacherFaqKeys = [
-  { q: "How do I create a new course?", a: "Go to Courses > click 'New Course' button > fill in the course details and submit." },
-  { q: "How do I manage enrollments?", a: "Navigate to Enrollments from the sidebar. You can approve or reject student enrollment requests." },
-  { q: "How do I add schedules to a course?", a: "Open a course detail page and click 'Add Schedule' to create class sessions." },
-  { q: "How do I export reports?", a: "Go to Reports and click 'Generate New Report' or download existing reports as PDF." },
-];
 
 function ContactForm() {
   const { t } = useTranslation();
@@ -109,6 +103,20 @@ function ContactForm() {
 export function TeacherSupportPage() {
   const { t } = useTranslation();
 
+  const teacherLinks = [
+    { icon: BookOpen, title: t("support.teacher.links.docs.title"), desc: t("support.teacher.links.docs.desc"), color: "text-blue-600 bg-blue-50" },
+    { icon: MessageCircle, title: t("support.teacher.links.chat.title"), desc: t("support.teacher.links.chat.desc"), color: "text-green-600 bg-green-50" },
+    { icon: Mail, title: t("support.teacher.links.email.title"), desc: t("support.teacher.links.email.desc"), color: "text-purple-600 bg-purple-50" },
+    { icon: FileText, title: t("support.teacher.links.release.title"), desc: t("support.teacher.links.release.desc"), color: "text-orange-600 bg-orange-50" },
+  ];
+
+  const teacherFaqs = [
+    { q: t("support.teacher.faq.create.q"), a: t("support.teacher.faq.create.a") },
+    { q: t("support.teacher.faq.enrollments.q"), a: t("support.teacher.faq.enrollments.a") },
+    { q: t("support.teacher.faq.schedules.q"), a: t("support.teacher.faq.schedules.a") },
+    { q: t("support.teacher.faq.reports.q"), a: t("support.teacher.faq.reports.a") },
+  ];
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
@@ -118,12 +126,7 @@ export function TeacherSupportPage() {
 
       {/* Quick Links */}
       <div className="grid gap-4 sm:grid-cols-2">
-        {[
-          { icon: BookOpen, title: "Documentation", desc: "Browse guides and tutorials", color: "text-blue-600 bg-blue-50" },
-          { icon: MessageCircle, title: "Live Chat", desc: "Chat with our support team", color: "text-green-600 bg-green-50" },
-          { icon: Mail, title: "Email Support", desc: "support@edumanager.com", color: "text-purple-600 bg-purple-50" },
-          { icon: FileText, title: "Release Notes", desc: "See what's new", color: "text-orange-600 bg-orange-50" },
-        ].map((item) => (
+        {teacherLinks.map((item) => (
           <Card key={item.title} className="cursor-pointer transition-shadow hover:shadow-md">
             <CardContent className="flex items-start gap-3 p-4">
               <div className={`rounded-lg p-2 ${item.color}`}>
@@ -148,7 +151,7 @@ export function TeacherSupportPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {teacherFaqKeys.map((faq, idx) => (
+          {teacherFaqs.map((faq, idx) => (
             <details key={idx} className="group rounded-lg border border-gray-100 p-3">
               <summary className="cursor-pointer text-sm font-medium text-gray-900 list-none flex items-center justify-between">
                 {faq.q}

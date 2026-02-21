@@ -20,12 +20,6 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import { supportSchema } from "@/lib/schemas";
 
-const studentFaqs = [
-  { q: "How do I enroll in a course?", a: "Browse courses from the Dashboard, open a course and click 'Apply to Enroll'. Your application will be reviewed by the teacher." },
-  { q: "How do I check my grades?", a: "Go to Grades from the sidebar or bottom navigation to view your GPA, course grades, and performance overview." },
-  { q: "How do I cancel an enrollment?", a: "Go to Enrollments, find the pending enrollment and click the cancel button." },
-  { q: "How do I contact my teacher?", a: "Use the Messages feature from the sidebar to send a message to your course teacher." },
-];
 
 function ContactForm() {
   const { t } = useTranslation();
@@ -109,6 +103,20 @@ function ContactForm() {
 export function StudentSupportPage() {
   const { t } = useTranslation();
 
+  const studentLinks = [
+    { icon: BookOpen, title: t("support.student.links.guide.title"), desc: t("support.student.links.guide.desc"), color: "text-blue-600 bg-blue-50" },
+    { icon: MessageCircle, title: t("support.student.links.chat.title"), desc: t("support.student.links.chat.desc"), color: "text-green-600 bg-green-50" },
+    { icon: Mail, title: t("support.student.links.email.title"), desc: t("support.student.links.email.desc"), color: "text-purple-600 bg-purple-50" },
+    { icon: FileText, title: t("support.student.links.kb.title"), desc: t("support.student.links.kb.desc"), color: "text-orange-600 bg-orange-50" },
+  ];
+
+  const studentFaqs = [
+    { q: t("support.student.faq.enroll.q"), a: t("support.student.faq.enroll.a") },
+    { q: t("support.student.faq.grades.q"), a: t("support.student.faq.grades.a") },
+    { q: t("support.student.faq.cancel.q"), a: t("support.student.faq.cancel.a") },
+    { q: t("support.student.faq.contact.q"), a: t("support.student.faq.contact.a") },
+  ];
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
@@ -117,12 +125,7 @@ export function StudentSupportPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {[
-          { icon: BookOpen, title: "Student Guide", desc: "Getting started tutorials", color: "text-blue-600 bg-blue-50" },
-          { icon: MessageCircle, title: "Live Chat", desc: "Chat with support team", color: "text-green-600 bg-green-50" },
-          { icon: Mail, title: "Email Support", desc: "support@eduportal.com", color: "text-purple-600 bg-purple-50" },
-          { icon: FileText, title: "Knowledge Base", desc: "Browse help articles", color: "text-orange-600 bg-orange-50" },
-        ].map((item) => (
+        {studentLinks.map((item) => (
           <Card key={item.title} className="cursor-pointer transition-shadow hover:shadow-md">
             <CardContent className="flex items-start gap-3 p-4">
               <div className={`rounded-lg p-2 ${item.color}`}>

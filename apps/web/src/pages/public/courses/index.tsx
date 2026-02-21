@@ -7,20 +7,6 @@ import { useStudentCourses } from "@/hooks/use-queries";
 import type { Course } from "@/api/client";
 import { EmptyState } from "@/components/empty-state";
 
-type CategoryKey = "all" | "math" | "physics" | "chemistry" | "english" | "computer" | "other";
-
-const CATEGORY_KEYS: CategoryKey[] = ["all", "math", "physics", "chemistry", "english", "computer", "other"];
-
-const CATEGORY_VALUES: Record<CategoryKey, string> = {
-  all: "全部",
-  math: "数学",
-  physics: "物理",
-  chemistry: "化学",
-  english: "英语",
-  computer: "计算机",
-  other: "其他",
-};
-
 function PublicCourseCard({
   course,
   onClick,
@@ -72,10 +58,17 @@ export function PublicCourseBrowsePage() {
   const navigate = useNavigate();
   const { t } = useTranslation("publicCourses");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategoryKey, setSelectedCategoryKey] = useState<CategoryKey>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const { data: courses = [], isLoading } = useStudentCourses();
 
-  const selectedCategoryValue = CATEGORY_VALUES[selectedCategoryKey];
+  // Derive unique categories from actual course data
+  const categories = useMemo(() => {
+    const cats = new Set<string>();
+    for (const course of courses) {
+      if (course.category) cats.add(course.category);
+    }
+    return Array.from(cats).sort();
+  }, [courses]);
 
   const filteredCourses = useMemo(() => {
     return courses.filter((course) => {
@@ -83,10 +76,10 @@ export function PublicCourseBrowsePage() {
         course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (course.description || "").toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory =
-        selectedCategoryKey === "all" || course.category === selectedCategoryValue;
+        selectedCategory === "all" || course.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [courses, searchQuery, selectedCategoryKey, selectedCategoryValue]);
+  }, [courses, searchQuery, selectedCategory]);
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-6 md:p-10">
@@ -107,18 +100,27 @@ export function PublicCourseBrowsePage() {
         />
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {CATEGORY_KEYS.map((key) => (
+      {categories.length > 0 && (
+        <div className="flex flex-wrap gap-2">
           <Button
-            key={key}
-            variant={selectedCategoryKey === key ? "default" : "outline"}
+            variant={selectedCategory === "all" ? "default" : "outline"}
             size="sm"
-            onClick={() => setSelectedCategoryKey(key)}
+            onClick={() => setSelectedCategory("all")}
           >
-            {t(`categories.${key}`)}
+            {t("categories.all")}
           </Button>
-        ))}
-      </div>
+          {categories.map((cat) => (
+            <Button
+              key={cat}
+              variant={selectedCategory === cat ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(cat)}
+            >
+              {cat}
+            </Button>
+          ))}
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">

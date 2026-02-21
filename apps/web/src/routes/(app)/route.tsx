@@ -15,7 +15,6 @@ import {
   BarChart3,
   ClipboardList,
   Settings,
-  HelpCircle,
   MessageSquare,
   FolderOpen,
   Home,
@@ -64,12 +63,10 @@ function AppLayout() {
 
   const teacherSupportItems = [
     { label: t("nav.settings"), href: "/teacher/settings", icon: Settings },
-    { label: t("nav.support"), href: "/teacher/support", icon: HelpCircle },
   ];
 
   const studentSupportItems = [
     { label: t("nav.settings"), href: "/student/settings", icon: Settings },
-    { label: t("nav.support"), href: "/student/support", icon: HelpCircle },
   ];
 
   const studentBottomNavItems = [

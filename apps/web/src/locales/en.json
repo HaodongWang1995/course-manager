@@ -130,7 +130,35 @@
     "send": "Send Message",
     "sentTitle": "Message sent",
     "sentDesc": "We will reply within 1-2 business days",
-    "sendAnother": "Send another"
+    "sendAnother": "Send another",
+    "teacher": {
+      "links": {
+        "docs": { "title": "Documentation", "desc": "Browse guides and tutorials" },
+        "chat": { "title": "Live Chat", "desc": "Chat with our support team" },
+        "email": { "title": "Email Support", "desc": "support@edumanager.com" },
+        "release": { "title": "Release Notes", "desc": "See what's new" }
+      },
+      "faq": {
+        "create": { "q": "How do I create a new course?", "a": "Go to Courses > click 'New Course' button > fill in the course details and submit." },
+        "enrollments": { "q": "How do I manage enrollments?", "a": "Navigate to Enrollments from the sidebar. You can approve or reject student enrollment requests." },
+        "schedules": { "q": "How do I add schedules to a course?", "a": "Open a course detail page and click 'Add Schedule' to create class sessions." },
+        "reports": { "q": "How do I export reports?", "a": "Go to Reports and click 'Generate New Report' or download existing reports as PDF." }
+      }
+    },
+    "student": {
+      "links": {
+        "guide": { "title": "Student Guide", "desc": "Getting started tutorials" },
+        "chat": { "title": "Live Chat", "desc": "Chat with support team" },
+        "email": { "title": "Email Support", "desc": "support@eduportal.com" },
+        "kb": { "title": "Knowledge Base", "desc": "Browse help articles" }
+      },
+      "faq": {
+        "enroll": { "q": "How do I enroll in a course?", "a": "Browse courses from the Dashboard, open a course and click 'Apply to Enroll'. Your application will be reviewed by the teacher." },
+        "grades": { "q": "How do I check my grades?", "a": "Go to Grades from the sidebar or bottom navigation to view your GPA, course grades, and performance overview." },
+        "cancel": { "q": "How do I cancel an enrollment?", "a": "Go to Enrollments, find the pending enrollment and click the cancel button." },
+        "contact": { "q": "How do I contact my teacher?", "a": "Use the Messages feature from the sidebar to send a message to your course teacher." }
+      }
+    }
   },
   "upload": {
     "prompt": "Drag & drop or click to upload",
