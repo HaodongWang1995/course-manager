@@ -58,6 +58,31 @@ router.post("/courses/:courseId/resources", authRequired, teacherOnly, async (re
   }
 });
 
+// DELETE /api/resources/:id — delete resource (teacher owns course)
+router.delete("/resources/:id", authRequired, teacherOnly, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const teacherId = req.user!.userId;
+
+    const check = await pool.query(
+      `SELECT r.id FROM resources r
+       JOIN courses c ON c.id = r.course_id
+       WHERE r.id = $1 AND c.teacher_id = $2`,
+      [id, teacherId],
+    );
+    if (check.rows.length === 0) {
+      res.status(403).json({ error: "无权删除此资源" });
+      return;
+    }
+
+    await pool.query("DELETE FROM resources WHERE id = $1", [id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Failed to delete resource:", err);
+    res.status(500).json({ error: "删除资源失败" });
+  }
+});
+
 // GET /api/students/resources — all resources for student's enrolled courses
 router.get("/students/resources", authRequired, async (req: Request, res: Response) => {
   try {

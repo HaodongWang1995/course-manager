@@ -32,6 +32,9 @@ import {
   Trash2,
   Save,
   Paperclip,
+  BookOpen,
+  FileText,
+  Calendar,
 } from "lucide-react";
 import {
   useCourseDetail,
@@ -42,6 +45,12 @@ import {
   useCourseAttachments,
   useUploadAttachment,
   useDeleteAttachment,
+  useCourseAssignments,
+  useCreateAssignment,
+  useDeleteAssignment,
+  useCourseResources,
+  useCreateResource,
+  useDeleteResource,
 } from "@/hooks/use-queries";
 import { useForm } from "@tanstack/react-form";
 import { scheduleFormValidator } from "@/lib/schemas";
@@ -76,7 +85,15 @@ function TeacherCourseDetail() {
   const { data: attachments = [] } = useCourseAttachments(courseId);
   const uploadMutation = useUploadAttachment();
   const deleteAttachmentMutation = useDeleteAttachment();
+  const { data: assignments = [] } = useCourseAssignments(courseId);
+  const createAssignmentMutation = useCreateAssignment();
+  const deleteAssignmentMutation = useDeleteAssignment();
+  const { data: resources = [] } = useCourseResources(courseId);
+  const createResourceMutation = useCreateResource();
+  const deleteResourceMutation = useDeleteResource();
 
+  const [showAddAssignment, setShowAddAssignment] = useState(false);
+  const [showAddResource, setShowAddResource] = useState(false);
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -338,6 +355,123 @@ function TeacherCourseDetail() {
         </CardContent>
       </Card>
 
+      {/* Assignments */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-gray-500" />
+            <CardTitle>作业 ({assignments.length})</CardTitle>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => setShowAddAssignment(true)}>
+            <Plus className="h-4 w-4 mr-1" /> 添加作业
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {assignments.length === 0 ? (
+            <p className="py-4 text-center text-sm text-gray-400">暂无作业</p>
+          ) : (
+            <div className="space-y-2">
+              {assignments.map((a) => (
+                <div key={a.id} className="flex items-start justify-between gap-3 rounded-lg border border-gray-200 p-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900">{a.title}</p>
+                    {a.description && (
+                      <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">{a.description}</p>
+                    )}
+                    <p className="mt-1 flex items-center gap-1 text-xs text-gray-400">
+                      <Calendar className="h-3 w-3" />
+                      截止：{new Date(a.due_date).toLocaleDateString("zh-CN")}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost-destructive"
+                    size="icon"
+                    onClick={() => {
+                      if (window.confirm("确定要删除此作业吗？")) {
+                        deleteAssignmentMutation.mutate({ id: a.id, courseId });
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Resources */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-gray-500" />
+            <CardTitle>课程资源 ({resources.length})</CardTitle>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => setShowAddResource(true)}>
+            <Plus className="h-4 w-4 mr-1" /> 添加资源
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {resources.length === 0 ? (
+            <p className="py-4 text-center text-sm text-gray-400">暂无课程资源</p>
+          ) : (
+            <div className="space-y-2">
+              {resources.map((r) => (
+                <div key={r.id} className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 p-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900">{r.title}</p>
+                    {(r.file_type || r.file_size) && (
+                      <p className="mt-0.5 text-xs text-gray-400">
+                        {r.file_type}{r.file_type && r.file_size ? " · " : ""}{r.file_size}
+                        {r.featured && <span className="ml-2 text-blue-500">精选</span>}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost-destructive"
+                    size="icon"
+                    onClick={() => {
+                      if (window.confirm("确定要删除此资源吗？")) {
+                        deleteResourceMutation.mutate({ id: r.id, courseId });
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Add Assignment Dialog */}
+      <AddAssignmentDialog
+        open={showAddAssignment}
+        onOpenChange={setShowAddAssignment}
+        onAdd={(data) => {
+          createAssignmentMutation.mutate(
+            { courseId, data },
+            { onSuccess: () => setShowAddAssignment(false) }
+          );
+        }}
+        isLoading={createAssignmentMutation.isPending}
+      />
+
+      {/* Add Resource Dialog */}
+      <AddResourceDialog
+        open={showAddResource}
+        onOpenChange={setShowAddResource}
+        onAdd={(data) => {
+          createResourceMutation.mutate(
+            { courseId, data },
+            { onSuccess: () => setShowAddResource(false) }
+          );
+        }}
+        isLoading={createResourceMutation.isPending}
+      />
+
       {/* Add Schedule Dialog */}
       <AddScheduleDialog
         open={showAddSchedule}
@@ -466,6 +600,175 @@ function AddScheduleDialog({
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading ? "添加中..." : "添加课时"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ── Add Assignment Dialog ─────────────────────────────
+
+function AddAssignmentDialog({
+  open,
+  onOpenChange,
+  onAdd,
+  isLoading,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onAdd: (data: { title: string; description?: string; due_date: string }) => void;
+  isLoading: boolean;
+}) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [dueDate, setDueDate] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !dueDate) return;
+    onAdd({ title: title.trim(), description: description.trim() || undefined, due_date: dueDate });
+  };
+
+  const handleClose = (v: boolean) => {
+    if (!v) { setTitle(""); setDescription(""); setDueDate(""); }
+    onOpenChange(v);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>添加作业</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="assignment-title">标题 *</Label>
+            <Input
+              id="assignment-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="例如：第一章课后练习"
+              required
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="assignment-desc">说明（可选）</Label>
+            <Input
+              id="assignment-desc"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="作业内容说明"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="assignment-due">截止日期 *</Label>
+            <Input
+              id="assignment-due"
+              type="datetime-local"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              required
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => handleClose(false)}>取消</Button>
+            <Button type="submit" disabled={isLoading || !title.trim() || !dueDate}>
+              {isLoading ? "添加中..." : "添加作业"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ── Add Resource Dialog ───────────────────────────────
+
+function AddResourceDialog({
+  open,
+  onOpenChange,
+  onAdd,
+  isLoading,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onAdd: (data: { title: string; file_type?: string; file_size?: string; featured?: boolean }) => void;
+  isLoading: boolean;
+}) {
+  const [title, setTitle] = useState("");
+  const [fileType, setFileType] = useState("");
+  const [fileSize, setFileSize] = useState("");
+  const [featured, setFeatured] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+    onAdd({
+      title: title.trim(),
+      file_type: fileType.trim() || undefined,
+      file_size: fileSize.trim() || undefined,
+      featured,
+    });
+  };
+
+  const handleClose = (v: boolean) => {
+    if (!v) { setTitle(""); setFileType(""); setFileSize(""); setFeatured(false); }
+    onOpenChange(v);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>添加课程资源</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="res-title">资源名称 *</Label>
+            <Input
+              id="res-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="例如：第一章讲义.pdf"
+              required
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="res-type">文件类型</Label>
+              <Input
+                id="res-type"
+                value={fileType}
+                onChange={(e) => setFileType(e.target.value)}
+                placeholder="pdf / ppt / doc"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="res-size">文件大小</Label>
+              <Input
+                id="res-size"
+                value={fileSize}
+                onChange={(e) => setFileSize(e.target.value)}
+                placeholder="例如：2.5 MB"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              id="res-featured"
+              type="checkbox"
+              checked={featured}
+              onChange={(e) => setFeatured(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300"
+            />
+            <Label htmlFor="res-featured" className="cursor-pointer text-sm">设为精选资源</Label>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => handleClose(false)}>取消</Button>
+            <Button type="submit" disabled={isLoading || !title.trim()}>
+              {isLoading ? "添加中..." : "添加资源"}
             </Button>
           </DialogFooter>
         </form>

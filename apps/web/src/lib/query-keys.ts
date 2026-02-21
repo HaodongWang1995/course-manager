@@ -45,6 +45,9 @@ export const courseKeys = createQueryKeys("course", {
   resources: (courseId: string) => ({
     queryKey: [courseId],
   }),
+  assignments: (courseId: string) => ({
+    queryKey: [courseId],
+  }),
 });
 
 export const feedbackKeys = createQueryKeys("feedback", {

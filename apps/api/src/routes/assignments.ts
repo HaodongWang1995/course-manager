@@ -82,6 +82,32 @@ router.get("/students/assignments", authRequired, async (req: Request, res: Resp
   }
 });
 
+// DELETE /api/assignments/:id — delete assignment (teacher owns course)
+router.delete("/assignments/:id", authRequired, teacherOnly, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const teacherId = req.user!.userId;
+
+    // Verify teacher owns the course the assignment belongs to
+    const check = await pool.query(
+      `SELECT a.id FROM assignments a
+       JOIN courses c ON c.id = a.course_id
+       WHERE a.id = $1 AND c.teacher_id = $2`,
+      [id, teacherId],
+    );
+    if (check.rows.length === 0) {
+      res.status(403).json({ error: "无权删除此作业" });
+      return;
+    }
+
+    await pool.query("DELETE FROM assignments WHERE id = $1", [id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Failed to delete assignment:", err);
+    res.status(500).json({ error: "删除作业失败" });
+  }
+});
+
 // PATCH /api/assignments/:id/submit — submit/update assignment status (student)
 router.patch("/assignments/:id/submit", authRequired, async (req: Request, res: Response) => {
   try {

@@ -394,6 +394,68 @@ export function useCourseResources(courseId: string) {
   });
 }
 
+export function useCreateResource() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ courseId, data }: {
+      courseId: string;
+      data: { title: string; file_type?: string; file_size?: string; featured?: boolean };
+    }) => resourceApi.create(courseId, data),
+    onSuccess: (_res, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: courseKeys.resources(courseId).queryKey });
+      queryClient.invalidateQueries({ queryKey: studentKeys.resources.queryKey });
+    },
+  });
+}
+
+export function useDeleteResource() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, courseId }: { id: string; courseId: string }) =>
+      resourceApi.delete(id),
+    onSuccess: (_res, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: courseKeys.resources(courseId).queryKey });
+      queryClient.invalidateQueries({ queryKey: studentKeys.resources.queryKey });
+    },
+  });
+}
+
+// ── Teacher Assignments (Real API) ────────────────────
+
+export function useCourseAssignments(courseId: string) {
+  return useQuery({
+    queryKey: courseKeys.assignments(courseId).queryKey,
+    queryFn: () => assignmentApi.listForCourse(courseId),
+    enabled: !!getToken() && !!courseId,
+  });
+}
+
+export function useCreateAssignment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ courseId, data }: {
+      courseId: string;
+      data: { title: string; description?: string; due_date: string };
+    }) => assignmentApi.create(courseId, data),
+    onSuccess: (_res, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: courseKeys.assignments(courseId).queryKey });
+      queryClient.invalidateQueries({ queryKey: studentKeys.assignments.queryKey });
+    },
+  });
+}
+
+export function useDeleteAssignment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, courseId }: { id: string; courseId: string }) =>
+      assignmentApi.delete(id),
+    onSuccess: (_res, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: courseKeys.assignments(courseId).queryKey });
+      queryClient.invalidateQueries({ queryKey: studentKeys.assignments.queryKey });
+    },
+  });
+}
+
 // ── Course Feedback (Real API) ────────────────────────
 
 export function useCourseFeedbackDetail(courseId: string) {

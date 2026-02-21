@@ -335,6 +335,9 @@ export const assignmentApi = {
       body: JSON.stringify(data),
     });
   },
+  delete(id: string) {
+    return request<{ success: boolean }>(`/api/assignments/${id}`, { method: "DELETE" });
+  },
 };
 
 // ── Grades ───────────────────────────────────────
@@ -400,6 +403,9 @@ export const resourceApi = {
   },
   listForStudent() {
     return request<StudentResources>("/api/students/resources");
+  },
+  delete(id: string) {
+    return request<{ success: boolean }>(`/api/resources/${id}`, { method: "DELETE" });
   },
 };
 
