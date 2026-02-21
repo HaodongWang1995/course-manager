@@ -17,12 +17,9 @@ import {
   Save,
   Send,
   Paperclip,
-  FileText,
   Plus,
   AtSign,
   Calendar,
-  X,
-  Download,
   Bold,
   Italic,
   List,
@@ -32,7 +29,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useFeedbackDraft, useSaveFeedbackDraft, usePublishFeedback } from "@/hooks/use-queries";
+import { useFeedbackDraft, useSaveFeedbackDraft, usePublishFeedback, useCourseDetail } from "@/hooks/use-queries";
 import { FormTextField, FormTextareaField } from "@/components/form-field";
 
 const presentStudents = [
@@ -49,6 +46,7 @@ interface FeedbackEditorPageProps {
 
 export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
   const { t } = useTranslation("feedback");
+  const { data: course } = useCourseDetail(courseId);
   const { data: draft } = useFeedbackDraft(courseId);
   const saveDraftMutation = useSaveFeedbackDraft();
   const publishMutation = usePublishFeedback();
@@ -146,14 +144,14 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-                  Advanced Mathematics
+                  {course?.title ?? courseId}
                 </h1>
                 <Badge className={draft?.published ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"}>
                   {draft?.published ? t("status.published") : t("status.draft")}
                 </Badge>
               </div>
               <p className="mt-1 text-sm text-gray-500">
-                {t("courseId")} {courseId} &middot; Session #12
+                {t("courseId")} {courseId}
               </p>
             </div>
             <div className="flex flex-col items-end gap-1.5">
@@ -175,19 +173,17 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
                     )}
                   </span>
                 )}
-                {saveStatus === "idle" && (
+                {saveStatus === "idle" && draft?.updated_at && (
                   <span className="flex items-center gap-1.5 text-xs text-gray-400">
                     <Clock className="h-3.5 w-3.5" />
-                    Last edited Oct 20, 2023 at 3:45 PM
+                    {new Date(draft.updated_at).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true })}
                   </span>
                 )}
               </div>
               <div className="text-right text-sm text-gray-500">
                 <p>
-                  <span className="font-medium text-gray-700">{t("date")}</span> Oct 20, 2023
-                </p>
-                <p>
-                  <span className="font-medium text-gray-700">{t("time")}</span> 10:00 AM - 11:30 AM
+                  <span className="font-medium text-gray-700">{t("date")}</span>{" "}
+                  {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                 </p>
               </div>
             </div>
@@ -310,26 +306,7 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
             <CardTitle className="text-sm font-semibold">{t("materialsShared")}</CardTitle>
             <p className="text-xs text-gray-500">{t("materialsDesc")}</p>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50/50 px-4 py-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
-                  <FileText className="h-5 w-5 text-red-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Calculus_Ch4_Notes.pdf</p>
-                  <p className="text-xs text-gray-500">2.4 MB &middot; Uploaded Oct 20, 2023</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon-sm">
-                  <Download className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost-destructive" size="icon-sm">
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+          <CardContent>
             <button className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-4 text-sm font-medium text-gray-500 transition-colors hover:border-blue-400 hover:bg-blue-50/50 hover:text-blue-600">
               <Paperclip className="h-4 w-4" />
               {t("attachFileOrLink")}

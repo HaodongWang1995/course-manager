@@ -59,7 +59,7 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
       password: "",
       role: "student" as "student" | "teacher",
     },
-    validators: { onBlur: registerSchema },
+    validators: { onSubmit: registerSchema },
     onSubmit: ({ value }) => {
       setError("");
       registerMutation.mutate({ ...value, role }, {
@@ -255,7 +255,7 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
                       onBlur={field.handleBlur}
                       className="h-12 rounded-lg border-slate-200 text-base placeholder:text-slate-400"
                     />
-                    {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                    {field.state.meta.errors.length > 0 && (
                       <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
@@ -280,7 +280,7 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
                         className="h-12 rounded-lg border-slate-200 pl-11 text-base placeholder:text-slate-400"
                       />
                     </div>
-                    {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                    {field.state.meta.errors.length > 0 && (
                       <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
@@ -312,7 +312,7 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
                     </div>
-                    {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                    {field.state.meta.errors.length > 0 && (
                       <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
                     )}
                   </div>
