@@ -12,6 +12,10 @@ export interface FileUploadZoneProps {
   multiple?: boolean;
   className?: string;
   disabled?: boolean;
+  uploadPromptText?: string;
+  maxSizeText?: string;
+  uploadingText?: string;
+  tooLargeText?: string;
 }
 
 export function FileUploadZone({
@@ -22,6 +26,10 @@ export function FileUploadZone({
   multiple = false,
   className,
   disabled = false,
+  uploadPromptText = "Drag & drop or click to upload",
+  maxSizeText,
+  uploadingText = "Uploading...",
+  tooLargeText,
 }: FileUploadZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -32,7 +40,7 @@ export function FileUploadZone({
     const maxBytes = maxSizeMB * 1024 * 1024;
     const oversized = files.filter((f) => f.size > maxBytes);
     if (oversized.length > 0) {
-      setError(`File too large. Max ${maxSizeMB}MB per file.`);
+      setError(tooLargeText ?? `File too large. Max ${maxSizeMB}MB per file.`);
       return;
     }
     onFileSelect(files);
@@ -82,13 +90,15 @@ export function FileUploadZone({
           className={cn("h-8 w-8", isDragging ? "text-blue-500" : "text-gray-400")}
         />
         {uploading ? (
-          <p className="text-sm text-gray-500">Uploading...</p>
+          <p className="text-sm text-gray-500">{uploadingText}</p>
         ) : (
           <>
             <p className="text-sm font-medium text-gray-700">
-              Drag & drop or click to upload
+              {uploadPromptText}
             </p>
-            <p className="text-xs text-gray-400">Max {maxSizeMB}MB per file</p>
+            <p className="text-xs text-gray-400">
+              {maxSizeText ?? `Max ${maxSizeMB}MB per file`}
+            </p>
           </>
         )}
       </div>

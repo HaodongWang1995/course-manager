@@ -51,6 +51,7 @@ export interface AttachmentListProps {
   onDelete?: (id: string) => void;
   isDeleting?: boolean;
   className?: string;
+  emptyText?: string;
 }
 
 export function AttachmentList({
@@ -58,10 +59,11 @@ export function AttachmentList({
   onDelete,
   isDeleting,
   className,
+  emptyText = "No attachments yet",
 }: AttachmentListProps) {
   if (attachments.length === 0) {
     return (
-      <p className="py-4 text-center text-sm text-gray-400">No attachments yet</p>
+      <p className="py-4 text-center text-sm text-gray-400">{emptyText}</p>
     );
   }
 

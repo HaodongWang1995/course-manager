@@ -15,18 +15,18 @@ These requirements come from `PRD/PROMP-BASIC.md` and serve as the foundation fo
 |------|---------|--------|
 | TanStack Router + React | Routing | ✅ Done |
 | TanStack Query v5 | Server state / data fetching | ✅ Done |
-| TanStack Form | All form logic + reusable form components | ⚠️ Partial (login, courses; feedback/other forms still use raw inputs) |
-| @lukemorales/query-key-factory | Centralized query key management | ❌ Not added |
-| Figma design | UI must match Figma designs as closely as possible | ⚠️ In progress (see PRD/UI-TODO.md) |
+| TanStack Form | All form logic + reusable form components | ✅ Done (all forms migrated) |
+| @lukemorales/query-key-factory | Centralized query key management | ✅ Done (`apps/web/src/lib/query-keys.ts`) |
+| Figma design | UI must match Figma designs as closely as possible | ✅ Done (all 46 UI-TODO items resolved) |
 | PC + H5 responsive layout | Shared layout across all pages | ✅ Done |
-| PostgreSQL (AWS) | Database | ✅ Local; AWS deployment pending |
+| PostgreSQL (AWS) | Database | ✅ Done (EC2 live at http://16.144.22.5) |
 | TypeScript | Type safety | ✅ Done |
 | Zod | Form validation | ✅ Done |
-| Oxlint | Linting (replaces ESLint) | ❌ Not configured |
-| oxfmt | Code formatting | ❌ Not configured |
-| Vitest | Unit/integration testing | ✅ Done |
-| Playwright | E2E UI testing (automated tests + MCP for visual verification) | ⚠️ Config exists; test coverage minimal |
-| EditorConfig | `.editorconfig` in project root | ❌ Missing |
+| Oxlint | Linting (replaces ESLint) | ✅ Done (configured in root package.json) |
+| oxfmt | Code formatting | ❌ De-prioritized (not production-ready) |
+| Vitest | Unit/integration testing | ✅ Done (265+ tests) |
+| Playwright | E2E UI testing (automated tests + MCP for visual verification) | ✅ Done (8 E2E tests in `apps/web/e2e/prd.spec.ts`) |
+| EditorConfig | `.editorconfig` in project root | ✅ Done |
 
 ### Project Standards
 - Maintain decent test coverage (unit + E2E)

@@ -109,6 +109,45 @@
   "attachments": {
     "empty": "No attachments yet"
   },
+  "schedule": {
+    "title": "Weekly Schedule",
+    "listView": "List View",
+    "calendarView": "Calendar View",
+    "today": "Today",
+    "noSchedule": {
+      "title": "No schedule yet",
+      "description": "Enroll in courses to see your weekly schedule here"
+    },
+    "noClassesToday": {
+      "title": "No classes today",
+      "description": "You have no scheduled classes for today"
+    },
+    "noClassesScheduled": {
+      "title": "No scheduled classes",
+      "description": "Your enrolled courses have no scheduled sessions yet"
+    },
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri"
+    },
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "requiredCourse": "Required Course",
+    "joinStream": "Join Class Stream",
+    "instructions": "Instructions",
+    "feedback": "Feedback",
+    "resources": "Resources",
+    "classAgenda": "Class Agenda",
+    "viewSyllabus": "View Course Syllabus",
+    "postFeedback": "Post Class Feedback",
+    "viewResources": "View Course Resources",
+    "seeSyllabus": "See Course Syllabus →",
+    "requirements": "Requirements",
+    "loading": "Loading..."
+  },
   "common": {
     "loading": "Loading...",
     "cancel": "Cancel",

@@ -109,6 +109,45 @@
   "attachments": {
     "empty": "暂无附件"
   },
+  "schedule": {
+    "title": "每周课程表",
+    "listView": "列表视图",
+    "calendarView": "日历视图",
+    "today": "今天",
+    "noSchedule": {
+      "title": "暂无课程安排",
+      "description": "报名课程后即可在此查看每周课程表"
+    },
+    "noClassesToday": {
+      "title": "今天没有课程",
+      "description": "今天没有已排课的课程"
+    },
+    "noClassesScheduled": {
+      "title": "暂无排课",
+      "description": "您报名的课程尚未安排课次"
+    },
+    "days": {
+      "mon": "周一",
+      "tue": "周二",
+      "wed": "周三",
+      "thu": "周四",
+      "fri": "周五"
+    },
+    "morning": "上午",
+    "afternoon": "下午",
+    "requiredCourse": "必修课",
+    "joinStream": "进入课堂直播",
+    "instructions": "课程说明",
+    "feedback": "课后反馈",
+    "resources": "学习资源",
+    "classAgenda": "本节课程",
+    "viewSyllabus": "查看课程大纲",
+    "postFeedback": "提交课后反馈",
+    "viewResources": "查看课程资源",
+    "seeSyllabus": "查看课程大纲 →",
+    "requirements": "课程要求",
+    "loading": "加载中..."
+  },
   "common": {
     "loading": "加载中...",
     "cancel": "取消",

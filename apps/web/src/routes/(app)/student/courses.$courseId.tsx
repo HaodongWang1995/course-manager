@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Button,
   Card,
@@ -47,6 +48,7 @@ const statusLabels: Record<string, { label: string; variant: "default" | "second
 };
 
 function StudentCourseDetail() {
+  const { t } = useTranslation();
   const { courseId } = Route.useParams();
   const navigate = useNavigate();
   const { data: course, isLoading } = useCourseDetail(courseId);
@@ -232,7 +234,7 @@ function StudentCourseDetail() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <AttachmentList attachments={attachments} />
+            <AttachmentList attachments={attachments} emptyText={t("attachments.empty")} />
           </CardContent>
         </Card>
       )}

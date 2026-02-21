@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Button,
   Card,
@@ -32,7 +33,6 @@ export const Route = createFileRoute("/(app)/student/")({
 });
 
 const hours = Array.from({ length: 11 }, (_, i) => i + 8); // 8 AM to 6 PM
-const dayNamesShort = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 const dayNamesMap: Record<number, number> = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4 }; // Mon-Fri → 0-4
 
 const courseColors = [
@@ -62,12 +62,21 @@ type ScheduleEvent = {
 };
 
 function StudentDashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
 
   const { data: schedules = [], isLoading } = useStudentScheduleFromDB();
+
+  const dayNamesShort = [
+    t("schedule.days.mon"),
+    t("schedule.days.tue"),
+    t("schedule.days.wed"),
+    t("schedule.days.thu"),
+    t("schedule.days.fri"),
+  ];
 
   // Build course → color index map
   const courseColorMap = useMemo(() => {
@@ -179,7 +188,7 @@ function StudentDashboard() {
   const weekRangeLabel = `${monday.toLocaleDateString("en-US", { month: "long", day: "numeric" })} - ${friday.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`;
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-12 text-gray-500">Loading...</div>;
+    return <div className="flex items-center justify-center py-12 text-gray-500">{t("schedule.loading")}</div>;
   }
 
   return (
@@ -187,7 +196,7 @@ function StudentDashboard() {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Weekly Schedule</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("schedule.title")}</h1>
           <p className="text-sm text-gray-500">{weekRangeLabel}</p>
         </div>
         <div className="flex items-center gap-2">
@@ -198,7 +207,7 @@ function StudentDashboard() {
             className="gap-1.5"
           >
             <List className="h-4 w-4" />
-            List View
+            {t("schedule.listView")}
           </Button>
           <Button
             variant={viewMode === "calendar" ? "default" : "outline"}
@@ -207,7 +216,7 @@ function StudentDashboard() {
             className="gap-1.5"
           >
             <Calendar className="h-4 w-4" />
-            Calendar View
+            {t("schedule.calendarView")}
           </Button>
         </div>
       </div>
@@ -215,8 +224,8 @@ function StudentDashboard() {
       {schedules.length === 0 ? (
         <EmptyState
           icon={Calendar}
-          title="No schedule yet"
-          description="Enroll in courses to see your weekly schedule here"
+          title={t("schedule.noSchedule.title")}
+          description={t("schedule.noSchedule.description")}
         />
       ) : (
         <>
@@ -266,7 +275,7 @@ function StudentDashboard() {
                       size="sm"
                       onClick={() => { setCurrentDate(new Date()); setSelectedEvent(null); }}
                     >
-                      Today
+                      {t("schedule.today")}
                     </Button>
                   </div>
 
@@ -388,6 +397,7 @@ function CourseDetailPanel({
   onNavigate: () => void;
   onFeedback: () => void;
 }) {
+  const { t } = useTranslation();
   const c = courseColors[colorIdx];
   const startTime = new Date(event.start_time).toLocaleString("en-US", {
     weekday: "short",
@@ -414,7 +424,7 @@ function CourseDetailPanel({
           <X className="h-4 w-4 text-gray-600" />
         </button>
         <Badge className="mb-2 text-xs font-medium bg-white/70 text-gray-700 border-0">
-          Required Course
+          {t("schedule.requiredCourse")}
         </Badge>
         <h3 className="pr-6 text-base font-bold text-gray-900">{event.course_title}</h3>
         <p className="mt-1 text-xs text-gray-600">
@@ -432,7 +442,7 @@ function CourseDetailPanel({
       <div className="border-b border-gray-100 px-4 py-3">
         <Button className="w-full gap-2 bg-blue-600 hover:bg-blue-700" size="sm">
           <ExternalLink className="h-4 w-4" />
-          Join Class Stream
+          {t("schedule.joinStream")}
         </Button>
       </div>
 
@@ -443,19 +453,19 @@ function CourseDetailPanel({
             value="instructions"
             className="rounded-none border-b-2 border-transparent px-3 py-2.5 text-xs data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent"
           >
-            Instructions
+            {t("schedule.instructions")}
           </TabsTrigger>
           <TabsTrigger
             value="feedback"
             className="rounded-none border-b-2 border-transparent px-3 py-2.5 text-xs data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent"
           >
-            Feedback
+            {t("schedule.feedback")}
           </TabsTrigger>
           <TabsTrigger
             value="resources"
             className="rounded-none border-b-2 border-transparent px-3 py-2.5 text-xs data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent"
           >
-            Resources
+            {t("schedule.resources")}
           </TabsTrigger>
         </TabsList>
 
@@ -463,7 +473,7 @@ function CourseDetailPanel({
           <TabsContent value="instructions" className="m-0 p-4">
             <div className="space-y-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Class Agenda</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">{t("schedule.classAgenda")}</p>
                 <p className="mt-1 text-sm text-gray-600">
                   Today's session covers the scheduled curriculum for {event.course_title}.
                   {event.title ? ` Topic: ${event.title}.` : ""}
@@ -474,7 +484,7 @@ function CourseDetailPanel({
                 className="flex w-full items-center gap-2 rounded-lg border border-gray-200 p-3 text-left text-sm hover:bg-gray-50"
               >
                 <FileText className="h-4 w-4 shrink-0 text-gray-400" />
-                <span className="text-gray-700">View Course Syllabus</span>
+                <span className="text-gray-700">{t("schedule.viewSyllabus")}</span>
                 <ExternalLink className="ml-auto h-3.5 w-3.5 text-gray-400" />
               </button>
             </div>
@@ -486,7 +496,7 @@ function CourseDetailPanel({
               className="flex w-full items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-left hover:bg-blue-100"
             >
               <MessageSquare className="h-4 w-4 shrink-0 text-blue-600" />
-              <span className="text-sm font-medium text-blue-700">Post Class Feedback</span>
+              <span className="text-sm font-medium text-blue-700">{t("schedule.postFeedback")}</span>
               <ExternalLink className="ml-auto h-3.5 w-3.5 text-blue-500" />
             </button>
           </TabsContent>
@@ -497,7 +507,7 @@ function CourseDetailPanel({
               className="flex w-full items-center gap-2 rounded-lg border border-gray-200 p-3 text-left text-sm hover:bg-gray-50"
             >
               <BookOpen className="h-4 w-4 shrink-0 text-gray-400" />
-              <span className="text-gray-700">View Course Resources</span>
+              <span className="text-gray-700">{t("schedule.viewResources")}</span>
               <ExternalLink className="ml-auto h-3.5 w-3.5 text-gray-400" />
             </button>
           </TabsContent>
@@ -510,7 +520,7 @@ function CourseDetailPanel({
           onClick={onNavigate}
           className="text-xs font-medium text-blue-600 hover:underline"
         >
-          See Course Syllabus →
+          {t("schedule.seeSyllabus")}
         </button>
       </div>
     </div>
@@ -533,6 +543,7 @@ function MobileScheduleView({
   onGoToFeedback: (courseId: string) => void;
   onViewCourse: (courseId: string) => void;
 }) {
+  const { t } = useTranslation();
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
@@ -577,7 +588,7 @@ function MobileScheduleView({
               onClick={() => onViewCourse(event.course_id)}
             >
               <FileText className="h-3.5 w-3.5" />
-              Requirements
+              {t("schedule.requirements")}
             </Button>
             <Button
               size="sm"
@@ -585,7 +596,7 @@ function MobileScheduleView({
               onClick={() => onGoToFeedback(event.course_id)}
             >
               <MessageSquare className="h-3.5 w-3.5" />
-              Post Feedback
+              {t("schedule.postFeedback")}
             </Button>
           </div>
         </div>
@@ -599,8 +610,8 @@ function MobileScheduleView({
         <p className="text-sm font-medium text-gray-500">{today}</p>
         <EmptyState
           icon={Clock}
-          title="No classes today"
-          description="You have no scheduled classes for today"
+          title={t("schedule.noClassesToday.title")}
+          description={t("schedule.noClassesToday.description")}
         />
       </div>
     );
@@ -611,13 +622,13 @@ function MobileScheduleView({
       <p className="text-sm font-medium text-gray-500">{today}</p>
       {morningEvents.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">Morning</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">{t("schedule.morning")}</h3>
           {morningEvents.map(renderEvent)}
         </div>
       )}
       {afternoonEvents.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">Afternoon</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">{t("schedule.afternoon")}</h3>
           {afternoonEvents.map(renderEvent)}
         </div>
       )}
@@ -637,6 +648,7 @@ function ListScheduleView({
   onSelectEvent: (event: ScheduleEvent) => void;
   selectedEventId?: string;
 }) {
+  const { t } = useTranslation();
   const sorted = [...events].sort(
     (a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
   );
@@ -645,8 +657,8 @@ function ListScheduleView({
     return (
       <EmptyState
         icon={Calendar}
-        title="No scheduled classes"
-        description="Your enrolled courses have no scheduled sessions yet"
+        title={t("schedule.noClassesScheduled.title")}
+        description={t("schedule.noClassesScheduled.description")}
       />
     );
   }

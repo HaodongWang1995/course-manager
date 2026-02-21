@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Button,
   Card,
@@ -64,6 +65,7 @@ const statusColors: Record<string, string> = {
 };
 
 function TeacherCourseDetail() {
+  const { t } = useTranslation();
   const { courseId } = Route.useParams();
   const navigate = useNavigate();
   const { data: course, isLoading } = useCourseDetail(courseId);
@@ -317,6 +319,10 @@ function TeacherCourseDetail() {
             accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.mp4,.zip"
             maxSizeMB={50}
             uploading={uploadMutation.isPending}
+            uploadPromptText={t("upload.prompt")}
+            maxSizeText={t("upload.maxSize", { mb: 50 })}
+            uploadingText={t("upload.uploading")}
+            tooLargeText={t("upload.tooLarge", { mb: 50 })}
             onFileSelect={(files) => {
               for (const file of files) {
                 uploadMutation.mutate({ file, courseId });
@@ -327,6 +333,7 @@ function TeacherCourseDetail() {
             attachments={attachments}
             onDelete={(id) => deleteAttachmentMutation.mutate(id)}
             isDeleting={deleteAttachmentMutation.isPending}
+            emptyText={t("attachments.empty")}
           />
         </CardContent>
       </Card>
