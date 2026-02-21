@@ -7,7 +7,7 @@
 3. [数据库初始化](#数据库初始化)
 4. [启动开发服务](#启动开发服务)
 5. [构建生产版本](#构建生产版本)
-6. [生产环境部署](#生产环境部署)
+6. [生产环境部署（Docker Compose）](#生产环境部署docker-compose)
 7. [文件存储（Cloudflare R2）](#文件存储cloudflare-r2)
 8. [环境变量说明](#环境变量说明)
 9. [常见问题](#常见问题)
@@ -80,26 +80,16 @@ CREATE DATABASE course_manager;
 
 ### 2. 执行迁移脚本
 
-按顺序执行 SQL 迁移文件：
-
-```bash
-# Phase 1: 用户、课程、课程表
-psql -U postgres -d course_manager -f apps/api/sql/001_init.sql
-
-# Phase 2: 选课系统
-psql -U postgres -d course_manager -f apps/api/sql/002_enrollments.sql
-```
-
-### 数据库表结构
-
-按顺序执行所有迁移文件：
+按顺序执行所有 SQL 迁移文件：
 
 ```bash
 psql -U postgres -d course_manager -f apps/api/sql/001_init.sql
 psql -U postgres -d course_manager -f apps/api/sql/002_enrollments.sql
 psql -U postgres -d course_manager -f apps/api/sql/003_features.sql
-# 004_attachments.sql — 附件功能（待实现）
+psql -U postgres -d course_manager -f apps/api/sql/004_attachments.sql
 ```
+
+### 数据库表结构
 
 | 表名 | 迁移文件 | 说明 |
 |------|----------|------|
@@ -112,7 +102,7 @@ psql -U postgres -d course_manager -f apps/api/sql/003_features.sql
 | `resources` | 003 | 课程资源表 |
 | `feedback` | 003 | 课后反馈表 |
 | `deadlines` | 003 | 教师待办/截止日期表 |
-| `attachments` | 004（待实现） | 课程/课节附件表，关联 R2 文件 |
+| `attachments` | 004 | 课程/课节附件表，关联 R2 文件 |
 
 ---
 
@@ -183,92 +173,152 @@ pnpm test:coverage
 
 ---
 
-## 生产环境部署
+## 生产环境部署（Docker Compose）
 
-### 后端 (Express API)
+当前生产环境部署在 AWS EC2 上，使用 Docker Compose 管理三个容器：PostgreSQL、API、Web（含 Nginx 反向代理）。
 
-#### 启动命令
+### 服务器信息
 
-```bash
-cd apps/api
-pnpm build          # TypeScript -> dist/
-node dist/index.js  # 启动服务
+| 项目 | 值 |
+|------|----|
+| 实例 ID | `i-0e834d5065a4ee7ff` |
+| 区域 | `us-west-2` |
+| Elastic IP | `100.23.242.232` |
+| 访问地址 | http://100.23.242.232/ |
+| SSH 密钥 | `~/.ssh/course-manager-key.pem` |
+| SSH 用户 | `ec2-user` |
+| 项目路径 | `/home/ec2-user/course-manager` |
+| 实例规格 | `t2.micro`（已添加 2GB swap 防 OOM） |
+
+### 容器架构
+
+```
+用户请求 ──> EC2 :80
+                │
+         ┌──────▼──────────────────────────────┐
+         │  Docker Compose                     │
+         │                                     │
+         │  web (nginx + React SPA)  :80       │
+         │    └── /api/* ──> api:3001          │
+         │                                     │
+         │  api (Express)            :3001     │
+         │    └── PostgreSQL DB      ──> db    │
+         │                                     │
+         │  db (PostgreSQL)          :5432     │
+         └─────────────────────────────────────┘
 ```
 
-#### 必需环境变量
+> API 容器不对外暴露端口，只在 Docker 内部网络通信。
 
-```env
+### 前置条件
+
+服务器上需要安装：
+- Docker & Docker Compose
+- Git
+
+### 首次部署
+
+```bash
+# 1. SSH 登录
+ssh -i ~/.ssh/course-manager-key.pem ec2-user@100.23.242.232
+
+# 2. 克隆仓库
+git clone <repo-url> ~/course-manager
+cd ~/course-manager
+
+# 3. 创建 API 环境变量文件
+cat > apps/api/.env << 'EOF'
 PORT=3001
-DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/<dbname>
-JWT_SECRET=<强随机字符串-至少32位>
-CORS_ORIGIN=https://your-frontend-domain.com
+DATABASE_URL=postgresql://postgres:postgres@db:5432/course_manager
+JWT_SECRET=<强随机字符串>
+CORS_ORIGIN=http://100.23.242.232
+# 附件功能（可选，留空则为 stub 模式）
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=course-manager-files
+R2_PUBLIC_URL=
+EOF
+
+# 4. 执行数据库迁移（首次，容器启动后）
+docker-compose -f docker-compose.prod.yml up -d db
+sleep 5
+docker-compose -f docker-compose.prod.yml exec db psql -U postgres -d course_manager \
+  -f /docker-entrypoint-initdb.d/001_init.sql
+# ... 依次执行 002-004
+
+# 5. 启动所有服务
+docker-compose -f docker-compose.prod.yml up -d --build
 ```
 
-#### 部署选项
+### 日常更新部署（一键）
 
-| 平台 | 适用场景 | 说明 |
-|------|----------|------|
-| Railway | 快速部署 | 支持 PostgreSQL 附加，自动检测 Node.js |
-| Fly.io | 全球边缘 | 需要 `fly.toml` 配置 |
-| Render | 免费层 | 自带 PostgreSQL |
-| AWS ECS/Fargate | 企业级 | 需要 Docker 化 |
-
-### 前端 (React SPA)
-
-#### 构建产物
+在本地项目根目录执行：
 
 ```bash
-cd apps/web
-pnpm build    # 输出到 dist/
+# 1. 推送代码到 GitHub
+git push origin master
+
+# 2. 登录服务器，拉取最新代码并重建
+ssh -i ~/.ssh/course-manager-key.pem ec2-user@100.23.242.232 \
+  "cd ~/course-manager && git pull origin master && \
+   docker-compose -f docker-compose.prod.yml up -d --build"
 ```
 
-#### 环境变量
+或使用本地脚本一步完成：
 
-前端通过 Vite 环境变量配置 API 地址：
-
-```env
-VITE_API_URL=https://api.your-domain.com
+```bash
+git push origin master && \
+ssh -i ~/.ssh/course-manager-key.pem ec2-user@100.23.242.232 \
+  "cd ~/course-manager && git pull origin master && \
+   docker-compose -f docker-compose.prod.yml up -d --build 2>&1 | tail -20"
 ```
 
-> 如果前后端同域部署（通过反向代理），`VITE_API_URL` 可留空，前端会使用相对路径 `/api`。
+> **注意**：`t2.micro` 内存仅 1GB，构建时可能 OOM。服务器已配置 2GB swapfile，如遇问题执行：
+> ```bash
+> # 在服务器上添加/检查 swap
+> sudo swapon --show
+> # 若为空，执行：
+> sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile \
+>   && sudo mkswap /swapfile && sudo swapon /swapfile
+> ```
 
-#### 部署选项
+### 验证部署
 
-| 平台 | 适用场景 | 说明 |
-|------|----------|------|
-| Vercel | 最简单 | 零配置部署静态站点 |
-| Netlify | 带表单/函数 | 支持 `_redirects` SPA 路由 |
-| AWS S3 + CloudFront | 企业级 | CDN 加速 |
-| Nginx | 自托管 | 需配置 SPA fallback |
+```bash
+# API 健康检查
+curl http://100.23.242.232/api/health
+# 预期：{"status":"ok","timestamp":"..."}
 
-#### Nginx 参考配置
-
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    root /var/www/course-manager/web;
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    location /api {
-        proxy_pass http://localhost:3001;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
+# 检查容器状态
+ssh -i ~/.ssh/course-manager-key.pem ec2-user@100.23.242.232 \
+  "docker-compose -f ~/course-manager/docker-compose.prod.yml ps"
 ```
 
-### 数据库 (PostgreSQL)
+### Docker Compose 常用命令
 
-| 服务 | 说明 |
-|------|------|
-| Supabase | 免费层，自带 REST API |
-| Railway PostgreSQL | 一键附加 |
-| AWS RDS / Aurora | 企业级，推荐 Aurora Serverless |
-| Neon | Serverless PostgreSQL |
+```bash
+# 在服务器上操作（先 SSH 进去）
+cd ~/course-manager
+
+# 查看容器状态
+docker-compose -f docker-compose.prod.yml ps
+
+# 查看实时日志
+docker-compose -f docker-compose.prod.yml logs -f
+
+# 查看 API 日志
+docker-compose -f docker-compose.prod.yml logs -f api
+
+# 重启单个服务
+docker-compose -f docker-compose.prod.yml restart api
+
+# 停止所有服务
+docker-compose -f docker-compose.prod.yml down
+
+# 重建并启动（代码更新后）
+docker-compose -f docker-compose.prod.yml up -d --build
+```
 
 ---
 
@@ -295,7 +345,7 @@ R2 选型理由：课程平台有大量学生下载行为，出站流量免费�
 ```json
 [
   {
-    "AllowedOrigins": ["https://your-domain.com", "http://localhost:5173"],
+    "AllowedOrigins": ["http://100.23.242.232", "http://localhost:5173"],
     "AllowedMethods": ["GET", "PUT"],
     "AllowedHeaders": ["*"],
     "MaxAgeSeconds": 3600
@@ -303,7 +353,9 @@ R2 选型理由：课程平台有大量学生下载行为，出站流量免费�
 ]
 ```
 
-4. 在 API 环境变量中添加（见下方[环境变量说明](#环境变量说明)）
+4. 在服务器 `apps/api/.env` 中填入 R2 凭据（见[环境变量说明](#环境变量说明)）
+
+> **未配置 R2 时**：API 以 stub 模式运行，上传请求会返回错误，其余功能正常。
 
 ### 上传流程（Presigned URL 直传）
 
@@ -314,18 +366,6 @@ R2 选型理由：课程平台有大量学生下载行为，出站流量免费�
 ```
 
 API 服务器不处理文件内容，仅生成签名 URL 和保存元数据，不影响服务器带宽。
-
-### 本地开发
-
-本地开发可继续使用 Cloudflare R2（免费额度足够），或配置 [MinIO](https://min.io/) 作为本地 S3 兼容存储：
-
-```bash
-# 使用 Docker 运行本地 MinIO
-docker run -p 9000:9000 -p 9001:9001 \
-  -e MINIO_ROOT_USER=minioadmin \
-  -e MINIO_ROOT_PASSWORD=minioadmin \
-  minio/minio server /data --console-address ":9001"
-```
 
 ---
 
@@ -355,6 +395,22 @@ docker run -p 9000:9000 -p 9001:9001 \
 
 ## 常见问题
 
+### Q: SSH 连接被拒绝（Permission denied）？
+
+EC2 实例首次创建时，`authorized_keys` 由 cloud-init 自动配置。若丢失，可通过以下步骤恢复：
+
+1. 停止实例
+2. 修改 user data 为以下脚本：
+```bash
+#!/bin/bash
+mkdir -p /home/ubuntu/.ssh
+echo "ssh-rsa <你的公钥>" > /home/ubuntu/.ssh/authorized_keys
+chmod 700 /home/ubuntu/.ssh
+chmod 600 /home/ubuntu/.ssh/authorized_keys
+chown -R ubuntu:ubuntu /home/ubuntu/.ssh
+```
+3. 启动实例（cloud-init 会执行脚本）
+
 ### Q: `pnpm install` 失败？
 
 确保 pnpm 版本为 9.x：
@@ -366,16 +422,30 @@ corepack prepare pnpm@9.15.0 --activate
 
 ### Q: 数据库连接失败？
 
-1. 确认 PostgreSQL 服务已启动
-2. 确认 `course_manager` 数据库已创建
-3. 检查 `DATABASE_URL` 中的用户名、密码、端口
+1. 确认 `db` 容器正常运行：`docker-compose -f docker-compose.prod.yml ps`
+2. 确认 `DATABASE_URL` 使用 Docker 内网地址：`postgresql://postgres:postgres@db:5432/course_manager`
+3. 检查用户名、密码是否与 `docker-compose.prod.yml` 中 `POSTGRES_*` 变量一致
 
 ### Q: 前端请求 API 返回 CORS 错误？
 
-检查后端 `CORS_ORIGIN` 是否包含前端的实际域名。多个域名用逗号分隔：
+检查后端 `CORS_ORIGIN` 是否包含前端的实际域名：
 
 ```env
-CORS_ORIGIN=https://app.example.com,https://www.example.com
+CORS_ORIGIN=http://100.23.242.232
+```
+
+### Q: 构建时 OOM（内存不足）？
+
+t2.micro 仅 1GB 内存。检查并开启 swap：
+
+```bash
+sudo swapon --show
+# 若为空，执行：
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
 
 ### Q: JWT Token 过期？
@@ -384,10 +454,9 @@ CORS_ORIGIN=https://app.example.com,https://www.example.com
 
 ### Q: 如何添加新的数据库迁移？
 
-在 `apps/api/sql/` 下创建新文件，按编号递增命名：
+在 `apps/api/sql/` 下创建新文件，按编号递增命名（如 `005_xxx.sql`），然后在生产数据库中手动执行：
 
+```bash
+docker-compose -f docker-compose.prod.yml exec db \
+  psql -U postgres -d course_manager -f /path/to/005_xxx.sql
 ```
-003_<description>.sql
-```
-
-然后在目标数据库上手动执行该 SQL 文件。
