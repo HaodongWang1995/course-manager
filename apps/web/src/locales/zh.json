@@ -710,6 +710,10 @@
     "loading": "加载中...",
     "openFilters": "打开筛选",
     "showing": "显示：",
+    "filter": {
+      "semester": "2023 秋季",
+      "fullYear": "全年"
+    },
     "kpi": {
       "gpa": "绩点",
       "classRank": "班级排名",
@@ -732,6 +736,7 @@
   "studentAssignments": {
     "title": "我的作业",
     "searchPlaceholder": "搜索作业...",
+    "filesCount": "{{count}} 个文件",
     "filters": {
       "all": "全部",
       "todo": "待完成",

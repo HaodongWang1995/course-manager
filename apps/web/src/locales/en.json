@@ -710,6 +710,10 @@
     "loading": "Loading...",
     "openFilters": "Open filters",
     "showing": "Showing:",
+    "filter": {
+      "semester": "Fall 2023",
+      "fullYear": "Full Year"
+    },
     "kpi": {
       "gpa": "GPA",
       "classRank": "Class Rank",
@@ -732,6 +736,7 @@
   "studentAssignments": {
     "title": "My Assignments",
     "searchPlaceholder": "Search assignments...",
+    "filesCount": "{{count}} files",
     "filters": {
       "all": "All",
       "todo": "To Do",

@@ -204,7 +204,7 @@ export function StudentAssignmentsPage() {
                           {"filesAttached" in assignment && assignment.filesAttached && (
                             <div className="flex items-center gap-1 text-xs text-gray-400">
                               <Paperclip className="h-3 w-3" />
-                              <span>{assignment.filesAttached as number} files</span>
+                              <span>{t("filesCount", { count: assignment.filesAttached as number })}</span>
                             </div>
                           )}
                         </div>

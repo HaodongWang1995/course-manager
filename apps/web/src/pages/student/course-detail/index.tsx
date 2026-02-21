@@ -232,7 +232,7 @@ export function StudentCourseDetailPage({ courseId }: StudentCourseDetailPagePro
                   {!["pending", "approved", "rejected"].includes(existingEnrollment.status) && existingEnrollment.status}
                 </Badge>
                 {existingEnrollment.reject_reason && (
-                  <span className="text-sm text-red-500">（{existingEnrollment.reject_reason}）</span>
+                  <span className="text-sm text-red-500">({existingEnrollment.reject_reason})</span>
                 )}
               </div>
             ) : applied ? (
