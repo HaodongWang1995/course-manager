@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -5,14 +6,6 @@ import {
   CardTitle,
 } from "@course-manager/ui";
 import { Filter } from "lucide-react";
-
-const gradeFilters = [
-  { label: "All Years", value: "all" },
-  { label: "Freshman", value: "freshman" },
-  { label: "Sophomore", value: "sophomore" },
-  { label: "Junior", value: "junior" },
-  { label: "Senior", value: "senior" },
-];
 
 export interface CourseFilter {
   label: string;
@@ -45,26 +38,36 @@ export function StudentFilters({
   showAtRisk,
   onShowAtRiskChange,
 }: StudentFiltersProps) {
+  const { t } = useTranslation("teacherStudents");
+
+  const gradeFilters = [
+    { label: t("filters.grades.all"), value: "all" },
+    { label: t("filters.grades.freshman"), value: "freshman" },
+    { label: t("filters.grades.sophomore"), value: "sophomore" },
+    { label: t("filters.grades.junior"), value: "junior" },
+    { label: t("filters.grades.senior"), value: "senior" },
+  ];
+
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-sm font-semibold">
           <Filter className="h-4 w-4" />
-          Filters
+          {t("filters.title")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         {/* Avg Attendance — large blue number */}
         <div className="rounded-lg bg-blue-50 px-4 py-3 text-center">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-blue-400">Avg. Attendance</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-blue-400">{t("filters.avgAttendance")}</p>
           <p className="mt-1 text-3xl font-bold leading-none text-blue-600">{avgAttendance}%</p>
-          <p className="mt-1 text-[10px] text-blue-400">across all students</p>
+          <p className="mt-1 text-[10px] text-blue-400">{t("filters.acrossAll")}</p>
         </div>
 
         {/* Enrolled Course Filter */}
         <div>
           <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Enrolled Course
+            {t("filters.enrolledCourse")}
           </h4>
           <div className="space-y-1">
             {courseFilters.map((course) => (
@@ -87,7 +90,7 @@ export function StudentFilters({
         {/* Grade/Year Filter */}
         <div>
           <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Grade / Year
+            {t("filters.gradeYear")}
           </h4>
           <div className="space-y-1">
             {gradeFilters.map((grade) => (
@@ -109,11 +112,11 @@ export function StudentFilters({
         {/* Status Toggles */}
         <div>
           <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Status
+            {t("filters.status")}
           </h4>
           <div className="space-y-2">
             <label className="flex cursor-pointer items-center justify-between rounded-md px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50">
-              <span>Active Only</span>
+              <span>{t("filters.activeOnly")}</span>
               <input
                 type="checkbox"
                 checked={showActiveOnly}
@@ -122,7 +125,7 @@ export function StudentFilters({
               />
             </label>
             <label className="flex cursor-pointer items-center justify-between rounded-md px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50">
-              <span>At-Risk Students</span>
+              <span>{t("filters.atRisk")}</span>
               <input
                 type="checkbox"
                 checked={showAtRisk}

@@ -588,6 +588,23 @@
     "activeStudents": "Active Students",
     "searchPlaceholder": "Search students by name, ID...",
     "allCourses": "All Courses",
+    "filters": {
+      "title": "Filters",
+      "avgAttendance": "Avg. Attendance",
+      "acrossAll": "across all students",
+      "enrolledCourse": "Enrolled Course",
+      "gradeYear": "Grade / Year",
+      "status": "Status",
+      "activeOnly": "Active Only",
+      "atRisk": "At-Risk Students",
+      "grades": {
+        "all": "All Years",
+        "freshman": "Freshman",
+        "sophomore": "Sophomore",
+        "junior": "Junior",
+        "senior": "Senior"
+      }
+    },
     "semesters": {
       "fall2023": "Fall Semester 2023",
       "spring2024": "Spring Semester 2024",
@@ -630,6 +647,25 @@
     "empty": {
       "title": "No enrollment applications",
       "description": "No enrollment applications for this course"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "filter": {
+      "all": "All",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "card": {
+      "applied": "Applied",
+      "rejectReasonPlaceholder": "Reason for rejection (optional)",
+      "approve": "Approve",
+      "reject": "Reject",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
     }
   },
   "teacherReports": {
@@ -776,5 +812,23 @@
     "dueDate": "Due Date",
     "saveDraft": "Save Draft",
     "saveAndPublish": "Save and Publish"
+  },
+  "studentFeedback": {
+    "loading": "Loading feedback...",
+    "title": "Feedback Detail",
+    "empty": "No feedback available for this course yet.",
+    "courseFeedback": "Course Feedback",
+    "status": {
+      "completed": "Completed",
+      "draft": "Draft"
+    },
+    "department": "Department",
+    "preClassReqs": "Pre-class Requirements",
+    "classSummary": "Class Summary",
+    "actionItems": "Action Items",
+    "pending": "Pending",
+    "due": "Due {{label}}",
+    "resources": "Resources",
+    "messageTeacher": "Message Teacher"
   }
 }

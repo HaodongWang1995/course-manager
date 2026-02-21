@@ -588,6 +588,23 @@
     "activeStudents": "在校学生",
     "searchPlaceholder": "按姓名、学号搜索学生...",
     "allCourses": "全部课程",
+    "filters": {
+      "title": "筛选",
+      "avgAttendance": "平均出勤率",
+      "acrossAll": "全体学生统计",
+      "enrolledCourse": "所选课程",
+      "gradeYear": "年级",
+      "status": "状态",
+      "activeOnly": "仅显示在校",
+      "atRisk": "高风险学生",
+      "grades": {
+        "all": "全部年级",
+        "freshman": "大一",
+        "sophomore": "大二",
+        "junior": "大三",
+        "senior": "大四"
+      }
+    },
     "semesters": {
       "fall2023": "2023年秋季学期",
       "spring2024": "2024年春季学期",
@@ -630,6 +647,25 @@
     "empty": {
       "title": "暂无选课申请",
       "description": "此课程暂无选课申请"
+    },
+    "status": {
+      "pending": "待审核",
+      "approved": "已批准",
+      "rejected": "已拒绝"
+    },
+    "filter": {
+      "all": "全部",
+      "pending": "待审核",
+      "approved": "已批准",
+      "rejected": "已拒绝"
+    },
+    "card": {
+      "applied": "申请时间",
+      "rejectReasonPlaceholder": "拒绝原因（可选）",
+      "approve": "批准",
+      "reject": "拒绝",
+      "confirm": "确认",
+      "cancel": "取消"
     }
   },
   "teacherReports": {
@@ -776,5 +812,23 @@
     "dueDate": "截止日期",
     "saveDraft": "保存草稿",
     "saveAndPublish": "保存并发布"
+  },
+  "studentFeedback": {
+    "loading": "加载反馈中...",
+    "title": "课后反馈详情",
+    "empty": "该课程暂无课后反馈。",
+    "courseFeedback": "课程反馈",
+    "status": {
+      "completed": "已完成",
+      "draft": "草稿"
+    },
+    "department": "院系",
+    "preClassReqs": "课前要求",
+    "classSummary": "课堂小结",
+    "actionItems": "待办事项",
+    "pending": "待完成",
+    "due": "截止 {{label}}",
+    "resources": "课程资源",
+    "messageTeacher": "发消息给老师"
   }
 }

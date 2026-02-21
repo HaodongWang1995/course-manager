@@ -33,7 +33,7 @@ interface TeacherCourseDetailPageProps {
 }
 
 export function TeacherCourseDetailPage({ courseId }: TeacherCourseDetailPageProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("teacherCourseDetail");
   const navigate = useNavigate();
 
   // Data hooks
@@ -60,7 +60,7 @@ export function TeacherCourseDetailPage({ courseId }: TeacherCourseDetailPagePro
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">加载中...</div>
+        <div className="text-gray-500">{t("loading")}</div>
       </div>
     );
   }
@@ -68,13 +68,13 @@ export function TeacherCourseDetailPage({ courseId }: TeacherCourseDetailPagePro
   if (!course) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <p className="text-gray-500">课程不存在</p>
+        <p className="text-gray-500">{t("notFound")}</p>
         <Button
           className="mt-4"
           variant="outline"
           onClick={() => navigate({ to: "/teacher/courses" })}
         >
-          返回课程列表
+          {t("back")}
         </Button>
       </div>
     );
@@ -90,7 +90,7 @@ export function TeacherCourseDetailPage({ courseId }: TeacherCourseDetailPagePro
           onClick={() => navigate({ to: "/teacher/courses" })}
         >
           <ArrowLeft className="h-4 w-4" />
-          返回课程列表
+          {t("back")}
         </Button>
       </div>
 

@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@course-manager/ui";
 import { ArrowLeft } from "lucide-react";
 import { useCourseFeedbackDetail, useCourseResources } from "@/hooks/use-queries";
@@ -9,13 +10,14 @@ interface StudentFeedbackPageProps {
 }
 
 export function StudentFeedbackPage({ courseId }: StudentFeedbackPageProps) {
+  const { t } = useTranslation("studentFeedback");
   const { data: feedback, isLoading } = useCourseFeedbackDetail(courseId);
   const { data: resources = [] } = useCourseResources(courseId);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-sm text-gray-500">Loading feedback...</p>
+        <p className="text-sm text-gray-500">{t("loading")}</p>
       </div>
     );
   }
@@ -30,11 +32,11 @@ export function StudentFeedbackPage({ courseId }: StudentFeedbackPageProps) {
           >
             <ArrowLeft className="h-4 w-4 text-gray-600" />
           </Link>
-          <h1 className="text-lg font-bold text-gray-900">Feedback Detail</h1>
+          <h1 className="text-lg font-bold text-gray-900">{t("title")}</h1>
         </div>
         <Card>
           <CardContent className="p-8 text-center">
-            <p className="text-sm text-gray-500">No feedback available for this course yet.</p>
+            <p className="text-sm text-gray-500">{t("empty")}</p>
           </CardContent>
         </Card>
       </div>
@@ -51,7 +53,7 @@ export function StudentFeedbackPage({ courseId }: StudentFeedbackPageProps) {
         >
           <ArrowLeft className="h-4 w-4 text-gray-600" />
         </a>
-        <h1 className="text-lg font-bold text-gray-900">Feedback Detail</h1>
+        <h1 className="text-lg font-bold text-gray-900">{t("title")}</h1>
       </div>
 
       <FeedbackDisplay feedback={feedback} resources={resources} />

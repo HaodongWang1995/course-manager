@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "@tanstack/react-router";
 import { Badge, Avatar, AvatarFallback } from "@course-manager/ui";
 import { Eye } from "lucide-react";
@@ -22,6 +23,8 @@ function getAttendanceBg(rate: number) {
 }
 
 export function StudentCard({ student, isSelected, onSelect }: StudentCardProps) {
+  const { t } = useTranslation("teacherStudents");
+
   return (
     <div className={`rounded-lg border p-4 ${isSelected ? "border-blue-300 bg-blue-50/40" : "border-gray-200 bg-white"}`}>
       <div className="flex items-start justify-between gap-3">
@@ -48,7 +51,7 @@ export function StudentCard({ student, isSelected, onSelect }: StudentCardProps)
           className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800"
         >
           <Eye className="h-3.5 w-3.5" />
-          View
+          {t("table.viewProfile")}
         </Link>
       </div>
       <div className="mt-3 flex flex-wrap gap-1">

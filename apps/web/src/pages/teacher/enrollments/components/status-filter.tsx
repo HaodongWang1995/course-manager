@@ -1,9 +1,4 @@
-const STATUS_TABS = [
-  { label: "All", value: "" },
-  { label: "Pending", value: "pending" },
-  { label: "Approved", value: "approved" },
-  { label: "Rejected", value: "rejected" },
-] as const;
+import { useTranslation } from "react-i18next";
 
 interface StatusFilterProps {
   statusFilter: string;
@@ -11,6 +6,15 @@ interface StatusFilterProps {
 }
 
 export function StatusFilter({ statusFilter, onStatusChange }: StatusFilterProps) {
+  const { t } = useTranslation("teacherEnrollments");
+
+  const STATUS_TABS = [
+    { label: t("filter.all"), value: "" },
+    { label: t("filter.pending"), value: "pending" },
+    { label: t("filter.approved"), value: "approved" },
+    { label: t("filter.rejected"), value: "rejected" },
+  ];
+
   return (
     <div className="flex gap-2">
       {STATUS_TABS.map((tab) => (

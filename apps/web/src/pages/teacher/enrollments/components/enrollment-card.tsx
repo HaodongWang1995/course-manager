@@ -1,12 +1,7 @@
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, Badge, Button, Avatar, AvatarFallback } from "@course-manager/ui";
 import { CheckCircle, XCircle, Clock } from "lucide-react";
 import type { Enrollment } from "@/api/client";
-
-const statusConfig = {
-  pending: { label: "Pending", variant: "secondary" as const, icon: Clock },
-  approved: { label: "Approved", variant: "default" as const, icon: CheckCircle },
-  rejected: { label: "Rejected", variant: "destructive" as const, icon: XCircle },
-};
 
 interface EnrollmentCardProps {
   enrollment: Enrollment;
@@ -31,6 +26,14 @@ export function EnrollmentCard({
   onCancelReject,
   onRejectReasonChange,
 }: EnrollmentCardProps) {
+  const { t } = useTranslation("teacherEnrollments");
+
+  const statusConfig = {
+    pending: { label: t("status.pending"), variant: "secondary" as const, icon: Clock },
+    approved: { label: t("status.approved"), variant: "default" as const, icon: CheckCircle },
+    rejected: { label: t("status.rejected"), variant: "destructive" as const, icon: XCircle },
+  };
+
   const config = statusConfig[enrollment.status];
   const StatusIcon = config.icon;
   const initials = (enrollment.student_name || "?")
@@ -64,7 +67,7 @@ export function EnrollmentCard({
               <p className="mt-1 text-sm text-gray-600">&quot;{enrollment.note}&quot;</p>
             )}
             <p className="mt-1 text-xs text-gray-400">
-              Applied: {new Date(enrollment.created_at).toLocaleDateString()}
+              {t("card.applied")}: {new Date(enrollment.created_at).toLocaleDateString()}
             </p>
 
             {/* Reject reason input */}
@@ -74,7 +77,7 @@ export function EnrollmentCard({
                   type="text"
                   value={rejectReason}
                   onChange={(e) => onRejectReasonChange(e.target.value)}
-                  placeholder="Reason for rejection (optional)"
+                  placeholder={t("card.rejectReasonPlaceholder")}
                   className="flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
                 <Button
@@ -83,14 +86,14 @@ export function EnrollmentCard({
                   onClick={() => onConfirmReject(enrollment.id)}
                   disabled={isPending}
                 >
-                  Confirm
+                  {t("card.confirm")}
                 </Button>
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={onCancelReject}
                 >
-                  Cancel
+                  {t("card.cancel")}
                 </Button>
               </div>
             )}
@@ -106,7 +109,7 @@ export function EnrollmentCard({
                 className="gap-1 bg-emerald-600 hover:bg-emerald-700"
               >
                 <CheckCircle className="h-3.5 w-3.5" />
-                Approve
+                {t("card.approve")}
               </Button>
               <Button
                 size="sm"
@@ -115,7 +118,7 @@ export function EnrollmentCard({
                 className="gap-1 text-red-600 hover:bg-red-50 hover:text-red-700"
               >
                 <XCircle className="h-3.5 w-3.5" />
-                Reject
+                {t("card.reject")}
               </Button>
             </div>
           )}

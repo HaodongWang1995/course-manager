@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, Badge } from "@course-manager/ui";
 import {
   Clock,
@@ -71,6 +72,7 @@ interface FeedbackDisplayProps {
 }
 
 export function FeedbackDisplay({ feedback, resources }: FeedbackDisplayProps) {
+  const { t } = useTranslation("studentFeedback");
   const requirements = feedback.requirements || [];
   const actions = feedback.actions || [];
   const pendingCount = actions.filter((a) => a.pending).length;
@@ -101,7 +103,7 @@ export function FeedbackDisplay({ feedback, resources }: FeedbackDisplayProps) {
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <h2 className="text-xl font-bold text-gray-900 leading-snug">
-                {feedback.course_title || "Course Feedback"}
+                {feedback.course_title || t("courseFeedback")}
               </h2>
               {headerDate && (
                 <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
@@ -127,7 +129,7 @@ export function FeedbackDisplay({ feedback, resources }: FeedbackDisplayProps) {
                   : "shrink-0 bg-amber-50 text-amber-700 border-amber-200"
               }
             >
-              {feedback.published ? "Completed" : "Draft"}
+              {feedback.published ? t("status.completed") : t("status.draft")}
             </Badge>
           </div>
 
@@ -142,7 +144,7 @@ export function FeedbackDisplay({ feedback, resources }: FeedbackDisplayProps) {
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">{feedback.teacher_name}</p>
-                <p className="text-xs text-gray-500">Department</p>
+                <p className="text-xs text-gray-500">{t("department")}</p>
               </div>
             </div>
           )}
@@ -156,7 +158,7 @@ export function FeedbackDisplay({ feedback, resources }: FeedbackDisplayProps) {
             <div className="flex items-center gap-2 mb-3">
               <BookOpen className="h-4 w-4 text-blue-600" />
               <h3 className="text-sm font-semibold text-blue-900">
-                Pre-class Requirements
+                {t("preClassReqs")}
               </h3>
             </div>
             <div className="space-y-3">
@@ -177,7 +179,7 @@ export function FeedbackDisplay({ feedback, resources }: FeedbackDisplayProps) {
       {(feedback.summary || feedback.quote) && (
         <Card>
           <CardContent className="p-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Class Summary</h3>
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">{t("classSummary")}</h3>
             <div className="space-y-3 text-sm text-gray-600 leading-relaxed">
               {feedback.summary && <p>{feedback.summary}</p>}
               {feedback.quote && (
@@ -195,10 +197,10 @@ export function FeedbackDisplay({ feedback, resources }: FeedbackDisplayProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-900">Action Items</h3>
+              <h3 className="text-sm font-semibold text-gray-900">{t("actionItems")}</h3>
               {pendingCount > 0 && (
                 <Badge className="bg-amber-50 text-amber-700 border-amber-200 text-[10px]">
-                  {pendingCount} Pending
+                  {pendingCount} {t("pending")}
                 </Badge>
               )}
             </div>
@@ -232,7 +234,7 @@ export function FeedbackDisplay({ feedback, resources }: FeedbackDisplayProps) {
                         }`}
                       >
                         <Clock className="h-3 w-3 shrink-0" />
-                        <span>Due {item.due_label}</span>
+                        <span>{t("due", { label: item.due_label })}</span>
                       </div>
                     )}
                   </div>
@@ -247,7 +249,7 @@ export function FeedbackDisplay({ feedback, resources }: FeedbackDisplayProps) {
       {resources.length > 0 && (
         <div>
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
-            Resources
+            {t("resources")}
           </p>
           <Card>
             <CardContent className="divide-y divide-gray-100 p-0">
@@ -279,7 +281,7 @@ export function FeedbackDisplay({ feedback, resources }: FeedbackDisplayProps) {
       <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white p-4 lg:hidden">
         <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:bg-blue-700 transition-colors">
           <MessageSquare className="h-4 w-4" />
-          Message Teacher
+          {t("messageTeacher")}
         </button>
       </div>
 
@@ -287,7 +289,7 @@ export function FeedbackDisplay({ feedback, resources }: FeedbackDisplayProps) {
       <div className="hidden lg:block">
         <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors">
           <MessageSquare className="h-4 w-4" />
-          Message Teacher
+          {t("messageTeacher")}
         </button>
       </div>
     </>
