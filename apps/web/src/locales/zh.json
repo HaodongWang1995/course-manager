@@ -12,7 +12,8 @@
     "students": "学生",
     "enrollments": "选课管理",
     "reports": "报告",
-    "home": "首页"
+    "home": "首页",
+    "browse": "浏览课程"
   },
   "enrollments": {
     "title": "我的选课",

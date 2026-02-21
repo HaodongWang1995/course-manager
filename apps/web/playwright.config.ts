@@ -4,9 +4,9 @@ const baseURL = process.env.E2E_BASE_URL || "http://localhost:5175";
 
 export default defineConfig({
   testDir: "./e2e",
-  timeout: 60_000,
+  timeout: 30_000,
   expect: {
-    timeout: 10_000,
+    timeout: 8_000,
   },
   use: {
     baseURL,

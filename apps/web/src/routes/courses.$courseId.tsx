@@ -40,7 +40,7 @@ function PublicCourseDetail() {
   const [note, setNote] = useState("");
 
   const { data: course, isLoading } = useCourseDetail(courseId);
-  const { data: user } = useCurrentUser();
+  const { data: user, isLoading: isUserLoading } = useCurrentUser();
   const isLoggedIn = !!getToken();
   const isStudent = user?.role === "student";
 
@@ -146,6 +146,7 @@ function PublicCourseDetail() {
               courseId={courseId}
               isLoggedIn={isLoggedIn}
               isStudent={isStudent}
+              isUserLoading={isUserLoading}
               enrollment={myEnrollment}
               note={note}
               onNoteChange={setNote}
@@ -244,6 +245,7 @@ interface EnrollmentCTAProps {
   courseId: string;
   isLoggedIn: boolean;
   isStudent: boolean;
+  isUserLoading: boolean;
   enrollment?: { status: string; reject_reason?: string };
   note: string;
   onNoteChange: (v: string) => void;
@@ -256,6 +258,7 @@ interface EnrollmentCTAProps {
 function EnrollmentCTA({
   isLoggedIn,
   isStudent,
+  isUserLoading,
   enrollment,
   note,
   onNoteChange,
@@ -273,6 +276,10 @@ function EnrollmentCTA({
         </Button>
       </div>
     );
+  }
+
+  if (isUserLoading) {
+    return <div className="h-10 animate-pulse rounded-md bg-gray-100" />;
   }
 
   if (!isStudent) {

@@ -39,6 +39,14 @@
 - **现象**：成绩页使用底部导航（Home / Grades / Schedule / Profile），与其他学生页面使用的侧边栏+顶栏布局完全不同；且底部导航中的 Schedule 指向 `/student/schedule`、Profile 指向 `/student/profile`（均不存在）
 - **修复方向**：将成绩页纳入统一的学生 layout（`apps/web/src/routes/(app)/student/route.tsx`），移除独立的底部导航
 
+### ✅ BUG-07：学生浏览全部课程后点击课程无法找到申请选课入口 — 已修复（2026-02-21）
+- **页面**：`/courses/$courseId`（公开课程详情）
+- **现象 1**：`EnrollmentCTA` 在 `useCurrentUser()` 加载期间（`user = undefined`）会返回 `null`，导致申请入口短暂或永久消失
+- **现象 2**：学生 app 导航无"浏览课程"直达入口，需通过 `/student/enrollments` → "浏览全部课程" 两步到达，不直观
+- **修复方向**：
+  1. `courses.$courseId.tsx` — `EnrollmentCTA` 增加 `isUserLoading` prop，加载中显示骨架占位而非 `null`
+  2. `routes/(app)/route.tsx` — 学生侧边栏新增 "Browse Courses" 条目（`/courses`）；移动端底部导航替换重复的 Schedule 项为 Browse 项
+
 ---
 
 ## ⚠️ UI / 体验问题
@@ -72,7 +80,7 @@
 
 ## ✨ 新增需求
 
-### FEAT-01：全站 i18n 多语言支持
+### ✅ FEAT-01：全站 i18n 多语言支持 — 已实现
 - **需求**：所有界面文字通过 i18n 框架管理，不再硬编码英文或中文字符串
 - **触发语言切换**：Settings 页已有语言选择器（English / 中文），需真正实现切换功能
 - **当前问题**：

@@ -52,10 +52,11 @@ async function applyEnrollment(request: Parameters<typeof test>[0]["request"], t
 /** Log in via the UI login page and wait for redirect. */
 async function loginViaUI(page: Page, email: string, password: string, role: "teacher" | "student") {
   await page.goto("/login");
-  await page.getByLabel("邮箱").fill(email);
-  await page.getByLabel("密码").fill(password);
-  // The second button is the login submit (first is register tab/toggle)
-  await page.getByRole("button", { name: "登录" }).nth(1).click();
+  // Use desktop layout IDs (tests run in Desktop Chrome, mobile layout is hidden)
+  await page.locator("#d-email").fill(email);
+  await page.locator("#d-password").fill(password);
+  // Scope submit to the form containing #d-email to avoid matching mobile form
+  await page.locator("form").filter({ has: page.locator("#d-email") }).locator('button[type="submit"]').click();
   await expect(page).toHaveURL(new RegExp(`/${role}`));
 }
 
@@ -95,15 +96,15 @@ test.describe("PRD E2E", () => {
 
     await page.goto("/login");
 
-    await page.getByLabel("邮箱").fill(teacher.user.email);
-    await page.getByLabel("密码").fill("password123");
-    await page.getByRole("button", { name: "登录" }).nth(1).click();
+    await page.locator("#d-email").fill(teacher.user.email);
+    await page.locator("#d-password").fill("password123");
+    await page.locator("form").filter({ has: page.locator("#d-email") }).locator('button[type="submit"]').click();
 
     await expect(page).toHaveURL(/\/teacher/);
     await page.goto("/teacher/courses");
-    await expect(page.getByText("课程管理")).toBeVisible();
+    await expect(page.getByText("Courses Management")).toBeVisible();
 
-    await page.getByRole("button", { name: "新建课程" }).click();
+    await page.getByRole("button", { name: "Create New Course" }).first().click();
 
     const title = `UI 新建课程 ${Date.now()}`;
     await page.getByText("课程标题").locator("..")!.locator("input").fill(title);
@@ -158,8 +159,10 @@ test.describe("PRD E2E", () => {
     // Submit enrollment
     await page.getByRole("button", { name: "提交申请" }).click();
 
-    // Confirm success state
-    await expect(page.getByText("申请已提交！")).toBeVisible();
+    // Confirm success: dialog closes and enrollment status badge appears
+    // (query refetch is fast so existingEnrollment is populated before "申请已提交！" renders)
+    await expect(page.getByRole("dialog")).not.toBeVisible({ timeout: 5000 });
+    await expect(page.getByText("审核中").first()).toBeVisible();
   });
 
   test("Teacher can review (approve) a pending enrollment", async ({ page, request }) => {
@@ -193,13 +196,14 @@ test.describe("PRD E2E", () => {
 
     // The student's enrollment should appear as Pending
     await expect(page.getByText(student.user.name)).toBeVisible();
-    await expect(page.getByText("Pending")).toBeVisible();
+    // Use first() to avoid strict-mode violation (filter button + badge both contain "Pending")
+    await expect(page.getByText("Pending").first()).toBeVisible();
 
     // Approve the enrollment
     await page.getByRole("button", { name: "Approve" }).first().click();
 
-    // Status should update to Approved
-    await expect(page.getByText("Approved")).toBeVisible();
+    // Status should update to Approved (first() avoids ambiguity with filter button)
+    await expect(page.getByText("Approved").first()).toBeVisible();
   });
 
   test("Teacher can update display name in settings", async ({ page, request }) => {
@@ -213,8 +217,8 @@ test.describe("PRD E2E", () => {
     await loginViaUI(page, teacher.user.email, "password123", "teacher");
     await page.goto("/teacher/settings");
 
-    // Profile form is visible
-    await expect(page.getByRole("heading", { name: /设置|Settings/ })).toBeVisible();
+    // Profile form is visible (use exact match to avoid matching sub-headings like "通知设置")
+    await expect(page.getByRole("heading", { name: "设置", exact: true })).toBeVisible();
 
     // Clear and update display name
     const nameInput = page.locator("#profile-name");

@@ -74,6 +74,117 @@ course-manager/
 | Linting | Oxlint (.oxlintrc.json) |
 | Testing | Vitest (unit/integration) + Playwright (E2E) |
 
+## Mandatory Conventions
+
+### 1. i18n — All User-Facing Text Must Use Translations
+
+**Every string visible to the user must go through `react-i18next`.** No hardcoded English or Chinese strings in JSX or component logic.
+
+```tsx
+// ✅ Correct
+import { useTranslation } from "react-i18next";
+function MyComponent() {
+  const { t } = useTranslation();
+  return <h1>{t("page.title")}</h1>;
+}
+
+// ❌ Wrong
+function MyComponent() {
+  return <h1>Weekly Schedule</h1>;
+}
+```
+
+**Rules:**
+- Add new keys to **both** `apps/web/src/locales/en.json` and `apps/web/src/locales/zh.json`
+- Group keys by feature namespace: `schedule.*, enrollments.*, settings.*, upload.*, etc.`
+- For `packages/ui` components with visible text: expose **text props** with English defaults so callers pass `t()` values
+  ```tsx
+  // packages/ui component
+  function MyWidget({ emptyText = "No items" }: { emptyText?: string }) { ... }
+  // caller (apps/web)
+  <MyWidget emptyText={t("widget.empty")} />
+  ```
+- Locale files: `apps/web/src/locales/zh.json` (default), `apps/web/src/locales/en.json`
+- i18n init: `apps/web/src/lib/i18n.ts`; import in `apps/web/src/main.tsx`
+- Language persistence: `localStorage("lang")`; switch via `setLanguage(lang)` from `i18n.ts`
+
+---
+
+### 2. Route Files — Layout & Wiring Only; Pages in `pages/`
+
+**Route files (`routes/**/*.tsx`) must only contain:**
+- `createFileRoute()` declaration
+- Import of the page component
+- Simple redirects or guards
+
+**All actual page logic lives in `apps/web/src/pages/`**, one folder per page. Sub-components of a page go in a `components/` sub-folder within that page folder.
+
+```
+apps/web/src/
+├── routes/
+│   └── (app)/
+│       └── teacher/
+│           ├── courses.tsx          ← route file: createFileRoute + import CoursesPage
+│           └── courses.$courseId.tsx ← route file: createFileRoute + import CourseDetailPage
+└── pages/
+    └── teacher/
+        ├── courses/
+        │   ├── index.tsx            ← CoursesPage component (full logic)
+        │   └── components/
+        │       ├── course-card.tsx
+        │       └── create-course-dialog.tsx
+        └── course-detail/
+            ├── index.tsx            ← CourseDetailPage component
+            └── components/
+                ├── schedule-list.tsx
+                ├── assignment-section.tsx
+                └── resource-section.tsx
+```
+
+**Route file template:**
+```tsx
+// apps/web/src/routes/(app)/teacher/courses.tsx
+import { createFileRoute } from "@tanstack/react-router";
+import { CoursesPage } from "@/pages/teacher/courses";
+
+export const Route = createFileRoute("/(app)/teacher/courses")({
+  component: CoursesPage,
+});
+```
+
+**When splitting a page into sub-components:**
+- Each sub-component gets its own file in `pages/{role}/{page}/components/`
+- Sub-components receive props; no direct API calls inside sub-components — keep data fetching in the page's `index.tsx`
+- Shared/reusable components (used across pages) go in `packages/ui/src/components/` or `apps/web/src/components/`
+
+---
+
+### 3. Component File Size — Max 400 Lines
+
+**Every component file must stay under 400 lines.** If a file exceeds this limit, extract sub-components or split into smaller files.
+
+**Rules:**
+- Page `index.tsx` files exceeding 400 lines must extract sections into `components/` sub-files
+- Dialog components with complex forms can be their own files (e.g., `add-schedule-dialog.tsx`)
+- Group tightly related helpers (types, constants, small pure functions) at the top of the file they belong to — do NOT create separate files for them unless they're shared
+
+```tsx
+// ✅ Good — extract large sections into sub-files
+// pages/teacher/course-detail/index.tsx  (~150 lines, orchestrator only)
+// pages/teacher/course-detail/components/schedule-section.tsx  (~70 lines)
+// pages/teacher/course-detail/components/add-schedule-dialog.tsx  (~90 lines)
+
+// ❌ Bad — one 700-line file doing everything
+// routes/(app)/teacher/courses.$courseId.tsx  (778 lines)
+```
+
+**When to split:**
+- Any component function body exceeding ~80 lines is a candidate for extraction
+- Complex dialogs with forms → their own file
+- List/card sections with delete/edit → their own file
+
+---
+
 ## Workflows
 
 ### Adding a New UI Component

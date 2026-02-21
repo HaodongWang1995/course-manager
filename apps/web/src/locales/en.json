@@ -12,7 +12,8 @@
     "students": "Students",
     "enrollments": "Enrollments",
     "reports": "Reports",
-    "home": "Home"
+    "home": "Home",
+    "browse": "Browse"
   },
   "enrollments": {
     "title": "My Enrollments",

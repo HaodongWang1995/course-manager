@@ -20,6 +20,7 @@ import {
   FolderOpen,
   Home,
   LogOut,
+  Search,
 } from "lucide-react";
 import { useAuthGuard, useAuthLogout } from "@/hooks/use-auth-guard";
 import { useTranslation } from "react-i18next";
@@ -52,6 +53,7 @@ function AppLayout() {
 
   const studentSidebarItems = [
     { label: t("nav.schedule"), href: "/student", icon: Calendar },
+    { label: t("nav.browse"), href: "/courses", icon: Search },
     { label: t("nav.courses"), href: "/student/enrollments", icon: BookOpen },
     { label: t("nav.grades"), href: "/student/grades", icon: BarChart3 },
     { label: t("nav.messages"), href: "/student/messages", icon: MessageSquare },
@@ -70,8 +72,8 @@ function AppLayout() {
 
   const studentBottomNavItems = [
     { label: t("nav.home"), href: "/student", icon: Home },
+    { label: t("nav.browse"), href: "/courses", icon: Search },
     { label: t("nav.grades"), href: "/student/grades", icon: BarChart3 },
-    { label: t("nav.schedule"), href: "/student", icon: Calendar },
     { label: t("nav.settings"), href: "/student/settings", icon: Settings },
   ];
 
