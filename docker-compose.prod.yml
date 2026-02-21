@@ -28,7 +28,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
       PORT: "3001"
       NODE_ENV: production
-      CORS_ORIGIN: http://16.144.22.5
+      CORS_ORIGIN: http://100.23.242.232
     depends_on:
       postgres:
         condition: service_healthy
