@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@course-manager/ui";
 import { MessageSquare, Construction } from "lucide-react";
 
@@ -7,13 +8,13 @@ export const Route = createFileRoute("/(app)/student/messages")({
 });
 
 function StudentMessages() {
+  const { t } = useTranslation("messages");
+
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Communicate with your teachers and classmates
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="mt-1 text-sm text-gray-500">{t("subtitle")}</p>
       </div>
 
       <Card>
@@ -23,10 +24,10 @@ function StudentMessages() {
             <Construction className="absolute -bottom-1 -right-1 h-7 w-7 text-amber-400" />
           </div>
           <p className="mt-5 text-base font-semibold text-gray-700">
-            消息功能正在开发中
+            {t("comingSoon")}
           </p>
           <p className="mt-2 max-w-xs text-sm text-gray-500">
-            我们正在打造更好的师生沟通体验，敬请期待。
+            {t("comingSoonDesc")}
           </p>
         </CardContent>
       </Card>

@@ -69,7 +69,8 @@
     "teacher": "Teacher: ",
     "note": "Note: ",
     "reason": "Reason: ",
-    "applied": "Applied: "
+    "applied": "Applied: ",
+    "cancelConfirm": "Are you sure you want to cancel this enrollment?"
   },
   "settings": {
     "title": "Settings",
@@ -191,7 +192,9 @@
       "tue": "Tue",
       "wed": "Wed",
       "thu": "Thu",
-      "fri": "Fri"
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
     },
     "morning": "Morning",
     "afternoon": "Afternoon",
@@ -743,6 +746,9 @@
     "loading": "Loading...",
     "totalResources": "Total Resources",
     "featured": "Featured",
+    "recentFeatured": "Recent & Featured",
+    "allResources": "All Resources",
+    "download": "Download",
     "empty": "No resources in this category"
   },
   "studentCourseDetail": {
@@ -830,5 +836,21 @@
     "due": "Due {{label}}",
     "resources": "Resources",
     "messageTeacher": "Message Teacher"
+  },
+  "studentSchedule": {
+    "title": "My Schedule",
+    "subtitle": "View class times for your enrolled courses",
+    "courseCount": "{{courses}} course(s), {{lessons}} lesson(s)",
+    "weeklyView": "Weekly Schedule",
+    "courseList": "Course List",
+    "emptyTitle": "No classes scheduled",
+    "emptyDesc": "You have no approved enrollments. Browse courses and apply to enroll.",
+    "lesson": "Lesson {{number}}"
+  },
+  "messages": {
+    "title": "Messages",
+    "subtitle": "Communicate with your teachers and classmates",
+    "comingSoon": "Messaging is under development",
+    "comingSoonDesc": "We're building a better teacher-student communication experience. Stay tuned."
   }
 }

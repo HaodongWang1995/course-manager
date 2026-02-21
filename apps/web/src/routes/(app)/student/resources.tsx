@@ -11,6 +11,7 @@ import {
   Download,
 } from "lucide-react";
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useStudentResources } from "@/hooks/use-queries";
 
 export const Route = createFileRoute("/(app)/student/resources")({
@@ -42,16 +43,23 @@ function getCoverGradient(course: string) {
   return categoryGradients.default;
 }
 
-const CATEGORIES = ["All", "Math", "Science", "Literature", "History"] as const;
-
 function matchesCategory(course: string, category: string) {
-  if (category === "All") return true;
+  if (category === "all") return true;
   return (course || "").toLowerCase().includes(category.toLowerCase());
 }
 
 function StudentResources() {
+  const { t } = useTranslation("studentResources");
   const { data: resources, isLoading } = useStudentResources();
-  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+
+  const CATEGORIES = [
+    { label: t("publicCourses.categories.all", { ns: "translation" }), value: "all" },
+    { label: t("publicCourses.categories.math", { ns: "translation" }), value: "math" },
+    { label: "Science", value: "science" },
+    { label: "Literature", value: "literature" },
+    { label: "History", value: "history" },
+  ];
 
   const filteredFeatured = useMemo(() => {
     if (!resources) return [];
@@ -66,14 +74,13 @@ function StudentResources() {
   if (isLoading || !resources) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">加载中...</div>
+        <div className="text-gray-500">{t("loading")}</div>
       </div>
     );
   }
 
   return (
     <div className="relative -mx-4 min-h-full overflow-x-hidden bg-[#eff6ff] pb-24 md:-mx-6 lg:mx-0 lg:min-h-[calc(100vh-5.5rem)] lg:pb-6">
-      {/* 11.1: Renamed to "Library" */}
       <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 px-4 pb-[13px] pt-3 backdrop-blur-md md:px-6 lg:px-8">
         <div className="flex h-10 w-full items-center justify-between">
           <div className="flex items-center gap-3">
@@ -84,27 +91,27 @@ function StudentResources() {
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-lg font-bold tracking-[-0.45px] text-[#137fec]">Library</h1>
+            <h1 className="text-lg font-bold tracking-[-0.45px] text-[#137fec]">{t("title")}</h1>
           </div>
           <div className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 bg-slate-200 text-[10px] font-semibold text-slate-600">
             TS
           </div>
         </div>
 
-        {/* 11.2: Category tabs */}
+        {/* Category tabs */}
         <div className="mt-2 flex items-center gap-2 overflow-x-auto pb-0.5">
           {CATEGORIES.map((cat) => (
             <button
-              key={cat}
+              key={cat.value}
               type="button"
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => setActiveCategory(cat.value)}
               className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-                activeCategory === cat
+                activeCategory === cat.value
                   ? "bg-[#137fec] text-white"
                   : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-50"
               }`}
             >
-              {cat}
+              {cat.label}
             </button>
           ))}
         </div>
@@ -118,21 +125,21 @@ function StudentResources() {
               <FolderOpen className="h-5 w-5" />
             </div>
             <p className="text-2xl font-bold leading-8 text-slate-900">{resources.all.length + resources.featured.length}</p>
-            <p className="text-xs text-slate-500">Total Resources</p>
+            <p className="text-xs text-slate-500">{t("totalResources")}</p>
           </article>
           <article className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
             <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-emerald-500">
               <CloudUpload className="h-5 w-5" />
             </div>
             <p className="text-2xl font-bold leading-8 text-slate-900">{resources.featured.length}</p>
-            <p className="text-xs text-slate-500">Featured</p>
+            <p className="text-xs text-slate-500">{t("featured")}</p>
           </article>
         </section>
 
-        {/* 11.3: Recent & Featured — thumbnail card grid */}
+        {/* Recent & Featured — thumbnail card grid */}
         {filteredFeatured.length > 0 && (
           <section>
-            <h2 className="mb-4 text-lg font-bold text-slate-900">Recent &amp; Featured</h2>
+            <h2 className="mb-4 text-lg font-bold text-slate-900">{t("recentFeatured")}</h2>
             <div className="grid grid-cols-2 gap-3">
               {filteredFeatured.map((item) => {
                 const Icon = typeIcons[item.file_type || ""] || FileText;
@@ -142,7 +149,6 @@ function StudentResources() {
                     key={item.id}
                     className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm"
                   >
-                    {/* Cover thumbnail */}
                     <div className={`relative flex h-24 items-center justify-center bg-gradient-to-br ${gradient}`}>
                       <Icon className="h-8 w-8 text-white/80" />
                       {item.file_type && (
@@ -151,7 +157,6 @@ function StudentResources() {
                         </span>
                       )}
                     </div>
-                    {/* Card body */}
                     <div className="p-3">
                       <h3 className="line-clamp-2 text-xs font-bold leading-4 text-slate-900">{item.title}</h3>
                       <p className="mt-1 text-[10px] leading-[15px] text-slate-400">{item.course_title}{item.file_size ? ` · ${item.file_size}` : ""}</p>
@@ -161,7 +166,7 @@ function StudentResources() {
                         aria-label={`Download ${item.title}`}
                       >
                         <Download className="h-3 w-3" />
-                        Download
+                        {t("download")}
                       </button>
                     </div>
                   </article>
@@ -174,7 +179,7 @@ function StudentResources() {
         {/* All Resources list */}
         {filteredAll.length > 0 && (
           <section>
-            <h2 className="mb-4 text-lg font-bold text-slate-900">All Resources</h2>
+            <h2 className="mb-4 text-lg font-bold text-slate-900">{t("allResources")}</h2>
             <div className="space-y-3">
               {filteredAll.map((item) => {
                 const Icon = typeIcons[item.file_type || ""] || FileText;
@@ -209,7 +214,7 @@ function StudentResources() {
         {filteredFeatured.length === 0 && filteredAll.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <FolderOpen className="mb-3 h-10 w-10 text-slate-300" />
-            <p className="text-sm font-medium text-slate-500">No resources in this category</p>
+            <p className="text-sm font-medium text-slate-500">{t("empty")}</p>
           </div>
         )}
       </main>

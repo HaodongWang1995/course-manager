@@ -49,7 +49,7 @@ export function StudentEnrollmentsPage() {
   };
 
   const handleCancel = (id: string) => {
-    if (window.confirm("确定要取消这个报名吗？")) {
+    if (window.confirm(t("enrollments.cancelConfirm"))) {
       cancelMutation.mutate(id);
     }
   };

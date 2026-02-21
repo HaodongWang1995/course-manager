@@ -69,7 +69,8 @@
     "teacher": "教师：",
     "note": "备注：",
     "reason": "拒绝原因：",
-    "applied": "申请时间："
+    "applied": "申请时间：",
+    "cancelConfirm": "确定要取消这个报名吗？"
   },
   "settings": {
     "title": "设置",
@@ -191,7 +192,9 @@
       "tue": "周二",
       "wed": "周三",
       "thu": "周四",
-      "fri": "周五"
+      "fri": "周五",
+      "sat": "周六",
+      "sun": "周日"
     },
     "morning": "上午",
     "afternoon": "下午",
@@ -743,6 +746,9 @@
     "loading": "加载中...",
     "totalResources": "资源总数",
     "featured": "精选",
+    "recentFeatured": "近期精选",
+    "allResources": "全部资源",
+    "download": "下载",
     "empty": "该分类暂无资源"
   },
   "studentCourseDetail": {
@@ -830,5 +836,21 @@
     "due": "截止 {{label}}",
     "resources": "课程资源",
     "messageTeacher": "发消息给老师"
+  },
+  "studentSchedule": {
+    "title": "我的课表",
+    "subtitle": "查看已选课程的上课时间安排",
+    "courseCount": "已选 {{courses}} 门课程，共 {{lessons}} 节课",
+    "weeklyView": "周课表",
+    "courseList": "课程列表",
+    "emptyTitle": "暂无课程安排",
+    "emptyDesc": "你还没有已通过的选课，去浏览课程并申请选课吧",
+    "lesson": "第 {{number}} 课"
+  },
+  "messages": {
+    "title": "消息",
+    "subtitle": "与您的老师和同学沟通交流",
+    "comingSoon": "消息功能正在开发中",
+    "comingSoonDesc": "我们正在打造更好的师生沟通体验，敬请期待。"
   }
 }

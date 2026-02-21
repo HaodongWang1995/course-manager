@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle, Badge } from "@course-manager/ui";
 import { Calendar, Clock, MapPin, BookOpen } from "lucide-react";
 import { useStudentScheduleFromDB } from "@/hooks/use-queries";
@@ -11,7 +12,6 @@ export const Route = createFileRoute("/(app)/student/schedule")({
 
 const hours = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM to 7 PM
 
-const dayNames = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
 const dayIndexMap: Record<number, number> = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 0: 6 };
 
 const colors = [
@@ -24,9 +24,20 @@ const colors = [
 ];
 
 function StudentSchedule() {
+  const { t } = useTranslation("studentSchedule");
+  const { t: tSchedule } = useTranslation("schedule");
   const { data: schedules = [], isLoading } = useStudentScheduleFromDB();
 
-  // Map schedules to weekly grid events
+  const dayNames = [
+    tSchedule("days.mon"),
+    tSchedule("days.tue"),
+    tSchedule("days.wed"),
+    tSchedule("days.thu"),
+    tSchedule("days.fri"),
+    tSchedule("days.sat"),
+    tSchedule("days.sun"),
+  ];
+
   const events = useMemo(() => {
     const courseColorMap = new Map<string, string>();
     let colorIdx = 0;
@@ -55,7 +66,7 @@ function StudentSchedule() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">加载中...</div>
+        <div className="text-gray-500">{tSchedule("loading")}</div>
       </div>
     );
   }
@@ -64,24 +75,26 @@ function StudentSchedule() {
     return (
       <div className="mx-auto max-w-4xl space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">我的课表</h1>
-          <p className="mt-1 text-sm text-gray-500">查看已选课程的上课时间安排</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+          <p className="mt-1 text-sm text-gray-500">{t("subtitle")}</p>
         </div>
         <EmptyState
           icon={Calendar}
-          title="暂无课程安排"
-          description="你还没有已通过的选课，去浏览课程并申请选课吧"
+          title={t("emptyTitle")}
+          description={t("emptyDesc")}
         />
       </div>
     );
   }
 
+  const courseCount = new Set(schedules.map((s) => s.course_id)).size;
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">我的课表</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
         <p className="mt-1 text-sm text-gray-500">
-          已选 {new Set(schedules.map((s) => s.course_id)).size} 门课程，共 {schedules.length} 节课
+          {t("courseCount", { courses: courseCount, lessons: schedules.length })}
         </p>
       </div>
 
@@ -90,7 +103,7 @@ function StudentSchedule() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            周课表
+            {t("weeklyView")}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -131,8 +144,6 @@ function StudentSchedule() {
                   if (event.dayOfWeek === undefined || event.startHour < 8) return null;
                   const top = (event.startHour - 8) * 60;
                   const height = Math.max(event.duration * 60, 30);
-                  // Each day column = 1/8 of the width (after the 60px time column)
-                  // Column starts at: 60px + dayOfWeek * (remaining / 7)
                   const colStart = event.dayOfWeek;
 
                   return (
@@ -167,7 +178,7 @@ function StudentSchedule() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5" />
-            课程列表
+            {t("courseList")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -183,7 +194,7 @@ function StudentSchedule() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h4 className="text-sm font-medium text-gray-900">
-                      {schedule.title || `第 ${schedule.lesson_number} 课`}
+                      {schedule.title || t("lesson", { number: schedule.lesson_number })}
                     </h4>
                     <Badge variant="outline" className="text-xs">
                       {schedule.course_title}
@@ -192,8 +203,8 @@ function StudentSchedule() {
                   <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-gray-500">
                     <span className="flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5" />
-                      {new Date(schedule.start_time).toLocaleString("zh-CN")} -{" "}
-                      {new Date(schedule.end_time).toLocaleTimeString("zh-CN")}
+                      {new Date(schedule.start_time).toLocaleString()} -{" "}
+                      {new Date(schedule.end_time).toLocaleTimeString()}
                     </span>
                     {schedule.room && (
                       <span className="flex items-center gap-1">
