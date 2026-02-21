@@ -19,7 +19,7 @@ These requirements come from `PRD/PROMP-BASIC.md` and serve as the foundation fo
 | @lukemorales/query-key-factory | Centralized query key management | ✅ Done (`apps/web/src/lib/query-keys.ts`) |
 | Figma design | UI must match Figma designs as closely as possible | ✅ Done (all 46 UI-TODO items resolved) |
 | PC + H5 responsive layout | Shared layout across all pages | ✅ Done |
-| PostgreSQL (AWS) | Database | ✅ Done (EC2 live at http://16.144.22.5) |
+| PostgreSQL (AWS) | Database | ✅ Done (EC2 live at http://100.23.242.232) |
 | TypeScript | Type safety | ✅ Done |
 | Zod | Form validation | ✅ Done |
 | Oxlint | Linting (replaces ESLint) | ✅ Done (configured in root package.json) |

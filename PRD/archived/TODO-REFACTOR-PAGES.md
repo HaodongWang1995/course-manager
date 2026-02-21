@@ -125,7 +125,7 @@ pages/landing/
 
 ---
 
-#### REFACTOR-05：teacher/courses.index — 543 行（课程列表）
+#### ✅ REFACTOR-05：teacher/courses.index — 543 行（课程列表）
 
 **路由文件**：
 ```
@@ -144,7 +144,7 @@ pages/teacher/courses/
 
 ---
 
-#### REFACTOR-06：teacher/students — 534 行
+#### ✅ REFACTOR-06：teacher/students — 534 行
 
 **路由文件**：
 ```
@@ -165,7 +165,7 @@ pages/teacher/students/
 
 ### 🟡 MEDIUM（200–500 行）
 
-#### REFACTOR-07：teacher/feedback.$courseId — 438 行
+#### ✅ REFACTOR-07：teacher/feedback.$courseId — 438 行
 
 ```
 pages/teacher/feedback/
@@ -178,7 +178,7 @@ pages/teacher/feedback/
 
 ---
 
-#### REFACTOR-08：courses.$courseId（公开详情）— 357 行
+#### ✅ REFACTOR-08：courses.$courseId（公开详情）— 357 行
 
 ```
 pages/public/course-detail/
@@ -191,7 +191,7 @@ pages/public/course-detail/
 
 ---
 
-#### REFACTOR-09：student/feedback.$courseId — 318 行
+#### ✅ REFACTOR-09：student/feedback.$courseId — 318 行
 
 ```
 pages/student/feedback/
@@ -203,8 +203,8 @@ pages/student/feedback/
 
 ---
 
-#### REFACTOR-10：teacher/settings — 269 行
-#### REFACTOR-11：student/settings — 269 行
+#### ✅ REFACTOR-10：teacher/settings — 269 行
+#### ✅ REFACTOR-11：student/settings — 269 行
 
 ```
 pages/teacher/settings/
@@ -220,7 +220,7 @@ pages/student/settings/         ← 相同结构，复用 components 或分别�
 
 ---
 
-#### REFACTOR-12：student/assignments — 279 行
+#### ✅ REFACTOR-12：student/assignments — 279 行
 
 ```
 pages/student/assignments/
@@ -232,7 +232,7 @@ pages/student/assignments/
 
 ---
 
-#### REFACTOR-13：student/courses.$courseId — 275 行
+#### ✅ REFACTOR-13：student/courses.$courseId — 275 行
 
 ```
 pages/student/course-detail/
@@ -246,7 +246,7 @@ pages/student/course-detail/
 
 ---
 
-#### REFACTOR-14：teacher/enrollments — 223 行
+#### ✅ REFACTOR-14：teacher/enrollments — 223 行
 
 ```
 pages/teacher/enrollments/
@@ -258,7 +258,7 @@ pages/teacher/enrollments/
 
 ---
 
-#### REFACTOR-15：student/resources — 218 行
+#### ✅ REFACTOR-15：student/resources — 218 行
 
 ```
 pages/student/resources/
@@ -271,7 +271,7 @@ pages/student/resources/
 
 ---
 
-#### REFACTOR-16：student/grades — 210 行
+#### ✅ REFACTOR-16：student/grades — 210 行
 
 ```
 pages/student/grades/
@@ -286,8 +286,8 @@ pages/student/grades/
 
 ### 🟢 LOW（< 200 行）
 
-#### REFACTOR-17：teacher/support — 172 行
-#### REFACTOR-18：student/support — 169 行
+#### ✅ REFACTOR-17：teacher/support — 172 行
+#### ✅ REFACTOR-18：student/support — 169 行
 
 ```
 pages/teacher/support/
@@ -301,7 +301,7 @@ pages/student/support/          ← 相同结构
 
 ---
 
-#### REFACTOR-19：student/enrollments — 169 行
+#### ✅ REFACTOR-19：student/enrollments — 169 行
 
 ```
 pages/student/enrollments/
@@ -313,7 +313,7 @@ pages/student/enrollments/
 
 ---
 
-#### REFACTOR-20：teacher/reports — 143 行
+#### ✅ REFACTOR-20：teacher/reports — 143 行
 
 ```
 pages/teacher/reports/
@@ -339,7 +339,7 @@ pages/teacher/calendar/
 
 ---
 
-#### REFACTOR-22：teacher/index（Dashboard）— 361 行
+#### ✅ REFACTOR-22：teacher/index（Dashboard）— 361 行
 
 ```
 pages/teacher/dashboard/
@@ -353,7 +353,7 @@ pages/teacher/dashboard/
 
 ---
 
-#### REFACTOR-23：courses.tsx（公开课程列表）— 138 行
+#### ✅ REFACTOR-23：courses.tsx（公开课程列表）— 138 行
 
 ```
 pages/public/courses/
@@ -591,26 +591,26 @@ import { Button } from "@course-manager/ui";
 
 | ID | 页面 | 原文件行数 | 子组件数 | 状态 |
 |----|------|----------|---------|------|
-| REFACTOR-01 | teacher/course-detail | 778 | 8 | ❌ |
-| REFACTOR-21 | teacher/calendar | 712 | 4 | ❌ |
-| REFACTOR-02 | student/schedule | 715 | 4 | ❌ |
-| REFACTOR-03 | auth/login | 701 | 2 | ❌ |
-| REFACTOR-04 | landing | 555 | 4 | ❌ |
-| REFACTOR-05 | teacher/courses | 543 | 3 | ❌ |
-| REFACTOR-06 | teacher/students | 534 | 3 | ❌ |
-| REFACTOR-22 | teacher/dashboard | 361 | 4 | ❌ |
-| REFACTOR-08 | public/course-detail | 357 | 3 | ❌ |
-| REFACTOR-07 | teacher/feedback | 438 | 3 | ❌ |
-| REFACTOR-09 | student/feedback | 318 | 2 | ❌ |
-| REFACTOR-10 | teacher/settings | 269 | 4 | ❌ |
-| REFACTOR-11 | student/settings | 269 | 4 | ❌ |
-| REFACTOR-12 | student/assignments | 279 | 2 | ❌ |
-| REFACTOR-13 | student/course-detail | 275 | 4 | ❌ |
-| REFACTOR-14 | teacher/enrollments | 223 | 2 | ❌ |
-| REFACTOR-15 | student/resources | 218 | 3 | ❌ |
-| REFACTOR-16 | student/grades | 210 | 3 | ❌ |
-| REFACTOR-17 | teacher/support | 172 | 2 | ❌ |
-| REFACTOR-18 | student/support | 169 | 2 | ❌ |
-| REFACTOR-19 | student/enrollments | 169 | 2 | ❌ |
-| REFACTOR-20 | teacher/reports | 143 | 2 | ❌ |
-| REFACTOR-23 | public/courses | 138 | 2 | ❌ |
+| REFACTOR-01 | teacher/course-detail | 778 | 8 | ✅ |
+| REFACTOR-21 | teacher/calendar | 712 | 4 | ✅ |
+| REFACTOR-02 | student/schedule | 715 | 4 | ✅ |
+| REFACTOR-03 | auth/login | 701 | 2 | ✅ |
+| REFACTOR-04 | landing | 555 | 4 | ✅ |
+| REFACTOR-05 | teacher/courses | 543 | 3 | ✅ |
+| REFACTOR-06 | teacher/students | 534 | 3 | ✅ |
+| REFACTOR-22 | teacher/dashboard | 361 | 4 | ✅ |
+| REFACTOR-08 | public/course-detail | 357 | 3 | ✅ |
+| REFACTOR-07 | teacher/feedback | 438 | 3 | ✅ |
+| REFACTOR-09 | student/feedback | 318 | 2 | ✅ |
+| REFACTOR-10 | teacher/settings | 269 | 4 | ✅ |
+| REFACTOR-11 | student/settings | 269 | 4 | ✅ |
+| REFACTOR-12 | student/assignments | 279 | 2 | ✅ |
+| REFACTOR-13 | student/course-detail | 275 | 4 | ✅ |
+| REFACTOR-14 | teacher/enrollments | 223 | 2 | ✅ |
+| REFACTOR-15 | student/resources | 218 | 3 | ✅ |
+| REFACTOR-16 | student/grades | 210 | 3 | ✅ |
+| REFACTOR-17 | teacher/support | 172 | 2 | ✅ |
+| REFACTOR-18 | student/support | 169 | 2 | ✅ |
+| REFACTOR-19 | student/enrollments | 169 | 2 | ✅ |
+| REFACTOR-20 | teacher/reports | 143 | 2 | ✅ |
+| REFACTOR-23 | public/courses | 138 | 2 | ✅ |

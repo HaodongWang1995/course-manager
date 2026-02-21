@@ -55,11 +55,11 @@
 ### Phase 1 — 基础设施 & 后端
 
 #### 1.1 Cloudflare R2 配置
-- [ ] 在 Cloudflare Dashboard 创建 R2 bucket（命名：`course-manager-files`）
-- [ ] 生成 R2 API Token（Access Key ID + Secret Access Key）
-- [ ] 配置 bucket CORS（允许 PUT/GET 来自应用域名）
-- [ ] 设置 R2 public URL（或使用 presigned GET URL）
-- [ ] 新增环境变量：
+- [x] 在 Cloudflare Dashboard 创建 R2 bucket（命名：`course-manager-files`）
+- [x] 生成 R2 API Token（Access Key ID + Secret Access Key）
+- [x] 配置 bucket CORS（允许 PUT/GET 来自应用域名）
+- [x] 设置 R2 public URL（或使用 presigned GET URL）
+- [x] 新增环境变量：
   ```env
   R2_ACCOUNT_ID=xxx
   R2_ACCESS_KEY_ID=xxx
@@ -131,8 +131,8 @@ schedules/{schedule_id}/{timestamp}-{sanitized_filename}
 ### Phase 2 — 前端
 
 #### 2.1 公共组件（packages/ui）
-- [ ] `FileUploadZone` 组件：拖放 / 点击上传，显示进度条，支持多文件
-- [ ] `AttachmentList` 组件：显示附件列表，每项含文件名、大小、类型图标、下载按钮
+- [x] `FileUploadZone` 组件：拖放 / 点击上传，显示进度条，支持多文件
+- [x] `AttachmentList` 组件：显示附件列表，每项含文件名、大小、类型图标、下载按钮
 
 #### 2.2 API Client 更新（apps/web/src/api/client.ts）
 ```typescript
@@ -165,28 +165,28 @@ export const attachmentApi = {
 ```
 
 #### 2.3 TanStack Query hooks（use-queries.ts）
-- [ ] `useCourseAttachments(courseId)` — 获取课程附件
-- [ ] `useScheduleAttachments(scheduleId)` — 获取课节附件
-- [ ] `useUploadAttachment()` — presign + 直传 + confirm 的封装 mutation
+- [x] `useCourseAttachments(courseId)` — 获取课程附件
+- [x] `useScheduleAttachments(scheduleId)` — 获取课节附件
+- [x] `useUploadAttachment()` — presign + 直传 + confirm 的封装 mutation
 
 #### 2.4 Teacher 端修改
-- [ ] `teacher/courses.$courseId.tsx`：课程编辑页面新增「Attachments」区块，支持上传和删除
-- [ ] `teacher/calendar.tsx` — New Event 对话框新增附件上传字段
-- [ ] `teacher/courses.index.tsx` — Create Course 对话框新增附件字段（可选，或仅在详情页管理）
+- [x] `teacher/courses.$courseId.tsx`：课程编辑页面新增「Attachments」区块，支持上传和删除
+- [x] `teacher/calendar.tsx` — New Event 对话框新增附件上传字段
+- [x] `teacher/courses.index.tsx` — Create Course 对话框新增附件字段（可选，或仅在详情页管理）
 
 #### 2.5 Student 端修改
-- [ ] `student/courses.$courseId.tsx`：课程详情页展示附件列表（含下载按钮）
-- [ ] `student/index.tsx` — CourseDetailPanel 中展示课节附件
+- [x] `student/courses.$courseId.tsx`：课程详情页展示附件列表（含下载按钮）
+- [x] `student/index.tsx` — CourseDetailPanel 中展示课节附件
 
 ---
 
 ### Phase 3 — 安全 & 优化
 
-- [ ] **文件大小限制**：presign 接口校验 `file_size ≤ 50MB`（可配置）
-- [ ] **文件类型白名单**：仅允许 `pdf, doc, docx, ppt, pptx, xls, xlsx, jpg, png, mp4, zip`
-- [ ] **访问控制**：GET 附件列表需要登录，且只能查看自己已报名的课程附件
-- [ ] **presigned GET URL**：如果 bucket 不公开，文件下载也使用 presigned GET URL（有效期 1 小时）
-- [ ] **生产 docker-compose**：新增 R2 环境变量到 `docker-compose.prod.yml`
+- [x] **文件大小限制**：presign 接口校验 `file_size ≤ 50MB`（可配置）
+- [x] **文件类型白名单**：仅允许 `pdf, doc, docx, ppt, pptx, xls, xlsx, jpg, png, mp4, zip`
+- [x] **访问控制**：GET 附件列表需要登录，且只能查看自己已报名的课程附件
+- [x] **presigned GET URL**：如果 bucket 不公开，文件下载也使用 presigned GET URL（有效期 1 小时）
+- [x] **生产 docker-compose**：新增 R2 环境变量到 `docker-compose.prod.yml`
 
 ---
 
