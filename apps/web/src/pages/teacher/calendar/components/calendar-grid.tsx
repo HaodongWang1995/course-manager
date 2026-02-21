@@ -1,14 +1,10 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, Button } from "@course-manager/ui";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 
 // Shared constants
 const hours = Array.from({ length: 10 }, (_, i) => i + 8); // 8 AM to 5 PM
-const dayNamesFull = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const monthNames = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
 
 // PostgreSQL TIMESTAMP strips timezone to keep wall-clock time as intended
 function parseLocalTime(isoStr: string): Date {
@@ -16,7 +12,7 @@ function parseLocalTime(isoStr: string): Date {
   return new Date(normalized);
 }
 
-export { parseLocalTime, monthNames };
+export { parseLocalTime };
 
 export interface CalendarEvent {
   day: number;
@@ -55,6 +51,7 @@ export function CalendarGrid({
   onSetToday,
   onDayClick,
 }: CalendarGridProps) {
+  const { t } = useTranslation("teacherCalendar");
   const weekEvents = useMemo(
     () =>
       allEvents.filter((e) => {
@@ -88,7 +85,7 @@ export function CalendarGrid({
             </button>
           </div>
           <Button variant="outline" size="sm" onClick={onSetToday}>
-            Today
+            {t("today")}
           </Button>
         </div>
       </CardHeader>
@@ -103,7 +100,7 @@ export function CalendarGrid({
         {view === "day" && (
           <DayView
             events={dayEvents}
-            dayLabel={currentDate.toLocaleDateString("en-US", {
+            dayLabel={currentDate.toLocaleDateString(undefined, {
               weekday: "short",
               month: "numeric",
               day: "numeric",
@@ -128,6 +125,11 @@ function MonthView({
   events: Array<{ date: Date; title: string; bgColor: string }>;
   onDayClick: (d: Date) => void;
 }) {
+  const { t } = useTranslation("teacherCalendar");
+  const dayNamesFull = [
+    t("days.sun"), t("days.mon"), t("days.tue"), t("days.wed"),
+    t("days.thu"), t("days.fri"), t("days.sat"),
+  ];
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const today = new Date();
@@ -205,7 +207,7 @@ function MonthView({
                       </div>
                     ))}
                     {cellEvents.length > 2 && (
-                      <p className="text-[10px] text-gray-400">+{cellEvents.length - 2} more</p>
+                      <p className="text-[10px] text-gray-400">{t("more", { count: cellEvents.length - 2 })}</p>
                     )}
                   </div>
                 </div>

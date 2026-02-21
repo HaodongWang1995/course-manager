@@ -1,4 +1,5 @@
 import { FileText, FolderOpen, Video, Presentation, FileSpreadsheet, Download } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Resource } from "@/api/client";
 
 const typeIcons: Record<string, typeof FileText> = {
@@ -31,11 +32,13 @@ interface FeaturedGridProps {
 }
 
 export function FeaturedGrid({ items }: FeaturedGridProps) {
+  const { t } = useTranslation("studentResources");
+
   if (items.length === 0) return null;
 
   return (
     <section>
-      <h2 className="mb-4 text-lg font-bold text-slate-900">Recent &amp; Featured</h2>
+      <h2 className="mb-4 text-lg font-bold text-slate-900">{t("recentFeatured")}</h2>
       <div className="grid grid-cols-2 gap-3">
         {items.map((item) => {
           const Icon = typeIcons[item.file_type || ""] || FileText;
@@ -66,7 +69,7 @@ export function FeaturedGrid({ items }: FeaturedGridProps) {
                   aria-label={`Download ${item.title}`}
                 >
                   <Download className="h-3 w-3" />
-                  Download
+                  {t("download")}
                 </button>
               </div>
             </article>

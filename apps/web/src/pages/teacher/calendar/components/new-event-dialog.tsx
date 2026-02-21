@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@course-manager/ui";
 import { useForm } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
 import { newEventFormValidator } from "@/lib/schemas";
 import type { Course } from "@/api/client";
 
@@ -52,6 +53,8 @@ export function NewEventDialog({
     },
   });
 
+  const { t } = useTranslation("teacherCalendar");
+
   const handleOpenChange = (v: boolean) => {
     onOpenChange(v);
     if (!v) form.reset();
@@ -61,7 +64,7 @@ export function NewEventDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>New Event</DialogTitle>
+          <DialogTitle>{t("dialog.title")}</DialogTitle>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -74,10 +77,10 @@ export function NewEventDialog({
           <form.Field name="course_id">
             {(field) => (
               <div className="space-y-2">
-                <Label>Course <span className="text-red-400">*</span></Label>
+                <Label>{t("dialog.course")} <span className="text-red-400">*</span></Label>
                 <Select value={field.state.value} onValueChange={(v) => field.handleChange(v)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a course" />
+                    <SelectValue placeholder={t("dialog.selectCourse")} />
                   </SelectTrigger>
                   <SelectContent>
                     {courses.map((c) => (
@@ -96,12 +99,12 @@ export function NewEventDialog({
           <form.Field name="title">
             {(field) => (
               <div className="space-y-2">
-                <Label>Title (optional)</Label>
+                <Label>{t("dialog.titleOptional")}</Label>
                 <Input
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
-                  placeholder="Lesson title"
+                  placeholder={t("dialog.lessonTitlePlaceholder")}
                 />
               </div>
             )}
@@ -112,7 +115,7 @@ export function NewEventDialog({
             <form.Field name="start_time">
               {(field) => (
                 <div className="space-y-2">
-                  <Label>Start Time <span className="text-red-400">*</span></Label>
+                  <Label>{t("dialog.startTime")} <span className="text-red-400">*</span></Label>
                   <Input
                     type="datetime-local"
                     value={field.state.value}
@@ -128,7 +131,7 @@ export function NewEventDialog({
             <form.Field name="end_time">
               {(field) => (
                 <div className="space-y-2">
-                  <Label>End Time <span className="text-red-400">*</span></Label>
+                  <Label>{t("dialog.endTime")} <span className="text-red-400">*</span></Label>
                   <Input
                     type="datetime-local"
                     value={field.state.value}
@@ -147,12 +150,12 @@ export function NewEventDialog({
           <form.Field name="room">
             {(field) => (
               <div className="space-y-2">
-                <Label>Room (optional)</Label>
+                <Label>{t("dialog.roomOptional")}</Label>
                 <Input
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
-                  placeholder="e.g. A-301"
+                  placeholder={t("dialog.roomPlaceholder")}
                 />
               </div>
             )}
@@ -160,12 +163,12 @@ export function NewEventDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
-              Cancel
+              {t("dialog.cancel")}
             </Button>
             <form.Subscribe selector={(s) => s.canSubmit}>
               {(canSubmit) => (
                 <Button type="submit" disabled={!canSubmit || isLoading}>
-                  {isLoading ? "Creating..." : "Create Event"}
+                  {isLoading ? t("dialog.creating") : t("dialog.createEvent")}
                 </Button>
               )}
             </form.Subscribe>

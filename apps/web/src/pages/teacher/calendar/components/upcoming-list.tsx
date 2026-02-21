@@ -1,8 +1,8 @@
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@course-manager/ui";
 import { CalendarPlus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Deadline } from "@/api/client";
 import type { CalendarEvent } from "./calendar-grid";
-import { monthNames } from "./calendar-grid";
 
 const deadlineColors = [
   "border-red-500 bg-red-50",
@@ -21,25 +21,27 @@ export function UpcomingListPanel({
   deadlines,
   onAddEvent,
 }: UpcomingListPanelProps) {
+  const { t } = useTranslation("teacherCalendar");
+
   return (
     <div className="space-y-4">
       {/* Upcoming Events */}
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">Upcoming Events</CardTitle>
-            <button className="text-xs font-medium text-blue-600 hover:underline">View All</button>
+            <CardTitle className="text-base">{t("upcoming.title")}</CardTitle>
+            <button className="text-xs font-medium text-blue-600 hover:underline">{t("upcoming.viewAll")}</button>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {upcomingEvents.length === 0 ? (
-            <p className="py-2 text-center text-xs text-gray-400">No upcoming events</p>
+            <p className="py-2 text-center text-xs text-gray-400">{t("upcoming.empty")}</p>
           ) : (
             upcomingEvents.map((event, idx) => (
               <div key={idx} className="flex items-start gap-3">
                 <div className={`flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-lg text-white ${event.bgColor}`}>
                   <span className="text-[9px] font-bold uppercase leading-tight">
-                    {monthNames[event.date.getMonth()].slice(0, 3).toUpperCase()}
+                    {event.date.toLocaleDateString(undefined, { month: "short" }).toUpperCase()}
                   </span>
                   <span className="text-sm font-bold leading-tight">{event.date.getDate()}</span>
                 </div>
@@ -60,7 +62,7 @@ export function UpcomingListPanel({
       {deadlines.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Deadlines</CardTitle>
+            <CardTitle className="text-base">{t("upcoming.deadlines")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {deadlines.map((item, idx) => (
@@ -71,8 +73,8 @@ export function UpcomingListPanel({
                 <p className="text-sm font-medium text-gray-900">{item.title}</p>
                 <p className={`mt-0.5 text-xs font-medium ${item.urgent ? "text-red-600" : "text-gray-500"}`}>
                   {item.urgent
-                    ? "Due Today"
-                    : new Date(item.due_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    ? t("upcoming.dueToday")
+                    : new Date(item.due_date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                 </p>
               </div>
             ))}
@@ -84,9 +86,9 @@ export function UpcomingListPanel({
       <Card className="border-dashed">
         <CardContent className="flex flex-col items-center gap-2 py-5 text-center">
           <CalendarPlus className="h-8 w-8 text-gray-300" />
-          <p className="text-xs text-gray-400">Need to schedule something?</p>
+          <p className="text-xs text-gray-400">{t("upcoming.schedulePrompt")}</p>
           <Button variant="outline" size="sm" className="text-xs" onClick={onAddEvent}>
-            Quick Add Task
+            {t("upcoming.quickAdd")}
           </Button>
         </CardContent>
       </Card>

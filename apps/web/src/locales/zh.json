@@ -48,7 +48,9 @@
     "errors": {
       "loginFailed": "登录失败",
       "registerFailed": "注册失败"
-    }
+    },
+    "welcomeTitle": "欢迎回来",
+    "welcomeSubtitle": "轻松管理您的课程安排与反馈。"
   },
   "enrollments": {
     "title": "我的选课",
@@ -388,7 +390,8 @@
       "all": "全部",
       "active": "已上架",
       "draft": "草稿",
-      "archived": "已下架"
+      "archived": "已下架",
+      "filterButton": "筛选"
     },
     "card": {
       "students": "{{count}} 名学生",
@@ -593,9 +596,39 @@
     "subtitle": "管理您的日程和活动",
     "views": { "month": "月", "week": "周", "day": "天" },
     "newEvent": "新建活动",
+    "today": "今天",
+    "more": "+{{count}} 条",
     "days": {
       "sun": "日", "mon": "一", "tue": "二", "wed": "三",
       "thu": "四", "fri": "五", "sat": "六"
+    },
+    "months": {
+      "jan": "一月", "feb": "二月", "mar": "三月", "apr": "四月",
+      "may": "五月", "jun": "六月", "jul": "七月", "aug": "八月",
+      "sep": "九月", "oct": "十月", "nov": "十一月", "dec": "十二月"
+    },
+    "dialog": {
+      "title": "新建活动",
+      "course": "课程",
+      "selectCourse": "选择课程",
+      "titleOptional": "标题（可选）",
+      "lessonTitlePlaceholder": "课节标题",
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "roomOptional": "教室（可选）",
+      "roomPlaceholder": "如：A-301",
+      "cancel": "取消",
+      "creating": "创建中...",
+      "createEvent": "创建活动"
+    },
+    "upcoming": {
+      "title": "即将到来的活动",
+      "viewAll": "查看全部",
+      "empty": "暂无即将到来的活动",
+      "deadlines": "截止日期",
+      "dueToday": "今日截止",
+      "schedulePrompt": "需要安排新活动？",
+      "quickAdd": "快速添加"
     }
   },
   "teacherStudents": {

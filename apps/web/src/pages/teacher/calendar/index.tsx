@@ -8,7 +8,7 @@ import {
   useUpcomingDeadlines,
   useAddSchedule,
 } from "@/hooks/use-queries";
-import { CalendarGrid, type CalendarEvent, parseLocalTime, monthNames } from "./components/calendar-grid";
+import { CalendarGrid, type CalendarEvent, parseLocalTime } from "./components/calendar-grid";
 import { UpcomingListPanel } from "./components/upcoming-list";
 import { NewEventDialog } from "./components/new-event-dialog";
 
@@ -108,10 +108,10 @@ export function TeacherCalendarPage() {
     if (view === "week") {
       const sat = new Date(sunday);
       sat.setDate(sunday.getDate() + 6);
-      const startStr = sunday.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+      const startStr = sunday.toLocaleDateString(undefined, { month: "long", day: "numeric" });
       return `${startStr} – ${sat.getDate()}, ${sat.getFullYear()}`;
     }
-    return `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+    return currentDate.toLocaleDateString(undefined, { month: "long", year: "numeric" });
   }, [view, currentDate, sunday]);
 
   const navigate = (dir: 1 | -1) => {

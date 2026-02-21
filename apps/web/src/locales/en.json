@@ -48,7 +48,9 @@
     "errors": {
       "loginFailed": "Login failed",
       "registerFailed": "Registration failed"
-    }
+    },
+    "welcomeTitle": "Welcome Back",
+    "welcomeSubtitle": "Manage your schedule and feedback with ease."
   },
   "enrollments": {
     "title": "My Enrollments",
@@ -388,7 +390,8 @@
       "all": "All",
       "active": "Active",
       "draft": "Draft",
-      "archived": "Archived"
+      "archived": "Archived",
+      "filterButton": "Filter"
     },
     "card": {
       "students": "{{count}} Students",
@@ -593,9 +596,39 @@
     "subtitle": "Manage your schedule and events",
     "views": { "month": "Month", "week": "Week", "day": "Day" },
     "newEvent": "New Event",
+    "today": "Today",
+    "more": "+{{count}} more",
     "days": {
       "sun": "Sun", "mon": "Mon", "tue": "Tue", "wed": "Wed",
       "thu": "Thu", "fri": "Fri", "sat": "Sat"
+    },
+    "months": {
+      "jan": "January", "feb": "February", "mar": "March", "apr": "April",
+      "may": "May", "jun": "June", "jul": "July", "aug": "August",
+      "sep": "September", "oct": "October", "nov": "November", "dec": "December"
+    },
+    "dialog": {
+      "title": "New Event",
+      "course": "Course",
+      "selectCourse": "Select a course",
+      "titleOptional": "Title (optional)",
+      "lessonTitlePlaceholder": "Lesson title",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "roomOptional": "Room (optional)",
+      "roomPlaceholder": "e.g. A-301",
+      "cancel": "Cancel",
+      "creating": "Creating...",
+      "createEvent": "Create Event"
+    },
+    "upcoming": {
+      "title": "Upcoming Events",
+      "viewAll": "View All",
+      "empty": "No upcoming events",
+      "deadlines": "Deadlines",
+      "dueToday": "Due Today",
+      "schedulePrompt": "Need to schedule something?",
+      "quickAdd": "Quick Add Task"
     }
   },
   "teacherStudents": {

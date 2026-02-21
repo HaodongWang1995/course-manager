@@ -47,7 +47,7 @@ export function CourseFilters({
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="gap-2 shrink-0">
             <Filter className="h-4 w-4" />
-            Filter
+            {t("filters.filterButton")}
             {filterStatus !== "all" && (
               <Badge className="ml-1 h-5 px-1.5 text-xs bg-blue-600 text-white border-0">
                 1

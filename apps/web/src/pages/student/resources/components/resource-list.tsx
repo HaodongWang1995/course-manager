@@ -1,4 +1,5 @@
 import { FileText, FolderOpen, Video, Presentation, FileSpreadsheet, MoreHorizontal } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Resource } from "@/api/client";
 
 const typeIcons: Record<string, typeof FileText> = {
@@ -14,11 +15,13 @@ interface ResourceListProps {
 }
 
 export function ResourceList({ items }: ResourceListProps) {
+  const { t } = useTranslation("studentResources");
+
   if (items.length === 0) return null;
 
   return (
     <section>
-      <h2 className="mb-4 text-lg font-bold text-slate-900">All Resources</h2>
+      <h2 className="mb-4 text-lg font-bold text-slate-900">{t("allResources")}</h2>
       <div className="space-y-3">
         {items.map((item) => {
           const Icon = typeIcons[item.file_type || ""] || FileText;

@@ -86,10 +86,10 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-white" />
           <div className="absolute bottom-5 left-6 right-6">
             <h1 className="text-[28px] font-bold text-slate-900 leading-tight">
-              Welcome Back
+              {t("welcomeTitle")}
             </h1>
             <p className="mt-1 text-sm text-slate-500">
-              Manage your schedule and feedback with ease.
+              {t("welcomeSubtitle")}
             </p>
           </div>
         </div>
