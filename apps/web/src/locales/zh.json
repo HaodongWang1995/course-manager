@@ -7,13 +7,44 @@
     "resources": "资源",
     "settings": "设置",
     "support": "帮助",
-    "dashboard": "Dashboard",
+    "dashboard": "仪表盘",
     "calendar": "日历",
     "students": "学生",
     "enrollments": "选课管理",
     "reports": "报告",
     "home": "首页",
     "browse": "浏览课程"
+  },
+  "auth": {
+    "tabs": { "login": "登录", "register": "注册" },
+    "role": { "prompt": "我是...", "student": "学生", "teacher": "教师" },
+    "fields": {
+      "email": "邮箱",
+      "password": "密码",
+      "name": "姓名"
+    },
+    "placeholders": {
+      "email": "name@example.com",
+      "password": "输入您的密码",
+      "passwordRegister": "至少6位字符",
+      "name": "您的姓名"
+    },
+    "login": {
+      "submit": "登录",
+      "submitting": "登录中...",
+      "rememberMe": "记住我",
+      "forgotPassword": "忘记密码？"
+    },
+    "register": {
+      "submit": "注册",
+      "submitting": "注册中..."
+    },
+    "footer": {
+      "noAccount": "没有账号？",
+      "signUpLink": "注册",
+      "hasAccount": "已有账号？",
+      "loginLink": "登录"
+    }
   },
   "enrollments": {
     "title": "我的选课",
@@ -147,6 +178,8 @@
     "viewResources": "查看课程资源",
     "seeSyllabus": "查看课程大纲 →",
     "requirements": "课程要求",
+    "upcomingClasses": "即将开课",
+    "joinRoom": "进入课程房间",
     "loading": "加载中..."
   },
   "common": {
@@ -156,5 +189,564 @@
     "search": "搜索",
     "comingSoon": "即将推出",
     "backToList": "返回列表"
+  },
+  "landing": {
+    "nav": {
+      "features": "功能",
+      "stats": "数据",
+      "courses": "课程",
+      "testimonials": "用户评价",
+      "login": "登录",
+      "browseCourses": "浏览课程"
+    },
+    "hero": {
+      "badge": "Beta 公测版",
+      "title": "现代化课程管理平台，专为",
+      "titleHighlight": "教育工作者",
+      "description": "强大的课程管理、学生追踪和绩效分析工具，简化您的教学工作流程，专为师生设计。",
+      "startTeaching": "开始教学",
+      "browseCourses": "浏览课程"
+    },
+    "stats": {
+      "title": "深受教育工作者信赖",
+      "subtitle": "加入已使用 EduManager 的数千名教师行列",
+      "activeTeachers": "活跃教师",
+      "studentsEnrolled": "在读学生",
+      "coursesCreated": "已创建课程",
+      "satisfactionRate": "满意度"
+    },
+    "features": {
+      "badge": "功能介绍",
+      "title": "一站式解决方案",
+      "subtitle": "专为现代教育设计的强大工具",
+      "courseManagement": {
+        "title": "课程管理",
+        "description": "轻松创建、组织和管理课程，在同一平台追踪课时、作业和学生进度。"
+      },
+      "studentDirectory": {
+        "title": "学生目录",
+        "description": "管理学生档案、追踪出勤情况，并高效地与学生及家长沟通。"
+      },
+      "analytics": {
+        "title": "数据分析与报告",
+        "description": "通过详细的绩效报告、成绩分布和参与度指标获取洞察。"
+      },
+      "scheduling": {
+        "title": "智能排课",
+        "description": "为教师和学生提供智能日历视图，并自动检测时间冲突。"
+      },
+      "assignments": {
+        "title": "作业中心",
+        "description": "无缝创建和分发作业、收集提交内容并提供反馈。"
+      },
+      "feedback": {
+        "title": "反馈系统",
+        "description": "收集和管理学生的课程反馈，持续改进教学方式。"
+      }
+    },
+    "showcase": {
+      "title": "课程展示",
+      "subtitle": "了解课程和日程在 EduManager 中的呈现方式",
+      "tabCourses": "课程",
+      "tabSchedule": "日程",
+      "students": "名学生",
+      "lessons": "节课",
+      "progress": "进度"
+    },
+    "progressSection": {
+      "title": "一览进度详情",
+      "description": "通过直观的可视化指标监控学生表现和课程完成情况。",
+      "overallCompletion": "整体完成率",
+      "assignmentsGraded": "作业批改率",
+      "studentEngagement": "学生参与度",
+      "quickAccess": "快速访问",
+      "quickAccessDesc": "直接进入您的控制台",
+      "teacherFeatures": "仪表盘、课程、学生、报告、日历",
+      "studentFeatures": "课表、成绩、作业、资源",
+      "goToDashboard": "进入控制台"
+    },
+    "testimonials": {
+      "title": "深受教育工作者喜爱",
+      "subtitle": "听听教师和学生怎么说"
+    },
+    "cta": {
+      "title": "准备好改变您的教学方式了吗？",
+      "description": "加入已在使用 EduManager 的数千名教育工作者，简化工作流程，提升学生成绩。",
+      "emailPlaceholder": "输入您的邮箱",
+      "getStarted": "立即开始"
+    },
+    "footer": {
+      "builtWith": "基于 @course-manager/ui 组件库构建。"
+    }
+  },
+  "dashboard": {
+    "title": "仪表盘",
+    "semester": {
+      "fall2023": "2023年秋季学期",
+      "spring2026": "2026年春季学期",
+      "fall2025": "2025年秋季学期"
+    },
+    "welcome": {
+      "morning": "早上好",
+      "afternoon": "下午好",
+      "evening": "晚上好",
+      "subtitle": "今天有 {{classCount}} 节课，{{urgentCount}} 个紧急截止日期。"
+    },
+    "scheduleSection": {
+      "title": "今日日程",
+      "noClasses": "今天没有课程安排",
+      "viewCalendar": "查看完整日历 →",
+      "students": "{{count}} 名学生"
+    },
+    "courseType": {
+      "Lecture": "讲课",
+      "Lab": "实验",
+      "Admin": "行政"
+    },
+    "status": {
+      "Upcoming": "即将开始",
+      "PendingPrep": "准备中",
+      "Finished": "已完成",
+      "Scheduled": "已安排"
+    },
+    "quickActions": {
+      "title": "快捷操作",
+      "assignment": "作业",
+      "announcement": "公告",
+      "message": "消息",
+      "report": "报告"
+    },
+    "calendarDays": {
+      "su": "日",
+      "mo": "一",
+      "tu": "二",
+      "we": "三",
+      "th": "四",
+      "fr": "五",
+      "sa": "六"
+    },
+    "deadlines": {
+      "title": "即将截止",
+      "viewAll": "查看全部",
+      "empty": "暂无截止事项"
+    }
+  },
+  "teacherCourses": {
+    "title": "课程管理",
+    "subtitle": "管理您的课程和课程表",
+    "createButton": "新建课程",
+    "loading": "加载中...",
+    "empty": {
+      "title": "未找到课程",
+      "filtered": "尝试调整搜索或筛选条件",
+      "initial": "创建您的第一门课程"
+    },
+    "createCard": {
+      "title": "新建课程",
+      "subtitle": "向您的课程表中添加新科目"
+    },
+    "filters": {
+      "searchPlaceholder": "搜索课程...",
+      "all": "全部",
+      "active": "已上架",
+      "draft": "草稿",
+      "archived": "已下架"
+    },
+    "card": {
+      "students": "{{count}} 名学生",
+      "lessons": "{{count}} 课时",
+      "free": "免费",
+      "edit": "编辑",
+      "viewDetail": "查看详情",
+      "archive": "下架",
+      "publish": "上架",
+      "delete": "删除",
+      "confirmDelete": "确定要删除此课程吗？"
+    },
+    "createDialog": {
+      "title": "新建课程",
+      "fields": {
+        "title": "课程标题",
+        "description": "课程描述",
+        "price": "价格（¥）",
+        "category": "分类",
+        "status": "状态"
+      },
+      "statusOptions": {
+        "active": "立即上架",
+        "draft": "保存为草稿"
+      },
+      "submit": "创建课程",
+      "submitting": "创建中...",
+      "cancel": "取消"
+    }
+  },
+  "teacherCourseDetail": {
+    "back": "返回",
+    "loading": "加载中...",
+    "notFound": "课程不存在",
+    "info": {
+      "edit": "编辑",
+      "save": "保存",
+      "saving": "保存中...",
+      "cancel": "取消",
+      "free": "免费",
+      "createdAt": "创建于 {{date}}",
+      "status": {
+        "active": "已上架",
+        "draft": "草稿",
+        "archived": "已下架"
+      },
+      "statusActions": {
+        "active": "上架",
+        "draft": "草稿",
+        "archived": "下架"
+      },
+      "fields": {
+        "title": "课程标题",
+        "description": "课程描述",
+        "price": "价格（¥）",
+        "category": "分类"
+      }
+    },
+    "schedule": {
+      "title": "课程日程",
+      "addButton": "添加课时",
+      "empty": "暂无课时，点击上方按钮添加",
+      "lesson": "第 {{number}} 课"
+    },
+    "addSchedule": {
+      "title": "添加课时",
+      "fields": {
+        "lessonNumber": "课时编号",
+        "locationType": "地点类型",
+        "room": "教室 / 地址",
+        "roomUrl": "网课房间链接",
+        "lessonTitle": "课时标题",
+        "startTime": "开始时间",
+        "endTime": "结束时间"
+      },
+      "locationType": {
+        "physical": "线下地址",
+        "online": "网课房间"
+      },
+      "placeholders": {
+        "room": "例如：A-301",
+        "roomUrl": "例如：https://meeting.example.com/room/123",
+        "title": "例如：矩阵基础"
+      },
+      "submit": "添加课时",
+      "submitting": "添加中...",
+      "cancel": "取消",
+      "confirmDelete": "确定要删除此课时吗？"
+    },
+    "attachment": {
+      "title": "课程附件"
+    },
+    "assignment": {
+      "title": "作业",
+      "addButton": "添加作业",
+      "empty": "暂无作业",
+      "due": "截止：{{date}}",
+      "confirmDelete": "确定要删除此作业吗？"
+    },
+    "addAssignment": {
+      "title": "添加作业",
+      "fields": {
+        "title": "标题",
+        "description": "说明（可选）",
+        "dueDate": "截止日期"
+      },
+      "placeholders": {
+        "title": "例如：第一章课后练习",
+        "description": "作业内容说明"
+      },
+      "submit": "添加作业",
+      "submitting": "添加中...",
+      "cancel": "取消"
+    },
+    "resource": {
+      "title": "课程资源",
+      "addButton": "添加资源",
+      "empty": "暂无课程资源",
+      "featured": "精选",
+      "confirmDelete": "确定要删除此资源吗？"
+    },
+    "addResource": {
+      "title": "添加课程资源",
+      "fields": {
+        "title": "资源名称",
+        "fileType": "文件类型",
+        "fileSize": "文件大小",
+        "featured": "设为精选资源"
+      },
+      "placeholders": {
+        "title": "例如：第一章讲义.pdf",
+        "fileType": "pdf / ppt / doc",
+        "fileSize": "例如：2.5 MB"
+      },
+      "submit": "添加资源",
+      "submitting": "添加中...",
+      "cancel": "取消"
+    }
+  },
+  "publicCourses": {
+    "title": "浏览课程",
+    "subtitle": "发现并报名参与课程",
+    "searchPlaceholder": "搜索课程...",
+    "categories": {
+      "all": "全部",
+      "math": "数学",
+      "physics": "物理",
+      "chemistry": "化学",
+      "english": "英语",
+      "computer": "计算机",
+      "other": "其他"
+    },
+    "card": {
+      "free": "免费",
+      "lessons": "{{count}} 课时",
+      "teacher": "{{name}}"
+    },
+    "empty": {
+      "title": "未找到课程",
+      "description": "尝试其他搜索词或分类"
+    },
+    "loading": "加载中..."
+  },
+  "publicCourseDetail": {
+    "loading": "加载中...",
+    "notFound": "课程不存在",
+    "back": "返回课程列表",
+    "free": "免费",
+    "lessons": "{{count}} 课时",
+    "description": "课程简介",
+    "schedule": {
+      "title": "课程日程",
+      "lesson": "第 {{number}} 课"
+    },
+    "attachments": {
+      "title": "课程附件"
+    },
+    "enrollment": {
+      "loginPrompt": "登录以报名课程",
+      "loginButton": "去登录",
+      "applyNote": "备注（可选）",
+      "applyNotePlaceholder": "向教师添加备注...",
+      "applyButton": "申请报名",
+      "applying": "申请中...",
+      "pendingTitle": "申请审核中",
+      "pendingDesc": "等待教师审核",
+      "approvedTitle": "报名已通过",
+      "approvedDesc": "您已成功报名此课程",
+      "rejectedTitle": "申请未通过",
+      "rejectedReason": "原因：{{reason}}",
+      "reapplyButton": "重新申请",
+      "reapplying": "申请中..."
+    }
+  },
+  "teacherCalendar": {
+    "title": "日历",
+    "subtitle": "管理您的日程和活动",
+    "views": { "month": "月", "week": "周", "day": "天" },
+    "newEvent": "新建活动",
+    "days": {
+      "sun": "日", "mon": "一", "tue": "二", "wed": "三",
+      "thu": "四", "fri": "五", "sat": "六"
+    }
+  },
+  "teacherStudents": {
+    "title": "学生目录",
+    "activeStudents": "在校学生",
+    "searchPlaceholder": "按姓名、学号搜索学生...",
+    "allCourses": "全部课程",
+    "semesters": {
+      "fall2023": "2023年秋季学期",
+      "spring2024": "2024年春季学期",
+      "summer2023": "2023年暑期"
+    },
+    "table": {
+      "shown": "名学生",
+      "exportCsv": "导出CSV",
+      "print": "打印名单",
+      "selected": "已选",
+      "export": "导出",
+      "clear": "清除",
+      "columns": {
+        "name": "学生姓名",
+        "id": "学号",
+        "courses": "选课数",
+        "attendance": "出勤率",
+        "actions": "操作"
+      },
+      "sort": {
+        "nameAsc": "按姓名排序（A-Z）",
+        "nameDesc": "按姓名排序（Z-A）",
+        "attendanceAsc": "按出勤率排序（低→高）",
+        "attendanceDesc": "按出勤率排序（高→低）"
+      },
+      "loading": "加载中...",
+      "emptyAll": "暂无学生数据（尚无学生报名课程）",
+      "emptyFiltered": "没有符合条件的学生",
+      "viewProfile": "查看档案"
+    }
+  },
+  "teacherEnrollments": {
+    "title": "选课管理",
+    "subtitle": "审核和管理学生选课申请",
+    "noCourses": {
+      "title": "未找到课程",
+      "description": "请先创建课程以管理选课申请"
+    },
+    "loading": "加载中...",
+    "empty": {
+      "title": "暂无选课申请",
+      "description": "此课程暂无选课申请"
+    }
+  },
+  "teacherReports": {
+    "title": "报告与分析",
+    "subtitle": "课程与学生数据概览",
+    "kpi": {
+      "totalCourses": "总课程数",
+      "activeCourses": "进行中课程",
+      "enrolledStudents": "选课学生数",
+      "pendingApplications": "待审核申请",
+      "totalLessons": "课程总课时"
+    },
+    "charts": {
+      "gradeDistribution": "成绩分布",
+      "attendanceTrend": "出勤率趋势",
+      "comingSoon": "图表分析功能即将上线"
+    },
+    "reportList": {
+      "title": "报告列表",
+      "autoGenDesc": "自动生成的课程分析报告将在此处显示",
+      "comingSoon": "报告生成功能正在开发中",
+      "stayTuned": "敬请期待"
+    }
+  },
+  "studentGrades": {
+    "title": "成绩单",
+    "loading": "加载中...",
+    "openFilters": "打开筛选",
+    "showing": "显示：",
+    "kpi": {
+      "gpa": "绩点",
+      "classRank": "班级排名",
+      "completion": "完成率"
+    },
+    "chart": {
+      "title": "成绩概览",
+      "vsAverage": "与班级平均分对比",
+      "you": "我",
+      "avg": "均"
+    },
+    "courses": "课程",
+    "coursesCount": "门课程",
+    "teacher": "教师：",
+    "overall": "综合",
+    "midterm": "期中",
+    "final": "期末",
+    "viewBreakdown": "查看详情"
+  },
+  "studentAssignments": {
+    "title": "我的作业",
+    "searchPlaceholder": "搜索作业...",
+    "filters": {
+      "all": "全部",
+      "todo": "待完成",
+      "inProgress": "进行中",
+      "completed": "已完成"
+    },
+    "priority": "重点作业",
+    "submitNow": "立即提交",
+    "thisWeek": "本周",
+    "actions": {
+      "start": "开始",
+      "continue": "继续",
+      "submitLate": "补交"
+    },
+    "status": {
+      "inProgress": "进行中",
+      "done": "已完成",
+      "late": "已逾期",
+      "submitted": "已提交"
+    }
+  },
+  "studentResources": {
+    "title": "资源库",
+    "loading": "加载中...",
+    "totalResources": "资源总数",
+    "featured": "精选",
+    "empty": "该分类暂无资源"
+  },
+  "studentCourseDetail": {
+    "loading": "加载中...",
+    "notFound": "课程不存在",
+    "back": "返回课程列表",
+    "free": "免费",
+    "lessons": "{{count}} 课时",
+    "description": "课程简介",
+    "enrollmentStatus": "选课状态：",
+    "status": {
+      "pending": "审核中",
+      "approved": "已通过",
+      "rejected": "已拒绝"
+    },
+    "applySuccess": "申请已提交！",
+    "viewEnrollments": "查看我的选课",
+    "applyButton": "申请选课",
+    "schedule": {
+      "title": "课程日程",
+      "lesson": "第 {{number}} 课",
+      "joinRoom": "进入课程房间",
+      "scheduleAttachments": "本节附件",
+      "noAttachments": "本节暂无附件"
+    },
+    "attachments": {
+      "title": "课程附件"
+    },
+    "applyDialog": {
+      "title": "申请选课",
+      "description": "向教师填写备注（可选）",
+      "notePlaceholder": "向教师添加备注...",
+      "cancel": "取消",
+      "submit": "提交申请"
+    }
+  },
+  "feedback": {
+    "loading": "加载中...",
+    "notFound": "未找到反馈",
+    "status": {
+      "published": "已发布",
+      "draft": "草稿"
+    },
+    "courseId": "课程 ID：",
+    "session": "第 {{number}} 课",
+    "saving": "保存中...",
+    "draftSaved": "草稿已保存",
+    "date": "日期：",
+    "time": "时间：",
+    "presentStudents": "出勤学生",
+    "studentsPresent": "名学生已签到",
+    "add": "添加",
+    "courseRequirements": "课程要求",
+    "requirementsDesc": "为学生设置预期和要求",
+    "preClassInstructions": "课前学生须知",
+    "postClassFeedback": "课后反馈",
+    "postClassFeedbackDesc": "本节课的笔记和反馈",
+    "mention": "提及",
+    "feedbackPlaceholder": "写下反馈...使用 @ 提及学生",
+    "materialsShared": "课程材料",
+    "materialsDesc": "本节课分享的文件和资源",
+    "attachFileOrLink": "附加文件或链接",
+    "homework": "作业",
+    "homeworkDesc": "为下节课布置作业",
+    "assignmentTitle": "作业标题",
+    "assignmentTitlePlaceholder": "例如：第四章习题集",
+    "dueDate": "截止日期",
+    "saveDraft": "保存草稿",
+    "saveAndPublish": "保存并发布"
   }
 }

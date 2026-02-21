@@ -27,9 +27,14 @@ interface CourseDetailPanelProps {
   onFeedback: () => void;
 }
 
+function isUrl(str: string) {
+  return /^https?:\/\//i.test(str);
+}
+
 export function CourseDetailPanel({ event, onClose, onNavigate, onFeedback }: CourseDetailPanelProps) {
   const { t } = useTranslation();
   const c = courseColors[event.colorIdx];
+  const roomIsUrl = !!event.room && isUrl(event.room);
   const startTime = new Date(event.start_time).toLocaleString("en-US", {
     weekday: "short", month: "short", day: "numeric",
     hour: "numeric", minute: "2-digit", hour12: true,
@@ -50,7 +55,7 @@ export function CourseDetailPanel({ event, onClose, onNavigate, onFeedback }: Co
         </Badge>
         <h3 className="pr-6 text-base font-bold text-gray-900">{event.course_title}</h3>
         <p className="mt-1 text-xs text-gray-600">{startTime} – {endTime}</p>
-        {event.room && (
+        {event.room && !roomIsUrl && (
           <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
             <MapPin className="h-3 w-3" />
             {event.room}
@@ -58,13 +63,17 @@ export function CourseDetailPanel({ event, onClose, onNavigate, onFeedback }: Co
         )}
       </div>
 
-      {/* Join button */}
-      <div className="border-b border-gray-100 px-4 py-3">
-        <Button className="w-full gap-2 bg-blue-600 hover:bg-blue-700" size="sm">
-          <ExternalLink className="h-4 w-4" />
-          {t("schedule.joinStream")}
-        </Button>
-      </div>
+      {/* Join room button — only shown when room is a URL */}
+      {roomIsUrl && (
+        <div className="border-b border-gray-100 px-4 py-3">
+          <a href={event.room} target="_blank" rel="noopener noreferrer">
+            <Button className="w-full gap-2 bg-blue-600 hover:bg-blue-700" size="sm">
+              <ExternalLink className="h-4 w-4" />
+              {t("schedule.joinRoom")}
+            </Button>
+          </a>
+        </div>
+      )}
 
       {/* Tabs */}
       <Tabs defaultValue="instructions">

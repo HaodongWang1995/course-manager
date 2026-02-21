@@ -9,6 +9,7 @@ import {
   Input,
   Label,
 } from "@course-manager/ui";
+import { useTranslation } from "react-i18next";
 
 interface AddResourceDialogProps {
   open: boolean;
@@ -28,6 +29,7 @@ export function AddResourceDialog({
   onAdd,
   isLoading,
 }: AddResourceDialogProps) {
+  const { t } = useTranslation("teacherCourseDetail");
   const [title, setTitle] = useState("");
   const [fileType, setFileType] = useState("");
   const [fileSize, setFileSize] = useState("");
@@ -58,36 +60,36 @@ export function AddResourceDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>添加课程资源</DialogTitle>
+          <DialogTitle>{t("addResource.title")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="res-title">资源名称 *</Label>
+            <Label htmlFor="res-title">{t("addResource.fields.title")}</Label>
             <Input
               id="res-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="例如：第一章讲义.pdf"
+              placeholder={t("addResource.placeholders.title")}
               required
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="res-type">文件类型</Label>
+              <Label htmlFor="res-type">{t("addResource.fields.fileType")}</Label>
               <Input
                 id="res-type"
                 value={fileType}
                 onChange={(e) => setFileType(e.target.value)}
-                placeholder="pdf / ppt / doc"
+                placeholder={t("addResource.placeholders.fileType")}
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="res-size">文件大小</Label>
+              <Label htmlFor="res-size">{t("addResource.fields.fileSize")}</Label>
               <Input
                 id="res-size"
                 value={fileSize}
                 onChange={(e) => setFileSize(e.target.value)}
-                placeholder="例如：2.5 MB"
+                placeholder={t("addResource.placeholders.fileSize")}
               />
             </div>
           </div>
@@ -100,15 +102,15 @@ export function AddResourceDialog({
               className="h-4 w-4 rounded border-gray-300"
             />
             <Label htmlFor="res-featured" className="cursor-pointer text-sm">
-              设为精选资源
+              {t("addResource.fields.featured")}
             </Label>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => handleClose(false)}>
-              取消
+              {t("addResource.cancel")}
             </Button>
             <Button type="submit" disabled={isLoading || !title.trim()}>
-              {isLoading ? "添加中..." : "添加资源"}
+              {isLoading ? t("addResource.submitting") : t("addResource.submit")}
             </Button>
           </DialogFooter>
         </form>

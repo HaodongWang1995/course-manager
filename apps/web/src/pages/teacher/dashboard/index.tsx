@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -24,11 +25,11 @@ import { useTeacherSchedule, useUpcomingDeadlines, useCurrentUser } from "@/hook
 import { WelcomeHeader } from "./components/welcome-header";
 import { DeadlineList } from "./components/deadline-list";
 
-const quickActions = [
-  { icon: ClipboardList, label: "Assignment", color: "bg-blue-100 text-blue-600", path: "/teacher/courses" },
-  { icon: Megaphone, label: "Announcement", color: "bg-orange-100 text-orange-600", path: "/teacher/courses" },
-  { icon: MessageSquare, label: "Message", color: "bg-green-100 text-green-600", path: "/teacher/students" },
-  { icon: FileBarChart, label: "Report", color: "bg-purple-100 text-purple-600", path: "/teacher/reports" },
+const quickActionDefs = [
+  { icon: ClipboardList, key: "assignment" as const, color: "bg-blue-100 text-blue-600", path: "/teacher/courses" },
+  { icon: Megaphone, key: "announcement" as const, color: "bg-orange-100 text-orange-600", path: "/teacher/courses" },
+  { icon: MessageSquare, key: "message" as const, color: "bg-green-100 text-green-600", path: "/teacher/students" },
+  { icon: FileBarChart, key: "report" as const, color: "bg-purple-100 text-purple-600", path: "/teacher/reports" },
 ];
 
 function getCourseType(title: string, lessonTitle?: string): "Lecture" | "Lab" | "Admin" {
@@ -52,11 +53,12 @@ const statusStyle: Record<string, string> = {
 };
 
 export function TeacherDashboardPage() {
+  const { t } = useTranslation("dashboard");
   const navigate = useNavigate();
   const { data: user } = useCurrentUser();
   const { data: schedule = [] } = useTeacherSchedule();
   const { data: deadlines = [] } = useUpcomingDeadlines();
-  const [semester] = useState("Fall Semester 2023");
+  const [semester] = useState(() => t("semester.fall2023"));
   const [showSemesterMenu, setShowSemesterMenu] = useState(false);
 
   const [calMonth, setCalMonth] = useState(() => new Date(2026, 1, 1));
@@ -100,7 +102,7 @@ export function TeacherDashboardPage() {
     <div className="space-y-6">
       {/* Semester Selector Row */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
         <div className="relative">
           <button
             className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
@@ -111,7 +113,7 @@ export function TeacherDashboardPage() {
           </button>
           {showSemesterMenu && (
             <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
-              {["Spring Semester 2026", "Fall Semester 2025", "Fall Semester 2023"].map((s) => (
+              {[t("semester.spring2026"), t("semester.fall2025"), t("semester.fall2023")].map((s) => (
                 <button
                   key={s}
                   className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${s === semester ? "font-semibold text-blue-600" : "text-gray-700"}`}
@@ -139,7 +141,7 @@ export function TeacherDashboardPage() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg">Today's Schedule</CardTitle>
+                  <CardTitle className="text-lg">{t("scheduleSection.title")}</CardTitle>
                   <p className="mt-0.5 text-xs text-gray-400">
                     {today.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
                   </p>
@@ -148,13 +150,13 @@ export function TeacherDashboardPage() {
                   className="text-sm font-medium text-blue-600 hover:underline"
                   onClick={() => navigate({ to: "/teacher/calendar" })}
                 >
-                  View Full Calendar →
+                  {t("scheduleSection.viewCalendar")}
                 </button>
               </div>
             </CardHeader>
             <CardContent className="space-y-0 divide-y divide-gray-50">
               {todaySchedule.length === 0 ? (
-                <p className="py-6 text-center text-sm text-gray-400">No classes scheduled for today</p>
+                <p className="py-6 text-center text-sm text-gray-400">{t("scheduleSection.noClasses")}</p>
               ) : (
                 todaySchedule.map((item) => (
                   <div
@@ -171,7 +173,7 @@ export function TeacherDashboardPage() {
                         <span
                           className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold border ${typeStyles[item.type]}`}
                         >
-                          {item.type}
+                          {t(`courseType.${item.type}`)}
                         </span>
                       </div>
                       <div className="mt-0.5 flex items-center gap-3 text-xs text-gray-400">
@@ -181,7 +183,7 @@ export function TeacherDashboardPage() {
                         </span>
                         <span className="flex items-center gap-1">
                           <Users className="h-3 w-3" />
-                          {item.students} Students
+                          {t("scheduleSection.students", { count: item.students })}
                         </span>
                       </div>
                     </div>
@@ -189,7 +191,7 @@ export function TeacherDashboardPage() {
                       variant="outline"
                       className={`shrink-0 text-xs ${statusStyle[item.status] || statusStyle.Scheduled}`}
                     >
-                      {item.status}
+                      {t(`status.${item.status}`)}
                     </Badge>
                   </div>
                 ))
@@ -200,22 +202,22 @@ export function TeacherDashboardPage() {
           {/* Quick Actions */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Quick Actions</CardTitle>
+              <CardTitle className="text-lg">{t("quickActions.title")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {quickActions.map((action) => {
+                {quickActionDefs.map((action) => {
                   const Icon = action.icon;
                   return (
                     <button
-                      key={action.label}
+                      key={action.key}
                       onClick={() => navigate({ to: action.path })}
                       className="flex flex-col items-center gap-2 rounded-xl border border-gray-100 p-4 transition-colors hover:bg-gray-50"
                     >
                       <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${action.color}`}>
                         <Icon className="h-5 w-5" />
                       </div>
-                      <span className="text-sm font-medium text-gray-700">{action.label}</span>
+                      <span className="text-sm font-medium text-gray-700">{t(`quickActions.${action.key}`)}</span>
                     </button>
                   );
                 })}
@@ -256,7 +258,7 @@ export function TeacherDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-7 gap-0.5 text-center">
-                {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+                {[t("calendarDays.su"), t("calendarDays.mo"), t("calendarDays.tu"), t("calendarDays.we"), t("calendarDays.th"), t("calendarDays.fr"), t("calendarDays.sa")].map((d) => (
                   <div key={d} className="py-1 text-[11px] font-medium text-gray-400">
                     {d}
                   </div>

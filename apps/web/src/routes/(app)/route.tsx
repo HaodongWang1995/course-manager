@@ -33,7 +33,9 @@ function AppLayout() {
   const location = useLocation();
   const { t } = useTranslation();
   const isTeacherRoute = location.pathname.startsWith("/teacher");
-  const role = isTeacherRoute ? "teacher" : "student";
+  const isCourseBrowse = location.pathname.startsWith("/courses");
+  // Course browse is accessible to any authenticated user (teacher or student)
+  const role = isTeacherRoute ? "teacher" : isCourseBrowse ? undefined : "student";
   const { user, isLoading, isAuthed } = useAuthGuard(role);
   const handleLogout = useAuthLogout();
 

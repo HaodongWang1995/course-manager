@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import {
   Button,
   Card,
@@ -71,6 +72,7 @@ export function getCoverGradient(idx: number): string {
 
 export function CourseActionsMenu({ course }: { course: Course }) {
   const navigate = useNavigate();
+  const { t } = useTranslation("teacherCourses");
   const deleteMutation = useDeleteCourse();
   const statusMutation = useUpdateCourseStatus();
 
@@ -93,7 +95,7 @@ export function CourseActionsMenu({ course }: { course: Course }) {
           }}
         >
           <Eye className="mr-2 h-4 w-4" />
-          查看详情
+          {t("card.viewDetail")}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={(e) => {
@@ -102,7 +104,7 @@ export function CourseActionsMenu({ course }: { course: Course }) {
           }}
         >
           <Edit className="mr-2 h-4 w-4" />
-          编辑课程
+          {t("card.edit")}
         </DropdownMenuItem>
         {course.status === "active" ? (
           <DropdownMenuItem
@@ -112,7 +114,7 @@ export function CourseActionsMenu({ course }: { course: Course }) {
             }}
           >
             <EyeOff className="mr-2 h-4 w-4" />
-            下架课程
+            {t("card.archive")}
           </DropdownMenuItem>
         ) : (
           <DropdownMenuItem
@@ -122,20 +124,20 @@ export function CourseActionsMenu({ course }: { course: Course }) {
             }}
           >
             <Eye className="mr-2 h-4 w-4" />
-            上架课程
+            {t("card.publish")}
           </DropdownMenuItem>
         )}
         <DropdownMenuItem
           className="text-red-600"
           onClick={(e) => {
             e.stopPropagation();
-            if (window.confirm(`确定要删除课程 "${course.title}" 吗？`)) {
+            if (window.confirm(t("card.confirmDelete"))) {
               deleteMutation.mutate(course.id);
             }
           }}
         >
           <Trash2 className="mr-2 h-4 w-4" />
-          删除课程
+          {t("card.delete")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -144,6 +146,7 @@ export function CourseActionsMenu({ course }: { course: Course }) {
 
 export function CourseGridCard({ course, index }: { course: Course; index: number }) {
   const navigate = useNavigate();
+  const { t } = useTranslation("teacherCourses");
   const gradient = getCoverGradient(index);
   const courseCode = getCourseCode(course.category, index);
   const lessonCount = Number(course.lesson_count) || 0;
@@ -190,11 +193,11 @@ export function CourseGridCard({ course, index }: { course: Course; index: numbe
         <div className="mt-3 flex items-center gap-4 text-sm text-gray-500">
           <div className="flex items-center gap-1.5">
             <Users className="h-3.5 w-3.5 text-gray-400" />
-            <span>{enrollmentCount} Students</span>
+            <span>{t("card.students", { count: enrollmentCount })}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <BookOpen className="h-3.5 w-3.5 text-gray-400" />
-            <span>{lessonCount} Lessons</span>
+            <span>{t("card.lessons", { count: lessonCount })}</span>
           </div>
         </div>
 

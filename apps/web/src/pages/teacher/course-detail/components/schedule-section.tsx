@@ -2,6 +2,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle } from "@course-manage
 import { Clock, MapPin, Plus, Trash2 } from "lucide-react";
 import type { Schedule } from "@/api/client";
 import { formatLocalDateTime, formatLocalTime } from "@/lib/time";
+import { useTranslation } from "react-i18next";
 
 interface ScheduleSectionProps {
   schedules: Schedule[];
@@ -14,18 +15,19 @@ export function ScheduleSection({
   onDelete,
   onRequestAdd,
 }: ScheduleSectionProps) {
+  const { t } = useTranslation("teacherCourseDetail");
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>课程日程 ({schedules.length})</CardTitle>
+        <CardTitle>{t("schedule.title")} ({schedules.length})</CardTitle>
         <Button size="sm" className="gap-1" onClick={onRequestAdd}>
           <Plus className="h-4 w-4" />
-          添加课时
+          {t("schedule.addButton")}
         </Button>
       </CardHeader>
       <CardContent>
         {schedules.length === 0 ? (
-          <p className="py-8 text-center text-sm text-gray-500">暂无课时，点击上方按钮添加</p>
+          <p className="py-8 text-center text-sm text-gray-500">{t("schedule.empty")}</p>
         ) : (
           <div className="space-y-3">
             {schedules.map((s) => (
@@ -38,7 +40,7 @@ export function ScheduleSection({
                 </div>
                 <div className="flex-1">
                   <h4 className="text-sm font-medium text-gray-900">
-                    {s.title || `第 ${s.lesson_number} 课`}
+                    {s.title || t("schedule.lesson", { number: s.lesson_number })}
                   </h4>
                   <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-gray-500">
                     <span className="flex items-center gap-1">
@@ -58,7 +60,7 @@ export function ScheduleSection({
                   variant="ghost-destructive"
                   size="icon"
                   onClick={() => {
-                    if (window.confirm("确定要删除此课时吗？")) {
+                    if (window.confirm(t("addSchedule.confirmDelete"))) {
                       onDelete(s.id);
                     }
                   }}

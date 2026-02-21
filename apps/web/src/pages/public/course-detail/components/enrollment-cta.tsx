@@ -1,4 +1,5 @@
 import { AlertCircle, CheckCircle, XCircle, Clock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@course-manager/ui";
 
 export interface EnrollmentCTAProps {
@@ -27,12 +28,14 @@ export function EnrollmentCTA({
   error,
   onLogin,
 }: EnrollmentCTAProps) {
+  const { t } = useTranslation("publicCourseDetail");
+
   if (!isLoggedIn) {
     return (
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-gray-500">登录后即可申请选课</p>
+        <p className="text-sm text-gray-500">{t("enrollment.loginPrompt")}</p>
         <Button onClick={onLogin} className="shrink-0">
-          登录后申请选课
+          {t("enrollment.loginButton")}
         </Button>
       </div>
     );
@@ -49,10 +52,13 @@ export function EnrollmentCTA({
   if (!enrollment) {
     return (
       <div className="space-y-3">
+        <label className="block text-sm font-medium text-gray-700">
+          {t("enrollment.applyNote")}
+        </label>
         <textarea
           value={note}
           onChange={(e) => onNoteChange(e.target.value)}
-          placeholder="申请备注（可选）"
+          placeholder={t("enrollment.applyNotePlaceholder")}
           rows={2}
           className="w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
@@ -63,7 +69,7 @@ export function EnrollmentCTA({
           </p>
         )}
         <Button onClick={onApply} disabled={applying} className="w-full">
-          {applying ? "提交中..." : "申请选课"}
+          {applying ? t("enrollment.applying") : t("enrollment.applyButton")}
         </Button>
       </div>
     );
@@ -73,9 +79,12 @@ export function EnrollmentCTA({
     return (
       <div className="flex items-center gap-2">
         <Clock className="h-5 w-5 text-amber-500" />
-        <span className="text-sm font-medium text-amber-600">
-          选课申请已提交，等待教师审核
-        </span>
+        <div>
+          <p className="text-sm font-medium text-amber-600">
+            {t("enrollment.pendingTitle")}
+          </p>
+          <p className="text-xs text-amber-500">{t("enrollment.pendingDesc")}</p>
+        </div>
       </div>
     );
   }
@@ -84,9 +93,12 @@ export function EnrollmentCTA({
     return (
       <div className="flex items-center gap-2">
         <CheckCircle className="h-5 w-5 text-emerald-500" />
-        <span className="text-sm font-medium text-emerald-600">
-          已选课，祝学习顺利！
-        </span>
+        <div>
+          <p className="text-sm font-medium text-emerald-600">
+            {t("enrollment.approvedTitle")}
+          </p>
+          <p className="text-xs text-emerald-500">{t("enrollment.approvedDesc")}</p>
+        </div>
       </div>
     );
   }
@@ -96,15 +108,21 @@ export function EnrollmentCTA({
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <XCircle className="h-5 w-5 text-red-500" />
-          <span className="text-sm font-medium text-red-600">
-            申请未通过
-            {enrollment.reject_reason ? `：${enrollment.reject_reason}` : ""}
-          </span>
+          <div>
+            <p className="text-sm font-medium text-red-600">
+              {t("enrollment.rejectedTitle")}
+            </p>
+            {enrollment.reject_reason && (
+              <p className="text-xs text-red-500">
+                {t("enrollment.rejectedReason", { reason: enrollment.reject_reason })}
+              </p>
+            )}
+          </div>
         </div>
         <textarea
           value={note}
           onChange={(e) => onNoteChange(e.target.value)}
-          placeholder="重新申请备注（可选）"
+          placeholder={t("enrollment.applyNotePlaceholder")}
           rows={2}
           className="w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
@@ -114,7 +132,7 @@ export function EnrollmentCTA({
           variant="outline"
           className="w-full"
         >
-          {applying ? "提交中..." : "重新申请"}
+          {applying ? t("enrollment.reapplying") : t("enrollment.reapplyButton")}
         </Button>
       </div>
     );

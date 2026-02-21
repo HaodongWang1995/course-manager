@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@course-manager/ui";
 import { FormTextField, FormTextareaField, FormSelectField } from "@/components/form-field";
+import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import { courseFormValidator } from "@/lib/schemas";
 
@@ -27,6 +28,7 @@ export function CreateCourseDialog({
   onClose,
   isLoading,
 }: CreateCourseDialogProps) {
+  const { t } = useTranslation("teacherCourses");
   const form = useForm({
     defaultValues: {
       title: "",
@@ -53,8 +55,8 @@ export function CreateCourseDialog({
   return (
     <DialogContent className="sm:max-w-lg">
       <DialogHeader>
-        <DialogTitle>新建课程</DialogTitle>
-        <DialogDescription>填写课程基本信息，创建后可继续编辑详情</DialogDescription>
+        <DialogTitle>{t("createDialog.title")}</DialogTitle>
+        <DialogDescription>{t("subtitle")}</DialogDescription>
       </DialogHeader>
       <form
         onSubmit={(e) => {
@@ -67,7 +69,7 @@ export function CreateCourseDialog({
           {(field) => (
             <FormTextField
               field={field}
-              label="课程标题"
+              label={t("createDialog.fields.title")}
               required
               placeholder="例如: 线性代数"
               autoFocus
@@ -79,7 +81,7 @@ export function CreateCourseDialog({
           {(field) => (
             <FormTextareaField
               field={field}
-              label="课程描述"
+              label={t("createDialog.fields.description")}
               placeholder="简要介绍课程内容和目标..."
             />
           )}
@@ -90,7 +92,7 @@ export function CreateCourseDialog({
             {(field) => (
               <FormTextField
                 field={field}
-                label="价格 (¥)"
+                label={t("createDialog.fields.price")}
                 type="number"
                 placeholder="0.00"
                 step="0.01"
@@ -103,7 +105,7 @@ export function CreateCourseDialog({
             {(field) => (
               <FormTextField
                 field={field}
-                label="分类"
+                label={t("createDialog.fields.category")}
                 placeholder="例如: 数学"
               />
             )}
@@ -114,10 +116,10 @@ export function CreateCourseDialog({
           {(field) => (
             <FormSelectField
               field={field}
-              label="发布状态"
+              label={t("createDialog.fields.status")}
               options={[
-                { value: "active", label: "立即上架" },
-                { value: "draft", label: "保存为草稿" },
+                { value: "active", label: t("createDialog.statusOptions.active") },
+                { value: "draft", label: t("createDialog.statusOptions.draft") },
               ]}
             />
           )}
@@ -125,10 +127,10 @@ export function CreateCourseDialog({
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onClose}>
-            取消
+            {t("createDialog.cancel")}
           </Button>
           <Button type="submit" disabled={isLoading} className="min-w-[100px]">
-            {isLoading ? "创建中..." : "创建课程"}
+            {isLoading ? t("createDialog.submitting") : t("createDialog.submit")}
           </Button>
         </DialogFooter>
       </form>

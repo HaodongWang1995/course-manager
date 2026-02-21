@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, Input, Label, Checkbox } from "@course-manager/ui";
 import {
   GraduationCap,
@@ -26,6 +27,7 @@ interface DesktopLoginLayoutProps {
 }
 
 export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
+  const { t } = useTranslation("auth");
   const loginMutation = useLogin();
   const registerMutation = useRegister();
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -106,7 +108,7 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
                     : "text-gray-500 hover:text-gray-700"
                 }`}
               >
-                Login
+                {t("tabs.login")}
               </button>
               <button
                 type="button"
@@ -117,7 +119,7 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
                     : "text-gray-500 hover:text-gray-700"
                 }`}
               >
-                Sign Up
+                {t("tabs.register")}
               </button>
             </div>
           </div>
@@ -138,14 +140,14 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
                 {(field) => (
                   <div className="space-y-1.5">
                     <Label htmlFor="d-email" className="text-sm font-medium text-slate-900">
-                      Email Address
+                      {t("fields.email")}
                     </Label>
                     <div className="relative">
                       <Mail className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                       <Input
                         id="d-email"
                         type="email"
-                        placeholder="name@example.com"
+                        placeholder={t("placeholders.email")}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
@@ -163,14 +165,14 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
                 {(field) => (
                   <div className="space-y-1.5">
                     <Label htmlFor="d-password" className="text-sm font-medium text-slate-900">
-                      Password
+                      {t("fields.password")}
                     </Label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                       <Input
                         id="d-password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
+                        placeholder={t("placeholders.password")}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
@@ -197,10 +199,10 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
                     checked={rememberMe}
                     onCheckedChange={(checked) => setRememberMe(checked === true)}
                   />
-                  <span className="text-sm text-slate-500">Remember me</span>
+                  <span className="text-sm text-slate-500">{t("login.rememberMe")}</span>
                 </label>
                 <button type="button" className="text-sm font-medium text-[#137FEC]">
-                  Forgot Password?
+                  {t("login.forgotPassword")}
                 </button>
               </div>
 
@@ -209,14 +211,14 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
                 className="mt-2 h-12 w-full rounded-lg bg-[#137FEC] text-base font-bold shadow-md hover:bg-[#1172d4]"
                 disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? t("login.submitting") : t("login.submit")}
               </Button>
             </form>
           ) : (
             <>
               {/* Role Selection — only shown during registration */}
               <div className="mt-5">
-                <p className="text-base font-medium text-slate-900">I am a...</p>
+                <p className="text-base font-medium text-slate-900">{t("role.prompt")}</p>
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <button
                     type="button"
@@ -236,7 +238,7 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
                     <span
                       className={`text-sm font-semibold ${role === "student" ? "text-[#137FEC]" : "text-slate-500"}`}
                     >
-                      Student
+                      {t("role.student")}
                     </span>
                   </button>
                   <button
@@ -257,7 +259,7 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
                     <span
                       className={`text-sm font-semibold ${role === "teacher" ? "text-[#137FEC]" : "text-slate-500"}`}
                     >
-                      Teacher
+                      {t("role.teacher")}
                     </span>
                   </button>
                 </div>
@@ -271,12 +273,12 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
                   {(field) => (
                     <div className="space-y-1.5">
                       <Label htmlFor="d-reg-name" className="text-sm font-medium text-slate-900">
-                        Full Name
+                        {t("fields.name")}
                       </Label>
                       <Input
                         id="d-reg-name"
                         type="text"
-                        placeholder="Your full name"
+                        placeholder={t("placeholders.name")}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
@@ -293,14 +295,14 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
                   {(field) => (
                     <div className="space-y-1.5">
                       <Label htmlFor="d-reg-email" className="text-sm font-medium text-slate-900">
-                        Email Address
+                        {t("fields.email")}
                       </Label>
                       <div className="relative">
                         <Mail className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                         <Input
                           id="d-reg-email"
                           type="email"
-                          placeholder="name@example.com"
+                          placeholder={t("placeholders.email")}
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
                           onBlur={field.handleBlur}
@@ -318,14 +320,14 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
                   {(field) => (
                     <div className="space-y-1.5">
                       <Label htmlFor="d-reg-password" className="text-sm font-medium text-slate-900">
-                        Password
+                        {t("fields.password")}
                       </Label>
                       <div className="relative">
                         <Lock className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                         <Input
                           id="d-reg-password"
                           type={showPassword ? "text" : "password"}
-                          placeholder="At least 6 characters"
+                          placeholder={t("placeholders.passwordRegister")}
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
                           onBlur={field.handleBlur}
@@ -351,7 +353,7 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
                   className="mt-2 h-12 w-full rounded-lg bg-[#137FEC] text-base font-bold shadow-md hover:bg-[#1172d4]"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Signing up..." : "Sign Up"}
+                  {isLoading ? t("register.submitting") : t("register.submit")}
                 </Button>
               </form>
             </>
@@ -361,22 +363,22 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
           <p className="mt-5 text-center text-sm text-slate-500">
             {tab === "login" ? (
               <>
-                Don&apos;t have an account?{" "}
+                {t("footer.noAccount")}{" "}
                 <button
                   onClick={() => { setTab("register"); setError(""); }}
                   className="font-bold text-[#137FEC]"
                 >
-                  Sign Up
+                  {t("footer.signUpLink")}
                 </button>
               </>
             ) : (
               <>
-                Already have an account?{" "}
+                {t("footer.hasAccount")}{" "}
                 <button
                   onClick={() => { setTab("login"); setError(""); }}
                   className="font-bold text-[#137FEC]"
                 >
-                  Login
+                  {t("footer.loginLink")}
                 </button>
               </>
             )}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, Input, Label, Checkbox } from "@course-manager/ui";
 import {
   GraduationCap,
@@ -26,6 +27,7 @@ interface MobileLoginLayoutProps {
 }
 
 export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
+  const { t } = useTranslation("auth");
   const loginMutation = useLogin();
   const registerMutation = useRegister();
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -109,14 +111,14 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
               {(field) => (
                 <div className="space-y-1.5">
                   <Label htmlFor="m-email" className="text-sm font-medium text-slate-900">
-                    Email Address
+                    {t("fields.email")}
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                     <Input
                       id="m-email"
                       type="email"
-                      placeholder="name@example.com"
+                      placeholder={t("placeholders.email")}
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
@@ -134,14 +136,14 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
               {(field) => (
                 <div className="space-y-1.5">
                   <Label htmlFor="m-password" className="text-sm font-medium text-slate-900">
-                    Password
+                    {t("fields.password")}
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                     <Input
                       id="m-password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder={t("placeholders.password")}
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
@@ -168,10 +170,10 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(checked === true)}
                 />
-                <span className="text-sm text-slate-500">Remember me</span>
+                <span className="text-sm text-slate-500">{t("login.rememberMe")}</span>
               </label>
               <button type="button" className="text-sm font-medium text-[#137FEC]">
-                Forgot Password?
+                {t("login.forgotPassword")}
               </button>
             </div>
 
@@ -180,14 +182,14 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
               className="mt-2 h-12 w-full rounded-lg bg-[#137FEC] text-base font-bold shadow-md hover:bg-[#1172d4]"
               disabled={isLoading}
             >
-              {isLoading ? "Logging in..." : "Login"}
+              {isLoading ? t("login.submitting") : t("login.submit")}
             </Button>
           </form>
         ) : (
           <>
             {/* Role Selection — only shown during registration */}
             <div className="mt-6">
-              <p className="text-base font-medium text-slate-900">I am a...</p>
+              <p className="text-base font-medium text-slate-900">{t("role.prompt")}</p>
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <button
                   type="button"
@@ -207,7 +209,7 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
                   <span
                     className={`text-sm font-semibold ${role === "student" ? "text-[#137FEC]" : "text-slate-500"}`}
                   >
-                    Student
+                    {t("role.student")}
                   </span>
                 </button>
                 <button
@@ -228,7 +230,7 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
                   <span
                     className={`text-sm font-semibold ${role === "teacher" ? "text-[#137FEC]" : "text-slate-500"}`}
                   >
-                    Teacher
+                    {t("role.teacher")}
                   </span>
                 </button>
               </div>
@@ -242,12 +244,12 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
                 {(field) => (
                   <div className="space-y-1.5">
                     <Label htmlFor="m-reg-name" className="text-sm font-medium text-slate-900">
-                      Name
+                      {t("fields.name")}
                     </Label>
                     <Input
                       id="m-reg-name"
                       type="text"
-                      placeholder="Your name"
+                      placeholder={t("placeholders.name")}
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
@@ -264,14 +266,14 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
                 {(field) => (
                   <div className="space-y-1.5">
                     <Label htmlFor="m-reg-email" className="text-sm font-medium text-slate-900">
-                      Email Address
+                      {t("fields.email")}
                     </Label>
                     <div className="relative">
                       <Mail className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                       <Input
                         id="m-reg-email"
                         type="email"
-                        placeholder="name@example.com"
+                        placeholder={t("placeholders.email")}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
@@ -289,14 +291,14 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
                 {(field) => (
                   <div className="space-y-1.5">
                     <Label htmlFor="m-reg-password" className="text-sm font-medium text-slate-900">
-                      Password
+                      {t("fields.password")}
                     </Label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                       <Input
                         id="m-reg-password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="At least 6 characters"
+                        placeholder={t("placeholders.passwordRegister")}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
@@ -322,7 +324,7 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
                 className="mt-2 h-12 w-full rounded-lg bg-[#137FEC] text-base font-bold shadow-md hover:bg-[#1172d4]"
                 disabled={isLoading}
               >
-                {isLoading ? "Registering..." : "Sign Up"}
+                {isLoading ? t("register.submitting") : t("register.submit")}
               </Button>
             </form>
           </>
@@ -332,22 +334,22 @@ export function MobileLoginLayout({ onSuccess }: MobileLoginLayoutProps) {
         <p className="mt-6 text-center text-sm text-slate-500">
           {tab === "login" ? (
             <>
-              Don&apos;t have an account?{" "}
+              {t("footer.noAccount")}{" "}
               <button
                 onClick={() => { setTab("register"); setError(""); }}
                 className="font-bold text-[#137FEC]"
               >
-                Sign Up
+                {t("footer.signUpLink")}
               </button>
             </>
           ) : (
             <>
-              Already have an account?{" "}
+              {t("footer.hasAccount")}{" "}
               <button
                 onClick={() => { setTab("login"); setError(""); }}
                 className="font-bold text-[#137FEC]"
               >
-                Login
+                {t("footer.loginLink")}
               </button>
             </>
           )}

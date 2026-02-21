@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { CloudUpload, FolderOpen, ArrowLeft } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useStudentResources } from "@/hooks/use-queries";
 import { FeaturedGrid } from "./components/featured-grid";
 import { ResourceList } from "./components/resource-list";
@@ -11,6 +12,7 @@ function matchesCategory(course: string, category: string) {
 }
 
 export function StudentResourcesPage() {
+  const { t } = useTranslation("studentResources");
   const { data: resources, isLoading } = useStudentResources();
   const [activeCategory, setActiveCategory] = useState<string>("All");
 
@@ -27,7 +29,7 @@ export function StudentResourcesPage() {
   if (isLoading || !resources) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">加载中...</div>
+        <div className="text-gray-500">{t("loading")}</div>
       </div>
     );
   }
@@ -45,7 +47,7 @@ export function StudentResourcesPage() {
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-lg font-bold tracking-[-0.45px] text-[#137fec]">Library</h1>
+            <h1 className="text-lg font-bold tracking-[-0.45px] text-[#137fec]">{t("title")}</h1>
           </div>
           <div className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 bg-slate-200 text-[10px] font-semibold text-slate-600">
             TS
@@ -66,14 +68,14 @@ export function StudentResourcesPage() {
             <p className="text-2xl font-bold leading-8 text-slate-900">
               {resources.all.length + resources.featured.length}
             </p>
-            <p className="text-xs text-slate-500">Total Resources</p>
+            <p className="text-xs text-slate-500">{t("totalResources")}</p>
           </article>
           <article className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
             <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-emerald-500">
               <CloudUpload className="h-5 w-5" />
             </div>
             <p className="text-2xl font-bold leading-8 text-slate-900">{resources.featured.length}</p>
-            <p className="text-xs text-slate-500">Featured</p>
+            <p className="text-xs text-slate-500">{t("featured")}</p>
           </article>
         </section>
 
@@ -86,7 +88,7 @@ export function StudentResourcesPage() {
         {filteredFeatured.length === 0 && filteredAll.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <FolderOpen className="mb-3 h-10 w-10 text-slate-300" />
-            <p className="text-sm font-medium text-slate-500">No resources in this category</p>
+            <p className="text-sm font-medium text-slate-500">{t("empty")}</p>
           </div>
         )}
       </main>

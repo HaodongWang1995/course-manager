@@ -15,6 +15,37 @@
     "home": "Home",
     "browse": "Browse"
   },
+  "auth": {
+    "tabs": { "login": "Login", "register": "Sign Up" },
+    "role": { "prompt": "I am a...", "student": "Student", "teacher": "Teacher" },
+    "fields": {
+      "email": "Email Address",
+      "password": "Password",
+      "name": "Full Name"
+    },
+    "placeholders": {
+      "email": "name@example.com",
+      "password": "Enter your password",
+      "passwordRegister": "At least 6 characters",
+      "name": "Your full name"
+    },
+    "login": {
+      "submit": "Login",
+      "submitting": "Logging in...",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot Password?"
+    },
+    "register": {
+      "submit": "Sign Up",
+      "submitting": "Signing up..."
+    },
+    "footer": {
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign Up",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Login"
+    }
+  },
   "enrollments": {
     "title": "My Enrollments",
     "subtitle": "Track your course enrollment applications",
@@ -147,6 +178,8 @@
     "viewResources": "View Course Resources",
     "seeSyllabus": "See Course Syllabus →",
     "requirements": "Requirements",
+    "upcomingClasses": "Upcoming Classes",
+    "joinRoom": "Join Room",
     "loading": "Loading..."
   },
   "common": {
@@ -156,5 +189,564 @@
     "search": "Search",
     "comingSoon": "Coming Soon",
     "backToList": "Back to List"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "stats": "Stats",
+      "courses": "Courses",
+      "testimonials": "Testimonials",
+      "login": "Log in",
+      "browseCourses": "Browse Courses"
+    },
+    "hero": {
+      "badge": "Now in Beta",
+      "title": "Modern Course Management for",
+      "titleHighlight": "Educators",
+      "description": "Streamline your teaching workflow with powerful tools for course management, student tracking, and performance analytics. Built for teachers and students alike.",
+      "startTeaching": "Start Teaching",
+      "browseCourses": "Browse Courses"
+    },
+    "stats": {
+      "title": "Trusted by Educators",
+      "subtitle": "Join thousands of teachers already using EduManager",
+      "activeTeachers": "Active Teachers",
+      "studentsEnrolled": "Students Enrolled",
+      "coursesCreated": "Courses Created",
+      "satisfactionRate": "Satisfaction Rate"
+    },
+    "features": {
+      "badge": "Features",
+      "title": "Everything You Need",
+      "subtitle": "Powerful tools designed for modern education",
+      "courseManagement": {
+        "title": "Course Management",
+        "description": "Create, organize, and manage courses with ease. Track lessons, assignments, and student progress all in one place."
+      },
+      "studentDirectory": {
+        "title": "Student Directory",
+        "description": "Manage student profiles, track attendance, and communicate with students and parents efficiently."
+      },
+      "analytics": {
+        "title": "Analytics & Reports",
+        "description": "Gain insights with detailed performance reports, grade distributions, and engagement metrics."
+      },
+      "scheduling": {
+        "title": "Smart Scheduling",
+        "description": "Intelligent calendar views for teachers and students with automated conflict detection."
+      },
+      "assignments": {
+        "title": "Assignment Center",
+        "description": "Create and distribute assignments, collect submissions, and provide feedback seamlessly."
+      },
+      "feedback": {
+        "title": "Feedback System",
+        "description": "Collect and manage course feedback from students to continuously improve your teaching methods."
+      }
+    },
+    "showcase": {
+      "title": "Course Showcase",
+      "subtitle": "See how courses and schedules look in EduManager",
+      "tabCourses": "Courses",
+      "tabSchedule": "Schedule",
+      "students": "students",
+      "lessons": "lessons",
+      "progress": "Progress"
+    },
+    "progressSection": {
+      "title": "Track Progress at a Glance",
+      "description": "Monitor student performance and course completion with intuitive visual indicators.",
+      "overallCompletion": "Overall Completion",
+      "assignmentsGraded": "Assignments Graded",
+      "studentEngagement": "Student Engagement",
+      "quickAccess": "Quick Access",
+      "quickAccessDesc": "Jump right into your dashboard",
+      "teacherFeatures": "Dashboard, Courses, Students, Reports, Calendar",
+      "studentFeatures": "Schedule, Grades, Assignments, Resources",
+      "goToDashboard": "Go to Dashboard"
+    },
+    "testimonials": {
+      "title": "Loved by Educators",
+      "subtitle": "Hear what teachers and students say about EduManager"
+    },
+    "cta": {
+      "title": "Ready to Transform Your Teaching?",
+      "description": "Join thousands of educators who are already using EduManager to streamline their workflow and improve student outcomes.",
+      "emailPlaceholder": "Enter your email",
+      "getStarted": "Get Started"
+    },
+    "footer": {
+      "builtWith": "Built with the @course-manager/ui component library."
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "semester": {
+      "fall2023": "Fall Semester 2023",
+      "spring2026": "Spring Semester 2026",
+      "fall2025": "Fall Semester 2025"
+    },
+    "welcome": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening",
+      "subtitle": "You have {{classCount}} classes today and {{urgentCount}} urgent deadlines."
+    },
+    "scheduleSection": {
+      "title": "Today's Schedule",
+      "noClasses": "No classes scheduled for today",
+      "viewCalendar": "View Full Calendar →",
+      "students": "{{count}} Students"
+    },
+    "courseType": {
+      "Lecture": "Lecture",
+      "Lab": "Lab",
+      "Admin": "Admin"
+    },
+    "status": {
+      "Upcoming": "Upcoming",
+      "PendingPrep": "Pending Prep",
+      "Finished": "Finished",
+      "Scheduled": "Scheduled"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "assignment": "Assignment",
+      "announcement": "Announcement",
+      "message": "Message",
+      "report": "Report"
+    },
+    "calendarDays": {
+      "su": "Su",
+      "mo": "Mo",
+      "tu": "Tu",
+      "we": "We",
+      "th": "Th",
+      "fr": "Fr",
+      "sa": "Sa"
+    },
+    "deadlines": {
+      "title": "Upcoming Deadlines",
+      "viewAll": "View All",
+      "empty": "No upcoming deadlines"
+    }
+  },
+  "teacherCourses": {
+    "title": "Courses Management",
+    "subtitle": "Manage your courses and curriculum",
+    "createButton": "Create New Course",
+    "loading": "Loading...",
+    "empty": {
+      "title": "No courses found",
+      "filtered": "Try adjusting your search or filter",
+      "initial": "Create your first course"
+    },
+    "createCard": {
+      "title": "Create New Course",
+      "subtitle": "Add a new subject to your curriculum"
+    },
+    "filters": {
+      "searchPlaceholder": "Search courses...",
+      "all": "All",
+      "active": "Active",
+      "draft": "Draft",
+      "archived": "Archived"
+    },
+    "card": {
+      "students": "{{count}} Students",
+      "lessons": "{{count}} Lessons",
+      "free": "Free",
+      "edit": "Edit",
+      "viewDetail": "View Detail",
+      "archive": "Archive",
+      "publish": "Publish",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to delete this course?"
+    },
+    "createDialog": {
+      "title": "Create New Course",
+      "fields": {
+        "title": "Course Title",
+        "description": "Description",
+        "price": "Price (¥)",
+        "category": "Category",
+        "status": "Status"
+      },
+      "statusOptions": {
+        "active": "Active (Publish now)",
+        "draft": "Draft (Save)"
+      },
+      "submit": "Create Course",
+      "submitting": "Creating...",
+      "cancel": "Cancel"
+    }
+  },
+  "teacherCourseDetail": {
+    "back": "Back",
+    "loading": "Loading...",
+    "notFound": "Course not found",
+    "info": {
+      "edit": "Edit",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "free": "Free",
+      "createdAt": "Created at {{date}}",
+      "status": {
+        "active": "Active",
+        "draft": "Draft",
+        "archived": "Archived"
+      },
+      "statusActions": {
+        "active": "Publish",
+        "draft": "Draft",
+        "archived": "Archive"
+      },
+      "fields": {
+        "title": "Course Title",
+        "description": "Course Description",
+        "price": "Price (¥)",
+        "category": "Category"
+      }
+    },
+    "schedule": {
+      "title": "Course Schedule",
+      "addButton": "Add Lesson",
+      "empty": "No lessons yet. Click the button above to add.",
+      "lesson": "Lesson {{number}}"
+    },
+    "addSchedule": {
+      "title": "Add Lesson",
+      "fields": {
+        "lessonNumber": "Lesson Number",
+        "locationType": "Location Type",
+        "room": "Room / Address",
+        "roomUrl": "Online Room URL",
+        "lessonTitle": "Lesson Title",
+        "startTime": "Start Time",
+        "endTime": "End Time"
+      },
+      "locationType": {
+        "physical": "Physical Address",
+        "online": "Online Room"
+      },
+      "placeholders": {
+        "room": "e.g. A-301",
+        "roomUrl": "e.g. https://meeting.example.com/room/123",
+        "title": "e.g. Matrix Basics"
+      },
+      "submit": "Add Lesson",
+      "submitting": "Adding...",
+      "cancel": "Cancel",
+      "confirmDelete": "Are you sure you want to delete this lesson?"
+    },
+    "attachment": {
+      "title": "Course Attachments"
+    },
+    "assignment": {
+      "title": "Assignments",
+      "addButton": "Add Assignment",
+      "empty": "No assignments yet",
+      "due": "Due: {{date}}",
+      "confirmDelete": "Are you sure you want to delete this assignment?"
+    },
+    "addAssignment": {
+      "title": "Add Assignment",
+      "fields": {
+        "title": "Title",
+        "description": "Description (optional)",
+        "dueDate": "Due Date"
+      },
+      "placeholders": {
+        "title": "e.g. Chapter 1 Exercises",
+        "description": "Assignment description"
+      },
+      "submit": "Add Assignment",
+      "submitting": "Adding...",
+      "cancel": "Cancel"
+    },
+    "resource": {
+      "title": "Course Resources",
+      "addButton": "Add Resource",
+      "empty": "No resources yet",
+      "featured": "Featured",
+      "confirmDelete": "Are you sure you want to delete this resource?"
+    },
+    "addResource": {
+      "title": "Add Course Resource",
+      "fields": {
+        "title": "Resource Name",
+        "fileType": "File Type",
+        "fileSize": "File Size",
+        "featured": "Mark as featured"
+      },
+      "placeholders": {
+        "title": "e.g. Chapter 1 Slides.pdf",
+        "fileType": "pdf / ppt / doc",
+        "fileSize": "e.g. 2.5 MB"
+      },
+      "submit": "Add Resource",
+      "submitting": "Adding...",
+      "cancel": "Cancel"
+    }
+  },
+  "publicCourses": {
+    "title": "Browse Courses",
+    "subtitle": "Discover and enroll in courses",
+    "searchPlaceholder": "Search courses...",
+    "categories": {
+      "all": "All",
+      "math": "Math",
+      "physics": "Physics",
+      "chemistry": "Chemistry",
+      "english": "English",
+      "computer": "Computer",
+      "other": "Other"
+    },
+    "card": {
+      "free": "Free",
+      "lessons": "{{count}} lessons",
+      "teacher": "{{name}}"
+    },
+    "empty": {
+      "title": "No courses found",
+      "description": "Try a different search or category"
+    },
+    "loading": "Loading..."
+  },
+  "publicCourseDetail": {
+    "loading": "Loading...",
+    "notFound": "Course not found",
+    "back": "Back to courses",
+    "free": "Free",
+    "lessons": "{{count}} lessons",
+    "description": "Course Overview",
+    "schedule": {
+      "title": "Course Schedule",
+      "lesson": "Lesson {{number}}"
+    },
+    "attachments": {
+      "title": "Course Attachments"
+    },
+    "enrollment": {
+      "loginPrompt": "Sign in to enroll",
+      "loginButton": "Go to Login",
+      "applyNote": "Note (optional)",
+      "applyNotePlaceholder": "Add a note for the teacher...",
+      "applyButton": "Apply for Enrollment",
+      "applying": "Applying...",
+      "pendingTitle": "Application Pending",
+      "pendingDesc": "Waiting for teacher approval",
+      "approvedTitle": "Enrollment Approved",
+      "approvedDesc": "You are enrolled in this course",
+      "rejectedTitle": "Application Rejected",
+      "rejectedReason": "Reason: {{reason}}",
+      "reapplyButton": "Reapply",
+      "reapplying": "Reapplying..."
+    }
+  },
+  "teacherCalendar": {
+    "title": "Calendar",
+    "subtitle": "Manage your schedule and events",
+    "views": { "month": "Month", "week": "Week", "day": "Day" },
+    "newEvent": "New Event",
+    "days": {
+      "sun": "Sun", "mon": "Mon", "tue": "Tue", "wed": "Wed",
+      "thu": "Thu", "fri": "Fri", "sat": "Sat"
+    }
+  },
+  "teacherStudents": {
+    "title": "Students Directory",
+    "activeStudents": "Active Students",
+    "searchPlaceholder": "Search students by name, ID...",
+    "allCourses": "All Courses",
+    "semesters": {
+      "fall2023": "Fall Semester 2023",
+      "spring2024": "Spring Semester 2024",
+      "summer2023": "Summer 2023"
+    },
+    "table": {
+      "shown": "students shown",
+      "exportCsv": "Export CSV",
+      "print": "Print List",
+      "selected": "selected",
+      "export": "Export",
+      "clear": "Clear",
+      "columns": {
+        "name": "Student Name",
+        "id": "ID Number",
+        "courses": "Enrolled Courses",
+        "attendance": "Attendance Rate",
+        "actions": "Actions"
+      },
+      "sort": {
+        "nameAsc": "Sort by: Name (A-Z)",
+        "nameDesc": "Sort by: Name (Z-A)",
+        "attendanceAsc": "Sort by: Attendance (Low-High)",
+        "attendanceDesc": "Sort by: Attendance (High-Low)"
+      },
+      "loading": "Loading...",
+      "emptyAll": "No students yet (no students have enrolled in courses)",
+      "emptyFiltered": "No students match the current filters",
+      "viewProfile": "View Profile"
+    }
+  },
+  "teacherEnrollments": {
+    "title": "Enrollment Management",
+    "subtitle": "Review and manage student enrollment applications",
+    "noCourses": {
+      "title": "No courses found",
+      "description": "Create a course first to manage enrollments"
+    },
+    "loading": "Loading...",
+    "empty": {
+      "title": "No enrollment applications",
+      "description": "No enrollment applications for this course"
+    }
+  },
+  "teacherReports": {
+    "title": "Reports & Analytics",
+    "subtitle": "Overview of your courses and students",
+    "kpi": {
+      "totalCourses": "Total Courses",
+      "activeCourses": "Active Courses",
+      "enrolledStudents": "Enrolled Students",
+      "pendingApplications": "Pending Applications",
+      "totalLessons": "Total Lessons"
+    },
+    "charts": {
+      "gradeDistribution": "Grade Distribution",
+      "attendanceTrend": "Attendance Trend",
+      "comingSoon": "Charts feature coming soon"
+    },
+    "reportList": {
+      "title": "Report List",
+      "autoGenDesc": "Automatically generated course analytics reports will appear here",
+      "comingSoon": "Report generation is in development",
+      "stayTuned": "Stay tuned"
+    }
+  },
+  "studentGrades": {
+    "title": "Gradebook",
+    "loading": "Loading...",
+    "openFilters": "Open filters",
+    "showing": "Showing:",
+    "kpi": {
+      "gpa": "GPA",
+      "classRank": "Class Rank",
+      "completion": "Completion"
+    },
+    "chart": {
+      "title": "Performance Overview",
+      "vsAverage": "Vs. Class Average",
+      "you": "You",
+      "avg": "Avg"
+    },
+    "courses": "Courses",
+    "coursesCount": "courses",
+    "teacher": "Teacher:",
+    "overall": "Overall",
+    "midterm": "Midterm",
+    "final": "Final",
+    "viewBreakdown": "View Breakdown"
+  },
+  "studentAssignments": {
+    "title": "My Assignments",
+    "searchPlaceholder": "Search assignments...",
+    "filters": {
+      "all": "All",
+      "todo": "To Do",
+      "inProgress": "In Progress",
+      "completed": "Completed"
+    },
+    "priority": "Priority Assignment",
+    "submitNow": "Submit Now",
+    "thisWeek": "This Week",
+    "actions": {
+      "start": "Start",
+      "continue": "Continue",
+      "submitLate": "Submit Late"
+    },
+    "status": {
+      "inProgress": "In Progress",
+      "done": "Done",
+      "late": "Late",
+      "submitted": "Submitted"
+    }
+  },
+  "studentResources": {
+    "title": "Library",
+    "loading": "Loading...",
+    "totalResources": "Total Resources",
+    "featured": "Featured",
+    "empty": "No resources in this category"
+  },
+  "studentCourseDetail": {
+    "loading": "Loading...",
+    "notFound": "Course not found",
+    "back": "Back to courses",
+    "free": "Free",
+    "lessons": "{{count}} lessons",
+    "description": "Course Overview",
+    "enrollmentStatus": "Enrollment Status:",
+    "status": {
+      "pending": "Pending Review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "applySuccess": "Application submitted!",
+    "viewEnrollments": "View my enrollments",
+    "applyButton": "Apply for Enrollment",
+    "schedule": {
+      "title": "Course Schedule",
+      "lesson": "Lesson {{number}}",
+      "joinRoom": "Join Room",
+      "scheduleAttachments": "Lesson Files",
+      "noAttachments": "No files for this lesson"
+    },
+    "attachments": {
+      "title": "Course Attachments"
+    },
+    "applyDialog": {
+      "title": "Apply for Enrollment",
+      "description": "Enter a note for the teacher (optional)",
+      "notePlaceholder": "Add a note for the teacher...",
+      "cancel": "Cancel",
+      "submit": "Submit Application"
+    }
+  },
+  "feedback": {
+    "loading": "Loading...",
+    "notFound": "Feedback not found",
+    "status": {
+      "published": "Published",
+      "draft": "Draft"
+    },
+    "courseId": "Course ID:",
+    "session": "Session #{{number}}",
+    "saving": "Saving...",
+    "draftSaved": "Draft Saved",
+    "date": "Date:",
+    "time": "Time:",
+    "presentStudents": "Present Students",
+    "studentsPresent": "students marked present for this session",
+    "add": "Add",
+    "courseRequirements": "Course Requirements",
+    "requirementsDesc": "Set expectations and requirements for students",
+    "preClassInstructions": "Pre-class instructions for students",
+    "postClassFeedback": "Post-Class Feedback",
+    "postClassFeedbackDesc": "Notes and feedback from today's session",
+    "mention": "Mention",
+    "feedbackPlaceholder": "Write feedback... Use @mentions to tag students",
+    "materialsShared": "Materials Shared",
+    "materialsDesc": "Files and resources shared during this session",
+    "attachFileOrLink": "Attach File or Link",
+    "homework": "Homework",
+    "homeworkDesc": "Assign homework for the next session",
+    "assignmentTitle": "Assignment Title",
+    "assignmentTitlePlaceholder": "e.g. Chapter 4 Problem Set",
+    "dueDate": "Due Date",
+    "saveDraft": "Save Draft",
+    "saveAndPublish": "Save and Publish"
   }
 }

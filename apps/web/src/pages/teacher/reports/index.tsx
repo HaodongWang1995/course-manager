@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -25,7 +26,7 @@ function ChartPlaceholder({ title, description }: { title: string; description: 
       <CardContent>
         <div className="flex h-52 flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 text-center">
           <Construction className="h-10 w-10 text-gray-300" />
-          <p className="mt-2 text-sm text-gray-400">图表分析功能即将上线</p>
+          <p className="mt-2 text-sm text-gray-400">{description}</p>
         </div>
       </CardContent>
     </Card>
@@ -33,39 +34,40 @@ function ChartPlaceholder({ title, description }: { title: string; description: 
 }
 
 export function TeacherReportsPage() {
+  const { t } = useTranslation("teacherReports");
   const { data: stats, isLoading } = useTeacherStats();
 
   const kpiCards = [
     {
-      title: "总课程数",
+      title: t("kpi.totalCourses"),
       value: isLoading ? "—" : (stats?.course_count ?? "0"),
       icon: BookOpen,
       color: "text-blue-600",
       iconBg: "bg-blue-100",
     },
     {
-      title: "进行中课程",
+      title: t("kpi.activeCourses"),
       value: isLoading ? "—" : (stats?.active_courses ?? "0"),
       icon: TrendingUp,
       color: "text-emerald-600",
       iconBg: "bg-emerald-100",
     },
     {
-      title: "选课学生数",
+      title: t("kpi.enrolledStudents"),
       value: isLoading ? "—" : (stats?.student_count ?? "0"),
       icon: Users,
       color: "text-violet-600",
       iconBg: "bg-violet-100",
     },
     {
-      title: "待审核申请",
+      title: t("kpi.pendingApplications"),
       value: isLoading ? "—" : (stats?.pending_enrollments ?? "0"),
       icon: Clock,
       color: "text-amber-600",
       iconBg: "bg-amber-100",
     },
     {
-      title: "课程总课时",
+      title: t("kpi.totalLessons"),
       value: isLoading ? "—" : (stats?.schedule_count ?? "0"),
       icon: ClipboardCheck,
       color: "text-rose-600",
@@ -77,8 +79,8 @@ export function TeacherReportsPage() {
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">Reports & Analytics</h1>
-        <p className="mt-1 text-sm text-gray-500">Overview of your courses and students</p>
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900">{t("title")}</h1>
+        <p className="mt-1 text-sm text-gray-500">{t("subtitle")}</p>
       </div>
 
       {/* KPI Cards */}
@@ -100,8 +102,8 @@ export function TeacherReportsPage() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <ChartPlaceholder title="成绩分布" description="按课程的平均成绩分布" />
-        <ChartPlaceholder title="出勤率趋势" description="各课程每周出勤率变化" />
+        <ChartPlaceholder title={t("charts.gradeDistribution")} description={t("charts.comingSoon")} />
+        <ChartPlaceholder title={t("charts.attendanceTrend")} description={t("charts.comingSoon")} />
       </div>
 
       {/* Reports list */}
@@ -109,15 +111,15 @@ export function TeacherReportsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
             <BarChart3 className="h-4 w-4" />
-            报告列表
+            {t("reportList.title")}
           </CardTitle>
-          <p className="text-sm text-gray-500">自动生成的课程分析报告将在此处显示</p>
+          <p className="text-sm text-gray-500">{t("reportList.autoGenDesc")}</p>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Construction className="h-12 w-12 text-gray-300" />
-            <p className="mt-3 text-sm font-medium text-gray-500">报告生成功能正在开发中</p>
-            <p className="mt-1 text-xs text-gray-400">敬请期待</p>
+            <p className="mt-3 text-sm font-medium text-gray-500">{t("reportList.comingSoon")}</p>
+            <p className="mt-1 text-xs text-gray-400">{t("reportList.stayTuned")}</p>
           </div>
         </CardContent>
       </Card>

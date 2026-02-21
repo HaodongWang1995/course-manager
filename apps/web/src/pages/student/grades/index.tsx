@@ -16,6 +16,7 @@ import {
   PolarAngleAxis,
   ResponsiveContainer,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 import { useStudentGrades } from "@/hooks/use-queries";
 
 const courseIcons = [
@@ -25,18 +26,19 @@ const courseIcons = [
 ];
 
 const kpiConfig = [
-  { key: "gpa" as const, label: "GPA", icon: GraduationCap, iconColorClass: "text-[#137fec]", iconBgClass: "bg-blue-50" },
-  { key: "rank" as const, label: "Class Rank", icon: Trophy, iconColorClass: "text-purple-500", iconBgClass: "bg-slate-50" },
-  { key: "completion" as const, label: "Completion", icon: CheckCircle2, iconColorClass: "text-emerald-600", iconBgClass: "bg-blue-50" },
+  { key: "gpa" as const, translationKey: "kpi.gpa", icon: GraduationCap, iconColorClass: "text-[#137fec]", iconBgClass: "bg-blue-50" },
+  { key: "rank" as const, translationKey: "kpi.classRank", icon: Trophy, iconColorClass: "text-purple-500", iconBgClass: "bg-slate-50" },
+  { key: "completion" as const, translationKey: "kpi.completion", icon: CheckCircle2, iconColorClass: "text-emerald-600", iconBgClass: "bg-blue-50" },
 ];
 
 export function StudentGradesPage() {
+  const { t } = useTranslation("studentGrades");
   const { data: grades, isLoading } = useStudentGrades();
 
   if (isLoading || !grades) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">加载中...</div>
+        <div className="text-gray-500">{t("loading")}</div>
       </div>
     );
   }
@@ -53,14 +55,14 @@ export function StudentGradesPage() {
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-lg font-bold tracking-[-0.45px] text-slate-900">Gradebook</h1>
+            <h1 className="text-lg font-bold tracking-[-0.45px] text-slate-900">{t("title")}</h1>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               type="button"
               className="rounded-full p-2 text-[#137fec] transition-colors hover:bg-[#137fec]/10"
-              aria-label="Open filters"
+              aria-label={t("openFilters")}
             >
               <Filter className="h-5 w-5" />
             </button>
@@ -71,7 +73,7 @@ export function StudentGradesPage() {
         </div>
 
         <div className="mt-2 flex w-full items-center gap-2 text-xs">
-          <span className="font-medium text-slate-500">Showing:</span>
+          <span className="font-medium text-slate-500">{t("showing")}</span>
           <span className="rounded-full bg-[#137fec]/10 px-2 py-0.5 font-medium text-[#137fec]">Fall 2023</span>
           <span className="rounded-full bg-[#137fec]/10 px-2 py-0.5 font-medium text-[#137fec]">Full Year</span>
         </div>
@@ -84,14 +86,14 @@ export function StudentGradesPage() {
             const value = grades[kpi.key];
             return (
               <article
-                key={kpi.label}
+                key={kpi.translationKey}
                 className="flex min-h-[126px] flex-col items-center justify-center rounded-xl border border-slate-100 bg-white p-[13px] shadow-sm"
               >
                 <div className={`mb-1 flex h-10 w-10 items-center justify-center rounded-full ${kpi.iconBgClass}`}>
                   <Icon className={`h-5 w-5 ${kpi.iconColorClass}`} />
                 </div>
                 <p className="text-2xl font-bold leading-8 text-slate-900">{value}</p>
-                <p className="text-xs font-medium text-slate-500">{kpi.label}</p>
+                <p className="text-xs font-medium text-slate-500">{t(kpi.translationKey)}</p>
               </article>
             );
           })}
@@ -100,17 +102,17 @@ export function StudentGradesPage() {
         <section className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-base font-bold leading-6 text-slate-900">Performance Overview</h2>
-              <p className="text-xs leading-4 text-slate-500">Vs. Class Average</p>
+              <h2 className="text-base font-bold leading-6 text-slate-900">{t("chart.title")}</h2>
+              <p className="text-xs leading-4 text-slate-500">{t("chart.vsAverage")}</p>
             </div>
             <div className="mt-1 flex items-center gap-3 text-[10px] font-medium text-slate-600">
               <span className="inline-flex items-center gap-1">
                 <span className="h-2 w-2 rounded-full bg-[#137fec]" />
-                You
+                {t("chart.you")}
               </span>
               <span className="inline-flex items-center gap-1">
                 <span className="h-2 w-2 rounded-full bg-slate-300" />
-                Avg
+                {t("chart.avg")}
               </span>
             </div>
           </div>
@@ -144,9 +146,9 @@ export function StudentGradesPage() {
 
         <section>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold leading-7 text-slate-900">Courses</h2>
+            <h2 className="text-lg font-bold leading-7 text-slate-900">{t("courses")}</h2>
             <span className="text-sm font-medium text-[#137fec]">
-              {grades.courses.length} courses
+              {grades.courses.length} {t("coursesCount")}
             </span>
           </div>
 
@@ -166,23 +168,23 @@ export function StudentGradesPage() {
                       </div>
                       <div>
                         <h3 className="text-base font-bold leading-5 text-slate-900">{course.name}</h3>
-                        <p className="text-xs leading-4 text-slate-500">Teacher: {course.teacher}</p>
+                        <p className="text-xs leading-4 text-slate-500">{t("teacher")} {course.teacher}</p>
                       </div>
                     </div>
 
                     <div className="text-right">
                       <p className="text-lg font-bold leading-7 text-[#137fec]">{course.overall}%</p>
-                      <p className="text-[10px] font-medium uppercase leading-4 text-slate-400">Overall</p>
+                      <p className="text-[10px] font-medium uppercase leading-4 text-slate-400">{t("overall")}</p>
                     </div>
                   </div>
 
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-[9px] text-center">
-                      <p className="text-xs text-slate-500">Midterm</p>
+                      <p className="text-xs text-slate-500">{t("midterm")}</p>
                       <p className="text-base font-bold leading-6 text-slate-800">{course.midterm}</p>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-[9px] text-center">
-                      <p className="text-xs text-slate-500">Final</p>
+                      <p className="text-xs text-slate-500">{t("final")}</p>
                       <p className="text-base font-bold leading-6 text-slate-800">{course.final}</p>
                     </div>
                   </div>
@@ -191,7 +193,7 @@ export function StudentGradesPage() {
                     type="button"
                     className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-[#137fec]/10 pb-2 pt-3 text-sm font-semibold text-[#137fec] transition-colors hover:bg-[#137fec]/15 active:bg-[#137fec]/20"
                   >
-                    View Breakdown
+                    {t("viewBreakdown")}
                     <ChevronRight className="h-4 w-4" />
                   </button>
                 </article>

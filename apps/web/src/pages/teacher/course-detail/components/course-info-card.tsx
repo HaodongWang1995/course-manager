@@ -14,12 +14,7 @@ import {
 } from "@course-manager/ui";
 import { Edit, Save } from "lucide-react";
 import type { Course } from "@/api/client";
-
-const statusLabels: Record<string, string> = {
-  active: "已上架",
-  draft: "草稿",
-  archived: "已下架",
-};
+import { useTranslation } from "react-i18next";
 
 const statusColors: Record<string, string> = {
   active: "bg-green-50 text-green-700 border-green-200",
@@ -45,6 +40,7 @@ export function CourseInfoCard({
   isSaving,
   onStatusChange,
 }: CourseInfoCardProps) {
+  const { t } = useTranslation("teacherCourseDetail");
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -77,7 +73,7 @@ export function CourseInfoCard({
           {!editing && (
             <Button variant="outline" className="gap-2" onClick={startEditing}>
               <Edit className="h-4 w-4" />
-              编辑
+              {t("info.edit")}
             </Button>
           )}
           <Select value={course.status} onValueChange={onStatusChange}>
@@ -85,9 +81,9 @@ export function CourseInfoCard({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="active">上架</SelectItem>
-              <SelectItem value="draft">草稿</SelectItem>
-              <SelectItem value="archived">下架</SelectItem>
+              <SelectItem value="active">{t("info.statusActions.active")}</SelectItem>
+              <SelectItem value="draft">{t("info.statusActions.draft")}</SelectItem>
+              <SelectItem value="archived">{t("info.statusActions.archived")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -99,11 +95,11 @@ export function CourseInfoCard({
           {editing ? (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>课程标题</Label>
+                <Label>{t("info.fields.title")}</Label>
                 <Input value={title} onChange={(e) => setTitle(e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>课程描述</Label>
+                <Label>{t("info.fields.description")}</Label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -112,7 +108,7 @@ export function CourseInfoCard({
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>价格 (¥)</Label>
+                  <Label>{t("info.fields.price")}</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -122,7 +118,7 @@ export function CourseInfoCard({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>分类</Label>
+                  <Label>{t("info.fields.category")}</Label>
                   <Input
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
@@ -132,10 +128,10 @@ export function CourseInfoCard({
               <div className="flex gap-2">
                 <Button onClick={handleSave} disabled={isSaving} className="gap-2">
                   <Save className="h-4 w-4" />
-                  {isSaving ? "保存中..." : "保存"}
+                  {isSaving ? t("info.saving") : t("info.save")}
                 </Button>
                 <Button variant="outline" onClick={() => setEditing(false)}>
-                  取消
+                  {t("info.cancel")}
                 </Button>
               </div>
             </div>
@@ -151,7 +147,7 @@ export function CourseInfoCard({
                       className={`border ${statusColors[course.status]}`}
                       variant="outline"
                     >
-                      {statusLabels[course.status]}
+                      {t(`info.status.${course.status}`)}
                     </Badge>
                   </div>
                   <h1 className="mt-3 text-2xl font-bold text-gray-900">{course.title}</h1>
@@ -161,7 +157,7 @@ export function CourseInfoCard({
                     ¥{Number(course.price).toFixed(2)}
                   </div>
                 ) : (
-                  <span className="text-sm font-medium text-green-600">免费</span>
+                  <span className="text-sm font-medium text-green-600">{t("info.free")}</span>
                 )}
               </div>
               {course.description && (
@@ -170,7 +166,7 @@ export function CourseInfoCard({
                 </p>
               )}
               <p className="mt-4 text-xs text-gray-400">
-                创建于 {new Date(course.created_at).toLocaleString("zh-CN")}
+                {t("info.createdAt", { date: new Date(course.created_at).toLocaleString() })}
               </p>
             </>
           )}

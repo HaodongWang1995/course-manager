@@ -125,6 +125,16 @@ export function StudentSchedulePage() {
       .sort((a, b) => a.startHour - b.startHour);
   }, [calendarEvents]);
 
+  const upcomingEvents = useMemo(() => {
+    const tomorrow = new Date();
+    tomorrow.setHours(0, 0, 0, 0);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return calendarEvents
+      .filter((e) => { const d = new Date(e.startDate); d.setHours(0, 0, 0, 0); return d.getTime() >= tomorrow.getTime(); })
+      .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
+      .slice(0, 5);
+  }, [calendarEvents]);
+
   const navigateWeek = (dir: 1 | -1) => {
     setCurrentDate((prev) => { const d = new Date(prev); d.setDate(d.getDate() + dir * 7); return d; });
     setSelectedEvent(null);
@@ -165,6 +175,7 @@ export function StudentSchedulePage() {
             <MobileScheduleView
               morningEvents={todayEvents.filter((e) => e.startHour < 12)}
               afternoonEvents={todayEvents.filter((e) => e.startHour >= 12)}
+              upcomingEvents={upcomingEvents}
               onGoToFeedback={(courseId) => navigate({ to: `/student/feedback/${courseId}` })}
               onViewCourse={(courseId) => navigate({ to: `/student/courses/${courseId}` })}
             />

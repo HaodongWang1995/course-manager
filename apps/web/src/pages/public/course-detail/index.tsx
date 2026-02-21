@@ -1,5 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Button,
   Card,
@@ -34,6 +35,7 @@ interface PublicCourseDetailPageProps {
 
 export function PublicCourseDetailPage({ courseId }: PublicCourseDetailPageProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation("publicCourseDetail");
   const [note, setNote] = useState("");
 
   const { data: course, isLoading } = useCourseDetail(courseId);
@@ -59,7 +61,7 @@ export function PublicCourseDetailPage({ courseId }: PublicCourseDetailPageProps
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">加载中...</div>
+        <div className="text-gray-500">{t("loading")}</div>
       </div>
     );
   }
@@ -67,13 +69,13 @@ export function PublicCourseDetailPage({ courseId }: PublicCourseDetailPageProps
   if (!course) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <p className="text-gray-500">课程不存在</p>
+        <p className="text-gray-500">{t("notFound")}</p>
         <Button
           className="mt-4"
           variant="outline"
           onClick={() => navigate({ to: "/courses" })}
         >
-          返回课程列表
+          {t("back")}
         </Button>
       </div>
     );
@@ -87,7 +89,7 @@ export function PublicCourseDetailPage({ courseId }: PublicCourseDetailPageProps
         onClick={() => navigate({ to: "/courses" })}
       >
         <ArrowLeft className="h-4 w-4" />
-        返回课程列表
+        {t("back")}
       </Button>
 
       <Card>
@@ -112,7 +114,7 @@ export function PublicCourseDetailPage({ courseId }: PublicCourseDetailPageProps
                 className="bg-green-50 text-green-700 border-green-200"
                 variant="outline"
               >
-                免费
+                {t("free")}
               </Badge>
             )}
           </div>
@@ -124,13 +126,13 @@ export function PublicCourseDetailPage({ courseId }: PublicCourseDetailPageProps
             </span>
             <span className="flex items-center gap-1.5">
               <BookOpen className="h-4 w-4" />
-              {course.schedules?.length || 0} 节课
+              {t("lessons", { count: course.schedules?.length || 0 })}
             </span>
           </div>
 
           {course.description && (
             <div className="mt-6">
-              <h2 className="text-sm font-semibold text-gray-900">课程简介</h2>
+              <h2 className="text-sm font-semibold text-gray-900">{t("description")}</h2>
               <p className="mt-2 whitespace-pre-line text-sm text-gray-600">
                 {course.description}
               </p>
@@ -161,7 +163,7 @@ export function PublicCourseDetailPage({ courseId }: PublicCourseDetailPageProps
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              课程日程
+              {t("schedule.title")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -176,7 +178,7 @@ export function PublicCourseDetailPage({ courseId }: PublicCourseDetailPageProps
                   </div>
                   <div className="flex-1">
                     <h4 className="text-sm font-medium text-gray-900">
-                      {schedule.title || `第 ${schedule.lesson_number} 课`}
+                      {schedule.title || t("schedule.lesson", { number: schedule.lesson_number })}
                     </h4>
                     <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-gray-500">
                       <span className="flex items-center gap-1">
@@ -205,7 +207,7 @@ export function PublicCourseDetailPage({ courseId }: PublicCourseDetailPageProps
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Paperclip className="h-5 w-5" />
-              课程资料
+              {t("attachments.title")}
             </CardTitle>
           </CardHeader>
           <CardContent>

@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   Badge,
@@ -72,23 +73,24 @@ export function StudentTable({
   onPageChange,
   totalStudents,
 }: StudentTableProps) {
+  const { t } = useTranslation("teacherStudents");
   return (
     <>
       {/* Stats Bar */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3">
         <div className="flex items-center gap-6">
           <p className="text-sm text-gray-500">
-            <span className="font-semibold text-gray-900">{filteredStudents.length}</span> students shown
+            <span className="font-semibold text-gray-900">{filteredStudents.length}</span> {t("table.shown")}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="gap-1.5">
             <Download className="h-3.5 w-3.5" />
-            Export CSV
+            {t("table.exportCsv")}
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5">
             <Printer className="h-3.5 w-3.5" />
-            Print List
+            {t("table.print")}
           </Button>
         </div>
       </div>
@@ -96,16 +98,16 @@ export function StudentTable({
       {/* Bulk action bar */}
       {selectedIds.size > 0 && (
         <div className="mb-3 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2">
-          <span className="text-sm font-medium text-blue-700">{selectedIds.size} selected</span>
+          <span className="text-sm font-medium text-blue-700">{selectedIds.size} {t("table.selected")}</span>
           <Button variant="outline" size="sm" className="h-7 gap-1 text-xs">
             <Download className="h-3 w-3" />
-            Export
+            {t("table.export")}
           </Button>
           <button
             className="ml-auto text-xs text-blue-500 hover:underline"
             onClick={onClearSelection}
           >
-            Clear
+            {t("table.clear")}
           </button>
         </div>
       )}
@@ -118,10 +120,10 @@ export function StudentTable({
           onChange={(e) => onSortChange(e.target.value)}
           className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
-          <option value="name">Sort by: Name (A-Z)</option>
-          <option value="name-desc">Sort by: Name (Z-A)</option>
-          <option value="attendance-high">Sort by: Attendance (High)</option>
-          <option value="attendance-low">Sort by: Attendance (Low)</option>
+          <option value="name">{t("table.sort.nameAsc")}</option>
+          <option value="name-desc">{t("table.sort.nameDesc")}</option>
+          <option value="attendance-high">{t("table.sort.attendanceDesc")}</option>
+          <option value="attendance-low">{t("table.sort.attendanceAsc")}</option>
           <option value="id">Sort by: Student ID</option>
         </select>
       </div>
@@ -140,19 +142,19 @@ export function StudentTable({
                   />
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Student Name
+                  {t("table.columns.name")}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  ID Number
+                  {t("table.columns.id")}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Enrolled Courses
+                  {t("table.columns.courses")}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Attendance Rate
+                  {t("table.columns.attendance")}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Actions
+                  {t("table.columns.actions")}
                 </th>
               </tr>
             </thead>
@@ -160,13 +162,13 @@ export function StudentTable({
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-sm text-gray-500">
-                    加载中...
+                    {t("table.loading")}
                   </td>
                 </tr>
               ) : paginatedStudents.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-sm text-gray-500">
-                    {totalStudents === 0 ? "暂无学生数据（尚无学生报名课程）" : "没有符合条件的学生"}
+                    {totalStudents === 0 ? t("table.emptyAll") : t("table.emptyFiltered")}
                   </td>
                 </tr>
               ) : null}
@@ -231,7 +233,7 @@ export function StudentTable({
                       className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800"
                     >
                       <Eye className="h-3.5 w-3.5" />
-                      View Profile
+                      {t("table.viewProfile")}
                     </Link>
                   </td>
                 </tr>
@@ -244,9 +246,8 @@ export function StudentTable({
       {totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3">
           <p className="text-sm text-gray-600">
-            第 <span className="font-medium">{(safePage - 1) * PAGE_SIZE + 1}</span>–
-            <span className="font-medium">{Math.min(safePage * PAGE_SIZE, filteredStudents.length)}</span> 条，
-            共 <span className="font-medium">{filteredStudents.length}</span> 条
+            <span className="font-medium">{(safePage - 1) * PAGE_SIZE + 1}</span>–
+            <span className="font-medium">{Math.min(safePage * PAGE_SIZE, filteredStudents.length)}</span> / <span className="font-medium">{filteredStudents.length}</span> {t("table.shown")}
           </p>
           <div className="flex items-center gap-1">
             <Button

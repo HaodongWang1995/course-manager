@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Calendar, MapPin } from "lucide-react";
+import { Calendar, ExternalLink, MapPin } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import type { ScheduleEvent } from "../index";
 
@@ -67,10 +67,17 @@ export function ListScheduleView({
                 <p className="truncate font-semibold text-gray-900">{event.course_title}</p>
                 <p className="mt-0.5 text-sm text-gray-500">{startTime} – {endTime}</p>
                 {event.room && (
-                  <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-400">
-                    <MapPin className="h-3 w-3" />
-                    {event.room}
-                  </p>
+                  /^https?:\/\//i.test(event.room) ? (
+                    <p className="mt-0.5 flex items-center gap-1 text-xs text-blue-600 font-medium">
+                      <ExternalLink className="h-3 w-3" />
+                      {t("schedule.joinRoom")}
+                    </p>
+                  ) : (
+                    <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-400">
+                      <MapPin className="h-3 w-3" />
+                      {event.room}
+                    </p>
+                  )
                 )}
               </div>
             </div>

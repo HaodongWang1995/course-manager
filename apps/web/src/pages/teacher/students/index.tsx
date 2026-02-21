@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Input } from "@course-manager/ui";
 import { Search, Users } from "lucide-react";
 import { useTeacherStudents } from "@/hooks/use-queries";
@@ -26,6 +27,7 @@ function getAttendanceBg(rate: number) {
 const PAGE_SIZE = 20;
 
 export function StudentsPage() {
+  const { t } = useTranslation("teacherStudents");
   const { data: rawStudents = [], isLoading } = useTeacherStudents();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("all");
@@ -55,7 +57,7 @@ export function StudentsPage() {
       courseSet.set(c, (courseSet.get(c) || 0) + 1);
     }));
     return [
-      { label: "All Courses", value: "all", count: students.length },
+      { label: t("allCourses"), value: "all", count: students.length },
       ...Array.from(courseSet.entries()).map(([name, count]) => ({
         label: name,
         value: name.toLowerCase().replace(/\s+/g, ""),
@@ -126,11 +128,11 @@ export function StudentsPage() {
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-              Students Directory
+              {t("title")}
             </h1>
             <p className="mt-1 text-sm text-gray-500">
               <Users className="mr-1 inline-block h-4 w-4" />
-              {students.filter((s) => s.status === "active").length} Active Students
+              {students.filter((s) => s.status === "active").length} {t("activeStudents")}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -138,7 +140,7 @@ export function StudentsPage() {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <Input
                 type="text"
-                placeholder="Search students by name, ID..."
+                placeholder={t("searchPlaceholder")}
                 className="w-72 pl-9"
                 value={searchQuery}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -147,9 +149,9 @@ export function StudentsPage() {
               />
             </div>
             <select className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
-              <option>Fall Semester 2023</option>
-              <option>Spring Semester 2024</option>
-              <option>Summer 2023</option>
+              <option>{t("semesters.fall2023")}</option>
+              <option>{t("semesters.spring2024")}</option>
+              <option>{t("semesters.summer2023")}</option>
             </select>
           </div>
         </div>

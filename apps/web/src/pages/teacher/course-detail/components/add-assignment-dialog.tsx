@@ -9,6 +9,7 @@ import {
   Input,
   Label,
 } from "@course-manager/ui";
+import { useTranslation } from "react-i18next";
 
 interface AddAssignmentDialogProps {
   open: boolean;
@@ -23,6 +24,7 @@ export function AddAssignmentDialog({
   onAdd,
   isLoading,
 }: AddAssignmentDialogProps) {
+  const { t } = useTranslation("teacherCourseDetail");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -50,30 +52,30 @@ export function AddAssignmentDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>添加作业</DialogTitle>
+          <DialogTitle>{t("addAssignment.title")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="assignment-title">标题 *</Label>
+            <Label htmlFor="assignment-title">{t("addAssignment.fields.title")}</Label>
             <Input
               id="assignment-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="例如：第一章课后练习"
+              placeholder={t("addAssignment.placeholders.title")}
               required
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="assignment-desc">说明（可选）</Label>
+            <Label htmlFor="assignment-desc">{t("addAssignment.fields.description")}</Label>
             <Input
               id="assignment-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="作业内容说明"
+              placeholder={t("addAssignment.placeholders.description")}
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="assignment-due">截止日期 *</Label>
+            <Label htmlFor="assignment-due">{t("addAssignment.fields.dueDate")}</Label>
             <Input
               id="assignment-due"
               type="datetime-local"
@@ -84,10 +86,10 @@ export function AddAssignmentDialog({
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => handleClose(false)}>
-              取消
+              {t("addAssignment.cancel")}
             </Button>
             <Button type="submit" disabled={isLoading || !title.trim() || !dueDate}>
-              {isLoading ? "添加中..." : "添加作业"}
+              {isLoading ? t("addAssignment.submitting") : t("addAssignment.submit")}
             </Button>
           </DialogFooter>
         </form>

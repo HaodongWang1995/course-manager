@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Users, ClipboardList } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import {
@@ -10,6 +11,7 @@ import { EnrollmentCard } from "./components/enrollment-card";
 import { StatusFilter } from "./components/status-filter";
 
 export function TeacherEnrollmentsPage() {
+  const { t } = useTranslation("teacherEnrollments");
   const { data: courses = [] } = useTeacherCourses();
   const [selectedCourseId, setSelectedCourseId] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -40,11 +42,11 @@ export function TeacherEnrollmentsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-          Enrollment Management
+          {t("title")}
         </h1>
         <p className="mt-1 text-sm text-gray-500">
           <Users className="mr-1 inline-block h-4 w-4" />
-          Review and manage student enrollment applications
+          {t("subtitle")}
         </p>
       </div>
 
@@ -69,16 +71,16 @@ export function TeacherEnrollmentsPage() {
       {!courseId ? (
         <EmptyState
           icon={ClipboardList}
-          title="No courses found"
-          description="Create a course first to manage enrollments"
+          title={t("noCourses.title")}
+          description={t("noCourses.description")}
         />
       ) : isLoading ? (
-        <div className="py-12 text-center text-gray-500">Loading...</div>
+        <div className="py-12 text-center text-gray-500">{t("loading")}</div>
       ) : enrollments.length === 0 ? (
         <EmptyState
           icon={ClipboardList}
-          title="No enrollment applications"
-          description="No enrollment applications for this course"
+          title={t("empty.title")}
+          description={t("empty.description")}
         />
       ) : (
         <div className="space-y-3">

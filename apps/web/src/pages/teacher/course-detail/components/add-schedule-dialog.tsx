@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -9,6 +10,7 @@ import {
 import { useForm } from "@tanstack/react-form";
 import { scheduleFormValidator } from "@/lib/schemas";
 import { FormTextField, FormDateTimeField } from "@/components/form-field";
+import { useTranslation } from "react-i18next";
 
 interface AddScheduleDialogProps {
   open: boolean;
@@ -31,6 +33,9 @@ export function AddScheduleDialog({
   onAdd,
   isLoading,
 }: AddScheduleDialogProps) {
+  const { t } = useTranslation("teacherCourseDetail");
+  const [roomType, setRoomType] = useState<"physical" | "online">("physical");
+
   const form = useForm({
     defaultValues: {
       lesson_number: nextLessonNumber as number | undefined,
@@ -51,6 +56,7 @@ export function AddScheduleDialog({
         room: value.room ?? "",
       });
       form.reset();
+      setRoomType("physical");
     },
   });
 
@@ -58,7 +64,7 @@ export function AddScheduleDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>添加课时</DialogTitle>
+          <DialogTitle>{t("addSchedule.title")}</DialogTitle>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -70,41 +76,77 @@ export function AddScheduleDialog({
           <div className="grid grid-cols-2 gap-4">
             <form.Field name="lesson_number">
               {(field) => (
-                <FormTextField field={field} label="课时编号" type="number" />
+                <FormTextField field={field} label={t("addSchedule.fields.lessonNumber")} type="number" />
               )}
             </form.Field>
-            <form.Field name="room">
-              {(field) => (
-                <FormTextField field={field} label="教室" placeholder="例如: A-301" />
-              )}
-            </form.Field>
+
+            {/* Location type toggle */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">{t("addSchedule.fields.locationType")}</label>
+              <div className="flex rounded-md border border-gray-200 overflow-hidden">
+                <button
+                  type="button"
+                  className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${
+                    roomType === "physical"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-600 hover:bg-gray-50"
+                  }`}
+                  onClick={() => setRoomType("physical")}
+                >
+                  {t("addSchedule.locationType.physical")}
+                </button>
+                <button
+                  type="button"
+                  className={`flex-1 px-3 py-2 text-sm font-medium transition-colors border-l border-gray-200 ${
+                    roomType === "online"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-600 hover:bg-gray-50"
+                  }`}
+                  onClick={() => setRoomType("online")}
+                >
+                  {t("addSchedule.locationType.online")}
+                </button>
+              </div>
+            </div>
           </div>
+
+          {/* Room field — label + placeholder changes based on type */}
+          <form.Field name="room">
+            {(field) => (
+              <FormTextField
+                field={field}
+                label={roomType === "online" ? t("addSchedule.fields.roomUrl") : t("addSchedule.fields.room")}
+                placeholder={roomType === "online" ? t("addSchedule.placeholders.roomUrl") : t("addSchedule.placeholders.room")}
+                type={roomType === "online" ? "url" : "text"}
+              />
+            )}
+          </form.Field>
 
           <form.Field name="title">
             {(field) => (
-              <FormTextField field={field} label="课时标题" placeholder="例如: 矩阵基础" />
+              <FormTextField field={field} label={t("addSchedule.fields.lessonTitle")} placeholder={t("addSchedule.placeholders.title")} />
             )}
           </form.Field>
 
           <div className="grid grid-cols-2 gap-4">
             <form.Field name="start_time">
               {(field) => (
-                <FormDateTimeField field={field} label="开始时间" required />
+                <FormDateTimeField field={field} label={t("addSchedule.fields.startTime")} required />
               )}
             </form.Field>
             <form.Field name="end_time">
               {(field) => (
-                <FormDateTimeField field={field} label="结束时间" required />
+                <FormDateTimeField field={field} label={t("addSchedule.fields.endTime")} required />
               )}
             </form.Field>
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              取消
+              {t("addSchedule.cancel")}
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "添加中..." : "添加课时"}
+              {isLoading ? t("addSchedule.submitting") : t("addSchedule.submit")}
             </Button>
           </DialogFooter>
         </form>

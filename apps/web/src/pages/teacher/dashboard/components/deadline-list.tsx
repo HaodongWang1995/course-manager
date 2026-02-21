@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@course-manager/ui";
+import { useTranslation } from "react-i18next";
 
 const deadlineColors = [
   "border-l-red-500",
@@ -19,17 +20,18 @@ interface DeadlineListProps {
 }
 
 export function DeadlineList({ deadlines }: DeadlineListProps) {
+  const { t } = useTranslation("dashboard");
   return (
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Upcoming Deadlines</CardTitle>
-          <button className="text-xs font-medium text-blue-600 hover:underline">View All</button>
+          <CardTitle className="text-base">{t("deadlines.title")}</CardTitle>
+          <button className="text-xs font-medium text-blue-600 hover:underline">{t("deadlines.viewAll")}</button>
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
         {deadlines.length === 0 ? (
-          <p className="py-4 text-center text-sm text-gray-400">No upcoming deadlines</p>
+          <p className="py-4 text-center text-sm text-gray-400">{t("deadlines.empty")}</p>
         ) : (
           deadlines.map((item, idx) => {
             const colorClass = deadlineColors[idx % deadlineColors.length];

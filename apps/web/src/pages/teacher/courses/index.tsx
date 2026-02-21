@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, Dialog, DialogTrigger } from "@course-manager/ui";
 import { Plus, BookOpen } from "lucide-react";
 import { useTeacherCourses, useAddCourse } from "@/hooks/use-queries";
@@ -8,6 +9,7 @@ import { CourseFilters } from "./components/course-filters";
 import { CreateCourseDialog } from "./components/create-course-dialog";
 
 export function TeacherCoursesPage() {
+  const { t } = useTranslation("teacherCourses");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -28,7 +30,7 @@ export function TeacherCoursesPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">加载中...</div>
+        <div className="text-gray-500">{t("loading")}</div>
       </div>
     );
   }
@@ -39,13 +41,13 @@ export function TeacherCoursesPage() {
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Courses Management</h1>
-            <p className="mt-1 text-sm text-gray-500">Manage your courses and curriculum</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+            <p className="mt-1 text-sm text-gray-500">{t("subtitle")}</p>
           </div>
           <DialogTrigger asChild>
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
-              Create New Course
+              {t("createButton")}
             </Button>
           </DialogTrigger>
         </div>
@@ -62,18 +64,18 @@ export function TeacherCoursesPage() {
         {filteredCourses.length === 0 && !showAddDialog ? (
           <EmptyState
             icon={BookOpen}
-            title="No courses found"
+            title={t("empty.title")}
             description={
               searchQuery || filterStatus !== "all"
-                ? "Try adjusting your search or filter"
-                : "Create your first course"
+                ? t("empty.filtered")
+                : t("empty.initial")
             }
             action={
               !searchQuery && filterStatus === "all" ? (
                 <DialogTrigger asChild>
                   <Button className="gap-2">
                     <Plus className="h-4 w-4" />
-                    Create New Course
+                    {t("createButton")}
                   </Button>
                 </DialogTrigger>
               ) : undefined
@@ -91,8 +93,8 @@ export function TeacherCoursesPage() {
                   <Plus className="h-6 w-6 text-gray-400" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-700">Create New Course</p>
-                  <p className="mt-1 text-xs text-gray-400">Add a new subject to your curriculum</p>
+                  <p className="text-sm font-semibold text-gray-700">{t("createCard.title")}</p>
+                  <p className="mt-1 text-xs text-gray-400">{t("createCard.subtitle")}</p>
                 </div>
               </div>
             </DialogTrigger>

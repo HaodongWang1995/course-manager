@@ -1,6 +1,7 @@
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@course-manager/ui";
 import { FileText, Plus, Trash2 } from "lucide-react";
 import type { Resource } from "@/api/client";
+import { useTranslation } from "react-i18next";
 
 interface ResourceSectionProps {
   resources: Resource[];
@@ -13,20 +14,21 @@ export function ResourceSection({
   onDelete,
   onRequestAdd,
 }: ResourceSectionProps) {
+  const { t } = useTranslation("teacherCourseDetail");
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <FileText className="h-5 w-5 text-gray-500" />
-          <CardTitle>课程资源 ({resources.length})</CardTitle>
+          <CardTitle>{t("resource.title")} ({resources.length})</CardTitle>
         </div>
         <Button size="sm" variant="outline" onClick={onRequestAdd}>
-          <Plus className="h-4 w-4 mr-1" /> 添加资源
+          <Plus className="h-4 w-4 mr-1" /> {t("resource.addButton")}
         </Button>
       </CardHeader>
       <CardContent>
         {resources.length === 0 ? (
-          <p className="py-4 text-center text-sm text-gray-400">暂无课程资源</p>
+          <p className="py-4 text-center text-sm text-gray-400">{t("resource.empty")}</p>
         ) : (
           <div className="space-y-2">
             {resources.map((r) => (
@@ -41,7 +43,7 @@ export function ResourceSection({
                       {r.file_type}
                       {r.file_type && r.file_size ? " · " : ""}
                       {r.file_size}
-                      {r.featured && <span className="ml-2 text-blue-500">精选</span>}
+                      {r.featured && <span className="ml-2 text-blue-500">{t("resource.featured")}</span>}
                     </p>
                   )}
                 </div>
@@ -49,7 +51,7 @@ export function ResourceSection({
                   variant="ghost-destructive"
                   size="icon"
                   onClick={() => {
-                    if (window.confirm("确定要删除此资源吗？")) {
+                    if (window.confirm(t("resource.confirmDelete"))) {
                       onDelete(r.id);
                     }
                   }}

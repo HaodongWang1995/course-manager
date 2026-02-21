@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCurrentUser, useLogout } from "./use-queries";
 import { getToken } from "@/api/client";
 
-export function useAuthGuard(role: "teacher" | "student") {
+export function useAuthGuard(role?: "teacher" | "student") {
   const navigate = useNavigate();
   const { data: user, isLoading, isError } = useCurrentUser();
 
@@ -12,12 +12,12 @@ export function useAuthGuard(role: "teacher" | "student") {
       navigate({ to: "/login" });
       return;
     }
-    if (!isLoading && (isError || (user && user.role !== role))) {
+    if (!isLoading && (isError || (role && user && user.role !== role))) {
       navigate({ to: "/login" });
     }
   }, [user, isLoading, isError, navigate, role]);
 
-  const isAuthed = !isLoading && !!user && user.role === role;
+  const isAuthed = !isLoading && !!user && (!role || user.role === role);
 
   return { user, isLoading, isAuthed };
 }

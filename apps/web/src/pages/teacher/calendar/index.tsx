@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, Tabs, TabsList, TabsTrigger } from "@course-manager/ui";
 import { Plus } from "lucide-react";
 import {
@@ -22,6 +23,7 @@ const eventColors = [
 const eventBgColors = ["bg-blue-500", "bg-green-500", "bg-purple-500", "bg-orange-500", "bg-teal-500"];
 
 export function TeacherCalendarPage() {
+  const { t } = useTranslation("teacherCalendar");
   const [view, setView] = useState("month");
   const [showNewEvent, setShowNewEvent] = useState(false);
   const [currentDate, setCurrentDate] = useState(() => new Date());
@@ -72,14 +74,16 @@ export function TeacherCalendarPage() {
     return d;
   }, [currentDate]);
 
+  const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
+
   const weekDays = useMemo(() =>
     Array.from({ length: 7 }, (_, i) => {
       const d = new Date(sunday);
       d.setDate(sunday.getDate() + i);
-      const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-      return `${dayNames[d.getDay()]} ${d.getDate()}`;
+      return `${t(`days.${dayKeys[d.getDay()]}`)} ${d.getDate()}`;
     }),
-    [sunday]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sunday, t]
   );
 
   const todayDayIdx = useMemo(() => {
@@ -125,20 +129,20 @@ export function TeacherCalendarPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Calendar</h1>
-          <p className="text-sm text-gray-500">Manage your schedule and events</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+          <p className="text-sm text-gray-500">{t("subtitle")}</p>
         </div>
         <div className="flex items-center gap-3">
           <Tabs value={view} onValueChange={setView}>
             <TabsList>
-              <TabsTrigger value="month">Month</TabsTrigger>
-              <TabsTrigger value="week">Week</TabsTrigger>
-              <TabsTrigger value="day">Day</TabsTrigger>
+              <TabsTrigger value="month">{t("views.month")}</TabsTrigger>
+              <TabsTrigger value="week">{t("views.week")}</TabsTrigger>
+              <TabsTrigger value="day">{t("views.day")}</TabsTrigger>
             </TabsList>
           </Tabs>
           <Button onClick={() => setShowNewEvent(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            New Event
+            {t("newEvent")}
           </Button>
         </div>
       </div>

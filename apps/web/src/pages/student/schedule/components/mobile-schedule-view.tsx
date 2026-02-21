@@ -1,8 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "@course-manager/ui";
-import { Clock, FileText, MapPin, MessageSquare } from "lucide-react";
+import { Clock, ExternalLink, FileText, MapPin, MessageSquare } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import type { ScheduleEvent } from "../index";
+
+function isUrl(str: string) {
+  return /^https?:\/\//i.test(str);
+}
 
 const courseColors = [
   { bg: "bg-blue-100", border: "border-blue-300", text: "text-blue-800", solid: "bg-blue-500" },
@@ -16,6 +20,7 @@ const courseColors = [
 interface MobileScheduleViewProps {
   morningEvents: ScheduleEvent[];
   afternoonEvents: ScheduleEvent[];
+  upcomingEvents?: ScheduleEvent[];
   onGoToFeedback: (courseId: string) => void;
   onViewCourse: (courseId: string) => void;
 }
@@ -23,6 +28,7 @@ interface MobileScheduleViewProps {
 export function MobileScheduleView({
   morningEvents,
   afternoonEvents,
+  upcomingEvents = [],
   onGoToFeedback,
   onViewCourse,
 }: MobileScheduleViewProps) {
@@ -50,10 +56,22 @@ export function MobileScheduleView({
               </p>
               <h4 className="mt-1 text-base font-semibold text-gray-900">{event.course_title}</h4>
               {event.room && (
-                <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
-                  <MapPin className="h-3 w-3" />
-                  {event.room}
-                </p>
+                isUrl(event.room) ? (
+                  <a
+                    href={event.room}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-0.5 flex items-center gap-1 text-xs text-blue-600 hover:underline font-medium"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    {t("schedule.joinRoom")}
+                  </a>
+                ) : (
+                  <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
+                    <MapPin className="h-3 w-3" />
+                    {event.room}
+                  </p>
+                )
               )}
             </div>
           </div>
@@ -81,6 +99,31 @@ export function MobileScheduleView({
           title={t("schedule.noClassesToday.title")}
           description={t("schedule.noClassesToday.description")}
         />
+        {upcomingEvents.length > 0 && (
+          <div className="space-y-3">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">{t("schedule.upcomingClasses")}</h3>
+            {upcomingEvents.map((event) => {
+              const c = courseColors[event.colorIdx];
+              const dateLabel = event.startDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+              const startTime = new Date(event.start_time).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+              const endTime = new Date(event.end_time).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+              return (
+                <div key={event.id} className={`overflow-hidden rounded-xl border-l-4 ${c.border.replace("border-", "border-l-")} bg-white shadow-sm`}>
+                  <div className="p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-400">{dateLabel} · {startTime} – {endTime}</p>
+                    <h4 className="mt-1 text-base font-semibold text-gray-900">{event.course_title}</h4>
+                    {event.room && (
+                      <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
+                        <MapPin className="h-3 w-3" />
+                        {event.room}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }

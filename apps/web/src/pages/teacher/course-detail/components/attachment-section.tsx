@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, FileUploadZone, AttachmentList } from "@course-manager/ui";
 import { Paperclip } from "lucide-react";
 import type { Attachment } from "@/api/client";
+import { useTranslation } from "react-i18next";
 
 interface AttachmentSectionProps {
   attachments: Attachment[];
@@ -27,11 +28,12 @@ export function AttachmentSection({
   tooLargeText,
   emptyText,
 }: AttachmentSectionProps) {
+  const { t } = useTranslation("teacherCourseDetail");
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
         <Paperclip className="h-5 w-5 text-gray-500" />
-        <CardTitle>课程附件 ({attachments.length})</CardTitle>
+        <CardTitle>{t("attachment.title")} ({attachments.length})</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <FileUploadZone

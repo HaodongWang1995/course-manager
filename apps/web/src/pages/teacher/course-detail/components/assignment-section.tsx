@@ -1,6 +1,7 @@
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@course-manager/ui";
 import { BookOpen, Calendar, Plus, Trash2 } from "lucide-react";
 import type { Assignment } from "@/api/client";
+import { useTranslation } from "react-i18next";
 
 interface AssignmentSectionProps {
   assignments: Assignment[];
@@ -13,20 +14,21 @@ export function AssignmentSection({
   onDelete,
   onRequestAdd,
 }: AssignmentSectionProps) {
+  const { t } = useTranslation("teacherCourseDetail");
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <BookOpen className="h-5 w-5 text-gray-500" />
-          <CardTitle>作业 ({assignments.length})</CardTitle>
+          <CardTitle>{t("assignment.title")} ({assignments.length})</CardTitle>
         </div>
         <Button size="sm" variant="outline" onClick={onRequestAdd}>
-          <Plus className="h-4 w-4 mr-1" /> 添加作业
+          <Plus className="h-4 w-4 mr-1" /> {t("assignment.addButton")}
         </Button>
       </CardHeader>
       <CardContent>
         {assignments.length === 0 ? (
-          <p className="py-4 text-center text-sm text-gray-400">暂无作业</p>
+          <p className="py-4 text-center text-sm text-gray-400">{t("assignment.empty")}</p>
         ) : (
           <div className="space-y-2">
             {assignments.map((a) => (
@@ -41,14 +43,14 @@ export function AssignmentSection({
                   )}
                   <p className="mt-1 flex items-center gap-1 text-xs text-gray-400">
                     <Calendar className="h-3 w-3" />
-                    截止：{new Date(a.due_date).toLocaleDateString("zh-CN")}
+                    {t("assignment.due", { date: new Date(a.due_date).toLocaleDateString() })}
                   </p>
                 </div>
                 <Button
                   variant="ghost-destructive"
                   size="icon"
                   onClick={() => {
-                    if (window.confirm("确定要删除此作业吗？")) {
+                    if (window.confirm(t("assignment.confirmDelete"))) {
                       onDelete(a.id);
                     }
                   }}

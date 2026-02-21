@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import {
   Card,
@@ -47,6 +48,7 @@ interface FeedbackEditorPageProps {
 }
 
 export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
+  const { t } = useTranslation("feedback");
   const { data: draft } = useFeedbackDraft(courseId);
   const saveDraftMutation = useSaveFeedbackDraft();
   const publishMutation = usePublishFeedback();
@@ -147,11 +149,11 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
                   Advanced Mathematics
                 </h1>
                 <Badge className={draft?.published ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"}>
-                  {draft?.published ? "Published" : "Draft"}
+                  {draft?.published ? t("status.published") : t("status.draft")}
                 </Badge>
               </div>
               <p className="mt-1 text-sm text-gray-500">
-                Course ID: {courseId} &middot; Session #12
+                {t("courseId")} {courseId} &middot; Session #12
               </p>
             </div>
             <div className="flex flex-col items-end gap-1.5">
@@ -159,13 +161,13 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
                 {saveStatus === "saving" && (
                   <span className="flex items-center gap-1.5 text-xs text-gray-400">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gray-400" />
-                    Saving...
+                    {t("saving")}
                   </span>
                 )}
                 {saveStatus === "saved" && (
                   <span className="flex items-center gap-1.5 text-xs text-emerald-600">
                     <CheckCircle2 className="h-3.5 w-3.5" />
-                    Draft Saved
+                    {t("draftSaved")}
                     {lastSaved && (
                       <span className="text-gray-400">
                         · {lastSaved.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}
@@ -182,10 +184,10 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
               </div>
               <div className="text-right text-sm text-gray-500">
                 <p>
-                  <span className="font-medium text-gray-700">Date:</span> Oct 20, 2023
+                  <span className="font-medium text-gray-700">{t("date")}</span> Oct 20, 2023
                 </p>
                 <p>
-                  <span className="font-medium text-gray-700">Time:</span> 10:00 AM - 11:30 AM
+                  <span className="font-medium text-gray-700">{t("time")}</span> 10:00 AM - 11:30 AM
                 </p>
               </div>
             </div>
@@ -196,10 +198,10 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
         <Card className="mb-6">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold">
-              Present Students
+              {t("presentStudents")}
             </CardTitle>
             <p className="text-xs text-gray-500">
-              {presentStudents.length} students marked present for this session
+              {presentStudents.length} {t("studentsPresent")}
             </p>
           </CardHeader>
           <CardContent>
@@ -218,7 +220,7 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
                 <button className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-dashed border-gray-300 text-gray-400 transition-colors hover:border-blue-400 hover:text-blue-500">
                   <Plus className="h-5 w-5" />
                 </button>
-                <span className="text-xs text-gray-400">Add</span>
+                <span className="text-xs text-gray-400">{t("add")}</span>
               </div>
             </div>
           </CardContent>
@@ -231,9 +233,9 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
               <CollapsibleTrigger asChild>
                 <button className="flex w-full items-center justify-between text-left">
                   <div>
-                    <CardTitle className="text-sm font-semibold">Course Requirements</CardTitle>
+                    <CardTitle className="text-sm font-semibold">{t("courseRequirements")}</CardTitle>
                     <p className="mt-0.5 text-xs text-gray-500">
-                      Instructions and prerequisites for students before class
+                      {t("requirementsDesc")}
                     </p>
                   </div>
                   <ChevronDown
@@ -249,7 +251,7 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
                     <div onChange={markDirty}>
                       <FormTextareaField
                         label=""
-                        placeholder="Pre-class instructions for students"
+                        placeholder={t("preClassInstructions")}
                         rows={5}
                         field={field}
                       />
@@ -264,8 +266,8 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
         {/* Post-Class Feedback */}
         <Card className="mb-6">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Post-Class Feedback</CardTitle>
-            <p className="text-xs text-gray-500">Notes and feedback from today's session</p>
+            <CardTitle className="text-sm font-semibold">{t("postClassFeedback")}</CardTitle>
+            <p className="text-xs text-gray-500">{t("postClassFeedbackDesc")}</p>
           </CardHeader>
           <CardContent>
             <div className="mb-2 flex items-center gap-1 rounded-t-lg border border-b-0 border-gray-300 bg-gray-50 px-2 py-1.5">
@@ -284,7 +286,7 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
               <div className="mx-1 h-5 w-px bg-gray-300" />
               <Button variant="ghost" size="sm" className="h-7 gap-1 px-2 text-xs text-blue-600 hover:text-blue-800">
                 <AtSign className="h-3.5 w-3.5" />
-                Mention
+                {t("mention")}
               </Button>
             </div>
             <form.Field name="feedback">
@@ -292,7 +294,7 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
                 <div onChange={markDirty}>
                   <FormTextareaField
                     label=""
-                    placeholder="Write your post-class feedback here. Use @mention to tag specific students..."
+                    placeholder={t("feedbackPlaceholder")}
                     rows={7}
                     field={field}
                   />
@@ -305,8 +307,8 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
         {/* Materials Shared */}
         <Card className="mb-6">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Materials Shared</CardTitle>
-            <p className="text-xs text-gray-500">Files and resources shared during this session</p>
+            <CardTitle className="text-sm font-semibold">{t("materialsShared")}</CardTitle>
+            <p className="text-xs text-gray-500">{t("materialsDesc")}</p>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50/50 px-4 py-3">
@@ -330,7 +332,7 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
             </div>
             <button className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-4 text-sm font-medium text-gray-500 transition-colors hover:border-blue-400 hover:bg-blue-50/50 hover:text-blue-600">
               <Paperclip className="h-4 w-4" />
-              Attach File or Link
+              {t("attachFileOrLink")}
             </button>
           </CardContent>
         </Card>
@@ -338,16 +340,16 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
         {/* Homework */}
         <Card className="mb-6">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Homework</CardTitle>
-            <p className="text-xs text-gray-500">Assign homework for the next session</p>
+            <CardTitle className="text-sm font-semibold">{t("homework")}</CardTitle>
+            <p className="text-xs text-gray-500">{t("homeworkDesc")}</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <form.Field name="assignmentTitle">
               {(field) => (
                 <div onChange={markDirty}>
                   <FormTextField
-                    label="Assignment Title"
-                    placeholder="e.g. Chapter 4 Problem Set"
+                    label={t("assignmentTitle")}
+                    placeholder={t("assignmentTitlePlaceholder")}
                     field={field}
                   />
                 </div>
@@ -357,7 +359,7 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
               {(field) => (
                 <div onChange={markDirty}>
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Due Date</label>
+                    <label className="block text-sm font-medium text-gray-700">{t("dueDate")}</label>
                     <div className="relative">
                       <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
                       <input
@@ -386,7 +388,7 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
               disabled={saveDraftMutation.isPending}
             >
               <Save className="h-4 w-4" />
-              {saveDraftMutation.isPending ? "Saving..." : "Save Draft"}
+              {saveDraftMutation.isPending ? t("saving") : t("saveDraft")}
             </Button>
             <Button
               className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700"
@@ -394,7 +396,7 @@ export function FeedbackEditorPage({ courseId }: FeedbackEditorPageProps) {
               disabled={publishMutation.isPending}
             >
               <Send className="h-4 w-4" />
-              {publishMutation.isPending ? "Publishing..." : "Save and Publish"}
+              {publishMutation.isPending ? t("saving") : t("saveAndPublish")}
             </Button>
           </div>
         </div>
