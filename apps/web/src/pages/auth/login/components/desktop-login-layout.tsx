@@ -36,7 +36,6 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
 
   function selectRole(r: "student" | "teacher") {
     setRole(r);
-    registerForm.setFieldValue("role", r);
   }
 
   const loginForm = useForm({
@@ -58,10 +57,10 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
       password: "",
       role: "student" as "student" | "teacher",
     },
-    validators: { onChange: registerSchema },
+    validators: { onBlur: registerSchema },
     onSubmit: ({ value }) => {
       setError("");
-      registerMutation.mutate(value, {
+      registerMutation.mutate({ ...value, role }, {
         onSuccess: (user) => onSuccess(user.role),
         onError: (err) => setError(err.message || "注册失败"),
       });
@@ -95,55 +94,6 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
 
         {/* Content */}
         <div className="px-6 pb-6">
-          {/* Role Selection */}
-          <div className="mt-5">
-            <p className="text-base font-medium text-slate-900">I am a...</p>
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => selectRole("student")}
-                className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 py-4 transition-all ${
-                  role === "student"
-                    ? "border-[#137FEC] bg-blue-50/50"
-                    : "border-slate-200 bg-white"
-                }`}
-              >
-                {role === "student" && (
-                  <CheckCircle2 className="absolute right-2 top-2 h-5 w-5 text-[#137FEC]" />
-                )}
-                <GraduationCap
-                  className={`h-7 w-7 ${role === "student" ? "text-[#137FEC]" : "text-slate-400"}`}
-                />
-                <span
-                  className={`text-sm font-semibold ${role === "student" ? "text-[#137FEC]" : "text-slate-500"}`}
-                >
-                  Student
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => selectRole("teacher")}
-                className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 py-4 transition-all ${
-                  role === "teacher"
-                    ? "border-[#137FEC] bg-blue-50/50"
-                    : "border-slate-200 bg-white"
-                }`}
-              >
-                {role === "teacher" && (
-                  <CheckCircle2 className="absolute right-2 top-2 h-5 w-5 text-[#137FEC]" />
-                )}
-                <BookOpen
-                  className={`h-7 w-7 ${role === "teacher" ? "text-[#137FEC]" : "text-slate-400"}`}
-                />
-                <span
-                  className={`text-sm font-semibold ${role === "teacher" ? "text-[#137FEC]" : "text-slate-500"}`}
-                >
-                  Teacher
-                </span>
-              </button>
-            </div>
-          </div>
-
           {/* Login/Register Toggle */}
           <div className="mt-5">
             <div className="flex rounded-lg bg-gray-100 p-1">
@@ -263,97 +213,148 @@ export function DesktopLoginLayout({ onSuccess }: DesktopLoginLayoutProps) {
               </Button>
             </form>
           ) : (
-            <form
-              onSubmit={(e) => { e.preventDefault(); registerForm.handleSubmit(); }}
-              className="mt-5 space-y-4"
-            >
-              <registerForm.Field name="name">
-                {(field) => (
-                  <div className="space-y-1.5">
-                    <Label htmlFor="d-reg-name" className="text-sm font-medium text-slate-900">
-                      Full Name
-                    </Label>
-                    <Input
-                      id="d-reg-name"
-                      type="text"
-                      placeholder="Your full name"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={field.handleBlur}
-                      className="h-12 rounded-lg border-slate-200 text-base placeholder:text-slate-400"
+            <>
+              {/* Role Selection — only shown during registration */}
+              <div className="mt-5">
+                <p className="text-base font-medium text-slate-900">I am a...</p>
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => selectRole("student")}
+                    className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 py-4 transition-all ${
+                      role === "student"
+                        ? "border-[#137FEC] bg-blue-50/50"
+                        : "border-slate-200 bg-white"
+                    }`}
+                  >
+                    {role === "student" && (
+                      <CheckCircle2 className="absolute right-2 top-2 h-5 w-5 text-[#137FEC]" />
+                    )}
+                    <GraduationCap
+                      className={`h-7 w-7 ${role === "student" ? "text-[#137FEC]" : "text-slate-400"}`}
                     />
-                    {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
+                    <span
+                      className={`text-sm font-semibold ${role === "student" ? "text-[#137FEC]" : "text-slate-500"}`}
+                    >
+                      Student
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => selectRole("teacher")}
+                    className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 py-4 transition-all ${
+                      role === "teacher"
+                        ? "border-[#137FEC] bg-blue-50/50"
+                        : "border-slate-200 bg-white"
+                    }`}
+                  >
+                    {role === "teacher" && (
+                      <CheckCircle2 className="absolute right-2 top-2 h-5 w-5 text-[#137FEC]" />
                     )}
-                  </div>
-                )}
-              </registerForm.Field>
+                    <BookOpen
+                      className={`h-7 w-7 ${role === "teacher" ? "text-[#137FEC]" : "text-slate-400"}`}
+                    />
+                    <span
+                      className={`text-sm font-semibold ${role === "teacher" ? "text-[#137FEC]" : "text-slate-500"}`}
+                    >
+                      Teacher
+                    </span>
+                  </button>
+                </div>
+              </div>
 
-              <registerForm.Field name="email">
-                {(field) => (
-                  <div className="space-y-1.5">
-                    <Label htmlFor="d-reg-email" className="text-sm font-medium text-slate-900">
-                      Email Address
-                    </Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                      <Input
-                        id="d-reg-email"
-                        type="email"
-                        placeholder="name@example.com"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        onBlur={field.handleBlur}
-                        className="h-12 rounded-lg border-slate-200 pl-11 text-base placeholder:text-slate-400"
-                      />
-                    </div>
-                    {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
-                    )}
-                  </div>
-                )}
-              </registerForm.Field>
-
-              <registerForm.Field name="password">
-                {(field) => (
-                  <div className="space-y-1.5">
-                    <Label htmlFor="d-reg-password" className="text-sm font-medium text-slate-900">
-                      Password
-                    </Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                      <Input
-                        id="d-reg-password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="At least 6 characters"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        onBlur={field.handleBlur}
-                        className="h-12 rounded-lg border-slate-200 pl-11 pr-11 text-base placeholder:text-slate-400"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                      >
-                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                      </button>
-                    </div>
-                    {field.state.meta.errors.length > 0 && (
-                      <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
-                    )}
-                  </div>
-                )}
-              </registerForm.Field>
-
-              <Button
-                type="submit"
-                className="mt-2 h-12 w-full rounded-lg bg-[#137FEC] text-base font-bold shadow-md hover:bg-[#1172d4]"
-                disabled={isLoading}
+              <form
+                onSubmit={(e) => { e.preventDefault(); registerForm.handleSubmit(); }}
+                className="mt-5 space-y-4"
               >
-                {isLoading ? "Signing up..." : "Sign Up"}
-              </Button>
-            </form>
+                <registerForm.Field name="name">
+                  {(field) => (
+                    <div className="space-y-1.5">
+                      <Label htmlFor="d-reg-name" className="text-sm font-medium text-slate-900">
+                        Full Name
+                      </Label>
+                      <Input
+                        id="d-reg-name"
+                        type="text"
+                        placeholder="Your full name"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={field.handleBlur}
+                        className="h-12 rounded-lg border-slate-200 text-base placeholder:text-slate-400"
+                      />
+                      {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                        <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
+                      )}
+                    </div>
+                  )}
+                </registerForm.Field>
+
+                <registerForm.Field name="email">
+                  {(field) => (
+                    <div className="space-y-1.5">
+                      <Label htmlFor="d-reg-email" className="text-sm font-medium text-slate-900">
+                        Email Address
+                      </Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                        <Input
+                          id="d-reg-email"
+                          type="email"
+                          placeholder="name@example.com"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          onBlur={field.handleBlur}
+                          className="h-12 rounded-lg border-slate-200 pl-11 text-base placeholder:text-slate-400"
+                        />
+                      </div>
+                      {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                        <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
+                      )}
+                    </div>
+                  )}
+                </registerForm.Field>
+
+                <registerForm.Field name="password">
+                  {(field) => (
+                    <div className="space-y-1.5">
+                      <Label htmlFor="d-reg-password" className="text-sm font-medium text-slate-900">
+                        Password
+                      </Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                        <Input
+                          id="d-reg-password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="At least 6 characters"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          onBlur={field.handleBlur}
+                          className="h-12 rounded-lg border-slate-200 pl-11 pr-11 text-base placeholder:text-slate-400"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                        >
+                          {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
+                      </div>
+                      {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                        <p className="text-xs text-red-500">{formatFieldErrors(field.state.meta.errors)}</p>
+                      )}
+                    </div>
+                  )}
+                </registerForm.Field>
+
+                <Button
+                  type="submit"
+                  className="mt-2 h-12 w-full rounded-lg bg-[#137FEC] text-base font-bold shadow-md hover:bg-[#1172d4]"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Signing up..." : "Sign Up"}
+                </Button>
+              </form>
+            </>
           )}
 
           {/* Footer: Switch link */}
