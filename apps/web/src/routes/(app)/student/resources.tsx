@@ -1,10 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import {
   CloudUpload,
   FileText,
   FolderOpen,
   ArrowLeft,
-  MoreHorizontal,
   Video,
   Presentation,
   FileSpreadsheet,
@@ -50,6 +49,7 @@ function matchesCategory(course: string, category: string) {
 
 function StudentResources() {
   const { t } = useTranslation("studentResources");
+  const router = useRouter();
   const { data: resources, isLoading } = useStudentResources();
   const [activeCategory, setActiveCategory] = useState<string>("all");
 
@@ -86,6 +86,7 @@ function StudentResources() {
           <div className="flex items-center gap-3">
             <button
               type="button"
+              onClick={() => router.history.back()}
               className="rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
               aria-label="Go back"
             >
@@ -199,10 +200,10 @@ function StudentResources() {
                     </div>
                     <button
                       type="button"
-                      className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-                      aria-label="Open item actions"
+                      className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-[#137fec]"
+                      aria-label={`Download ${item.title}`}
                     >
-                      <MoreHorizontal className="h-5 w-5" />
+                      <Download className="h-4 w-4" />
                     </button>
                   </article>
                 );
