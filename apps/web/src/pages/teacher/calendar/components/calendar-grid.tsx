@@ -1,10 +1,17 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, Button } from "@course-manager/ui";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 
-// Shared constants
-const hours = Array.from({ length: 10 }, (_, i) => i + 8); // 8 AM to 5 PM
+// Shared constants — full 24-hour grid; views scroll to 8 AM by default
+const hours = Array.from({ length: 24 }, (_, i) => i); // midnight → 11 PM
+
+function formatHour(hour: number): string {
+  if (hour === 0) return "12 AM";
+  if (hour === 12) return "12 PM";
+  if (hour < 12) return `${hour} AM`;
+  return `${hour - 12} PM`;
+}
 
 // PostgreSQL TIMESTAMP strips timezone to keep wall-clock time as intended
 function parseLocalTime(isoStr: string): Date {
@@ -228,6 +235,13 @@ function DayView({
   events: Array<{ startHour: number; duration: number; title: string; room: string; color: string }>;
   dayLabel: string;
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 8 * 60; // default scroll to 8 AM
+    }
+  }, []);
+
   return (
     <div className="overflow-x-auto">
       <div className="min-w-[400px]">
@@ -237,34 +251,36 @@ function DayView({
             {dayLabel}
           </div>
         </div>
-        <div className="relative">
-          {hours.map((hour) => (
-            <div key={hour} className="grid grid-cols-[60px_1fr] border-b border-gray-100" style={{ height: 60 }}>
-              <div className="flex items-start justify-end pr-2 pt-1 text-xs text-gray-400">
-                {hour > 12 ? hour - 12 : hour}{hour >= 12 ? " PM" : " AM"}
+        <div ref={scrollRef} className="max-h-[600px] overflow-y-auto">
+          <div className="relative">
+            {hours.map((hour) => (
+              <div key={hour} className="grid grid-cols-[60px_1fr] border-b border-gray-100" style={{ height: 60 }}>
+                <div className="flex items-start justify-end pr-2 pt-1 text-xs text-gray-400">
+                  {formatHour(hour)}
+                </div>
+                <div className="relative border-l border-gray-100" />
               </div>
-              <div className="relative border-l border-gray-100" />
-            </div>
-          ))}
-          {events.map((event, idx) => {
-            const top = (event.startHour - 8) * 60;
-            const height = event.duration * 60;
-            return (
-              <div
-                key={idx}
-                className={`absolute rounded-md border p-2 text-xs ${event.color}`}
-                style={{ top, height, left: "64px", right: "4px" }}
-              >
-                <p className="font-medium">{event.title}</p>
-                {event.room && (
-                  <div className="mt-1 flex items-center gap-1 opacity-75">
-                    <MapPin className="h-3 w-3" />
-                    {event.room}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+            ))}
+            {events.map((event, idx) => {
+              const top = event.startHour * 60; // relative to midnight (hour 0)
+              const height = event.duration * 60;
+              return (
+                <div
+                  key={idx}
+                  className={`absolute rounded-md border p-2 text-xs ${event.color}`}
+                  style={{ top, height, left: "64px", right: "4px" }}
+                >
+                  <p className="font-medium">{event.title}</p>
+                  {event.room && (
+                    <div className="mt-1 flex items-center gap-1 opacity-75">
+                      <MapPin className="h-3 w-3" />
+                      {event.room}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
@@ -281,6 +297,13 @@ function WeekView({
   weekDays: string[];
   todayIdx: number;
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 8 * 60; // default scroll to 8 AM
+    }
+  }, []);
+
   return (
     <div className="overflow-x-auto">
       <div className="min-w-[700px]">
@@ -294,33 +317,35 @@ function WeekView({
             </div>
           ))}
         </div>
-        <div className="relative">
-          {hours.map((hour) => (
-            <div key={hour} className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-gray-100" style={{ height: 60 }}>
-              <div className="flex items-start justify-end pr-2 pt-1 text-xs text-gray-400">
-                {hour > 12 ? hour - 12 : hour}{hour >= 12 ? " PM" : " AM"}
+        <div ref={scrollRef} className="max-h-[600px] overflow-y-auto">
+          <div className="relative">
+            {hours.map((hour) => (
+              <div key={hour} className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-gray-100" style={{ height: 60 }}>
+                <div className="flex items-start justify-end pr-2 pt-1 text-xs text-gray-400">
+                  {formatHour(hour)}
+                </div>
+                {weekDays.map((_, dayIdx) => (
+                  <div key={dayIdx} className="relative border-l border-gray-100" />
+                ))}
               </div>
-              {weekDays.map((_, dayIdx) => (
-                <div key={dayIdx} className="relative border-l border-gray-100" />
-              ))}
-            </div>
-          ))}
-          {events.filter((e) => e.day >= 0 && e.day < 7).map((event, idx) => {
-            const top = (event.startHour - 8) * 60;
-            const height = event.duration * 60;
-            const left = `calc(60px + ${event.day} * ((100% - 60px) / 7) + 2px)`;
-            const width = `calc((100% - 60px) / 7 - 4px)`;
-            return (
-              <div
-                key={idx}
-                className={`absolute rounded-md border p-1.5 text-xs ${event.color}`}
-                style={{ top, height, left, width }}
-              >
-                <p className="font-medium leading-tight">{event.title}</p>
-                {event.room && <p className="mt-0.5 opacity-75">{event.room}</p>}
-              </div>
-            );
-          })}
+            ))}
+            {events.filter((e) => e.day >= 0 && e.day < 7).map((event, idx) => {
+              const top = event.startHour * 60; // relative to midnight (hour 0)
+              const height = event.duration * 60;
+              const left = `calc(60px + ${event.day} * ((100% - 60px) / 7) + 2px)`;
+              const width = `calc((100% - 60px) / 7 - 4px)`;
+              return (
+                <div
+                  key={idx}
+                  className={`absolute rounded-md border p-1.5 text-xs ${event.color}`}
+                  style={{ top, height, left, width }}
+                >
+                  <p className="font-medium leading-tight">{event.title}</p>
+                  {event.room && <p className="mt-0.5 opacity-75">{event.room}</p>}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
