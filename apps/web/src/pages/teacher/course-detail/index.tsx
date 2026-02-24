@@ -15,9 +15,6 @@ import {
   useCourseAssignments,
   useCreateAssignment,
   useDeleteAssignment,
-  useCourseResources,
-  useCreateResource,
-  useDeleteResource,
 } from "@/hooks/use-queries";
 import { CourseInfoCard } from "./components/course-info-card";
 import { ScheduleSection } from "./components/schedule-section";
@@ -25,8 +22,6 @@ import { AddScheduleDialog } from "./components/add-schedule-dialog";
 import { AttachmentSection } from "./components/attachment-section";
 import { AssignmentSection } from "./components/assignment-section";
 import { AddAssignmentDialog } from "./components/add-assignment-dialog";
-import { ResourceSection } from "./components/resource-section";
-import { AddResourceDialog } from "./components/add-resource-dialog";
 
 interface TeacherCourseDetailPageProps {
   courseId: string;
@@ -48,14 +43,9 @@ export function TeacherCourseDetailPage({ courseId }: TeacherCourseDetailPagePro
   const { data: assignments = [] } = useCourseAssignments(courseId);
   const createAssignmentMutation = useCreateAssignment();
   const deleteAssignmentMutation = useDeleteAssignment();
-  const { data: resources = [] } = useCourseResources(courseId);
-  const createResourceMutation = useCreateResource();
-  const deleteResourceMutation = useDeleteResource();
-
   // Dialog state
   const [showAddSchedule, setShowAddSchedule] = useState(false);
   const [showAddAssignment, setShowAddAssignment] = useState(false);
-  const [showAddResource, setShowAddResource] = useState(false);
 
   if (isLoading) {
     return (
@@ -134,13 +124,6 @@ export function TeacherCourseDetailPage({ courseId }: TeacherCourseDetailPagePro
         onRequestAdd={() => setShowAddAssignment(true)}
       />
 
-      {/* Resources */}
-      <ResourceSection
-        resources={resources}
-        onDelete={(id) => deleteResourceMutation.mutate({ id, courseId })}
-        onRequestAdd={() => setShowAddResource(true)}
-      />
-
       {/* Dialogs */}
       <AddScheduleDialog
         open={showAddSchedule}
@@ -167,17 +150,6 @@ export function TeacherCourseDetailPage({ courseId }: TeacherCourseDetailPagePro
         isLoading={createAssignmentMutation.isPending}
       />
 
-      <AddResourceDialog
-        open={showAddResource}
-        onOpenChange={setShowAddResource}
-        onAdd={(data) =>
-          createResourceMutation.mutate(
-            { courseId, data },
-            { onSuccess: () => setShowAddResource(false) }
-          )
-        }
-        isLoading={createResourceMutation.isPending}
-      />
     </div>
   );
 }

@@ -459,7 +459,12 @@
       "title": "课程日程",
       "addButton": "添加课时",
       "empty": "暂无课时，点击上方按钮添加",
-      "lesson": "第 {{number}} 课"
+      "lesson": "第 {{number}} 课",
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "room": "教室",
+      "lessonNumber": "课时编号",
+      "delete": "删除"
     },
     "addSchedule": {
       "title": "添加课时",
@@ -494,7 +499,11 @@
       "addButton": "添加作业",
       "empty": "暂无作业",
       "due": "截止：{{date}}",
-      "confirmDelete": "确定要删除此作业吗？"
+      "confirmDelete": "确定要删除此作业吗？",
+      "noDescription": "暂无说明",
+      "dueDate": "截止日期",
+      "createdAt": "创建日期",
+      "delete": "删除"
     },
     "addAssignment": {
       "title": "添加作业",

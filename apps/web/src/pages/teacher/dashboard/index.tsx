@@ -18,7 +18,6 @@ import {
   ChevronLeft,
   ChevronRight,
   CalendarDays,
-  ChevronDown,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useTeacherSchedule, useUpcomingDeadlines, useCurrentUser } from "@/hooks/use-queries";
@@ -58,8 +57,6 @@ export function TeacherDashboardPage() {
   const { data: user } = useCurrentUser();
   const { data: schedule = [] } = useTeacherSchedule();
   const { data: deadlines = [] } = useUpcomingDeadlines();
-  const [semester] = useState(() => t("semester.fall2023"));
-  const [showSemesterMenu, setShowSemesterMenu] = useState(false);
 
   const [calMonth, setCalMonth] = useState(() => new Date(2026, 1, 1));
   const today = useMemo(() => new Date(), []);
@@ -100,32 +97,7 @@ export function TeacherDashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Semester Selector Row */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
-        <div className="relative">
-          <button
-            className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            onClick={() => setShowSemesterMenu(!showSemesterMenu)}
-          >
-            {semester}
-            <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
-          </button>
-          {showSemesterMenu && (
-            <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
-              {[t("semester.spring2026"), t("semester.fall2025"), t("semester.fall2023")].map((s) => (
-                <button
-                  key={s}
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${s === semester ? "font-semibold text-blue-600" : "text-gray-700"}`}
-                  onClick={() => setShowSemesterMenu(false)}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+      <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
 
       <WelcomeHeader
         userName={user?.name ?? ""}

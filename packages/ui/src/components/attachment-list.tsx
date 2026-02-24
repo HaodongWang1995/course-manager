@@ -81,7 +81,7 @@ export function AttachmentList({
             )}
           </div>
           <div className="flex items-center gap-1">
-            {attachment.download_url && !attachment.download_url.startsWith("stub://") && (
+            {attachment.download_url && (
               <a
                 href={attachment.download_url}
                 target="_blank"

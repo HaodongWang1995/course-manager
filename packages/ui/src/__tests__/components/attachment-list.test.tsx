@@ -29,10 +29,11 @@ describe("AttachmentList", () => {
     expect(link).toHaveAttribute("href", "https://example.com/lecture.pdf");
   });
 
-  it("does not render download link for stub:// URLs", () => {
+  it("renders download link even for stub:// URLs", () => {
     const stubAttachment = { ...baseAttachment, download_url: "stub://download/test" };
     render(<AttachmentList attachments={[stubAttachment]} />);
-    expect(screen.queryByRole("link")).toBeNull();
+    const link = screen.getByRole("link");
+    expect(link).toHaveAttribute("href", "stub://download/test");
   });
 
   it("does not show delete button when onDelete not provided", () => {

@@ -72,11 +72,6 @@ export function StudentGradesPage() {
           </div>
         </div>
 
-        <div className="mt-2 flex w-full items-center gap-2 text-xs">
-          <span className="font-medium text-slate-500">{t("showing")}</span>
-          <span className="rounded-full bg-[#137fec]/10 px-2 py-0.5 font-medium text-[#137fec]">{t("filter.semester")}</span>
-          <span className="rounded-full bg-[#137fec]/10 px-2 py-0.5 font-medium text-[#137fec]">{t("filter.fullYear")}</span>
-        </div>
       </header>
 
       <main className="mx-auto flex w-full max-w-[448px] flex-col gap-6 px-4 py-4 md:px-0">
