@@ -464,7 +464,12 @@
       "endTime": "End Time",
       "room": "Room",
       "lessonNumber": "Lesson #",
+      "edit": "Edit",
       "delete": "Delete"
+    },
+    "editSchedule": {
+      "title": "Edit Lesson",
+      "submit": "Save Changes"
     },
     "addSchedule": {
       "title": "Add Lesson",
@@ -503,7 +508,12 @@
       "noDescription": "No description provided",
       "dueDate": "Due Date",
       "createdAt": "Created",
+      "edit": "Edit",
       "delete": "Delete"
+    },
+    "editAssignment": {
+      "title": "Edit Assignment",
+      "submit": "Save Changes"
     },
     "addAssignment": {
       "title": "Add Assignment",

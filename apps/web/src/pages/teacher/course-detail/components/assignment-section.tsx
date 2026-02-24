@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@course-manager/ui";
-import { BookOpen, Calendar, ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
+import { BookOpen, Calendar, ChevronDown, ChevronUp, Pencil, Plus, Trash2 } from "lucide-react";
 import type { Assignment } from "@/api/client";
 import { useTranslation } from "react-i18next";
 
@@ -8,12 +8,14 @@ interface AssignmentSectionProps {
   assignments: Assignment[];
   onDelete: (id: string) => void;
   onRequestAdd: () => void;
+  onRequestEdit: (assignment: Assignment) => void;
 }
 
 export function AssignmentSection({
   assignments,
   onDelete,
   onRequestAdd,
+  onRequestEdit,
 }: AssignmentSectionProps) {
   const { t } = useTranslation("teacherCourseDetail");
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -80,7 +82,16 @@ export function AssignmentSection({
                           <dd className="text-gray-700">{new Date(a.created_at).toLocaleDateString()}</dd>
                         </div>
                       </dl>
-                      <div className="mt-3 flex justify-end">
+                      <div className="mt-3 flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="gap-1"
+                          onClick={() => onRequestEdit(a)}
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          {t("assignment.edit")}
+                        </Button>
                         <Button
                           variant="ghost-destructive"
                           size="sm"

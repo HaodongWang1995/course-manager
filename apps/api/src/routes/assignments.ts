@@ -82,6 +82,41 @@ router.get("/students/assignments", authRequired, async (req: Request, res: Resp
   }
 });
 
+// PUT /api/assignments/:id — update assignment (teacher owns course)
+router.put("/assignments/:id", authRequired, teacherOnly, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const teacherId = req.user!.userId;
+
+    // Verify teacher owns the course the assignment belongs to
+    const check = await pool.query(
+      `SELECT a.id, a.course_id FROM assignments a
+       JOIN courses c ON c.id = a.course_id
+       WHERE a.id = $1 AND c.teacher_id = $2`,
+      [id, teacherId],
+    );
+    if (check.rows.length === 0) {
+      res.status(403).json({ error: "无权修改此作业" });
+      return;
+    }
+
+    const { title, description, due_date } = req.body;
+    const result = await pool.query(
+      `UPDATE assignments
+       SET title = COALESCE($1, title),
+           description = COALESCE($2, description),
+           due_date = COALESCE($3, due_date)
+       WHERE id = $4
+       RETURNING *`,
+      [title || null, description !== undefined ? description : null, due_date || null, id],
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Failed to update assignment:", err);
+    res.status(500).json({ error: "更新作业失败" });
+  }
+});
+
 // DELETE /api/assignments/:id — delete assignment (teacher owns course)
 router.delete("/assignments/:id", authRequired, teacherOnly, async (req: Request, res: Response) => {
   try {

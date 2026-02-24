@@ -19,6 +19,7 @@ import {
   type Enrollment,
   type Deadline,
   type Feedback,
+  type Assignment,
 } from "@/api/client";
 import {
   authKeys,
@@ -451,6 +452,18 @@ export function useDeleteAssignment() {
       assignmentApi.delete(id),
     onSuccess: (_res, { courseId }) => {
       queryClient.invalidateQueries({ queryKey: courseKeys.assignments(courseId).queryKey });
+      queryClient.invalidateQueries({ queryKey: studentKeys.assignments.queryKey });
+    },
+  });
+}
+
+export function useUpdateAssignment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Assignment, "id" | "course_id" | "created_at">> }) =>
+      assignmentApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: courseKeys.assignments._def });
       queryClient.invalidateQueries({ queryKey: studentKeys.assignments.queryKey });
     },
   });

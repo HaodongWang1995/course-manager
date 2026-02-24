@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@course-manager/ui";
-import { ChevronDown, ChevronUp, Clock, MapPin, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Clock, MapPin, Pencil, Plus, Trash2 } from "lucide-react";
 import type { Schedule } from "@/api/client";
 import { formatLocalDateTime, formatLocalTime } from "@/lib/time";
 import { useTranslation } from "react-i18next";
@@ -9,12 +9,14 @@ interface ScheduleSectionProps {
   schedules: Schedule[];
   onDelete: (id: string) => void;
   onRequestAdd: () => void;
+  onRequestEdit: (schedule: Schedule) => void;
 }
 
 export function ScheduleSection({
   schedules,
   onDelete,
   onRequestAdd,
+  onRequestEdit,
 }: ScheduleSectionProps) {
   const { t } = useTranslation("teacherCourseDetail");
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -93,7 +95,16 @@ export function ScheduleSection({
                           <dd className="text-gray-700">#{s.lesson_number}</dd>
                         </div>
                       </dl>
-                      <div className="mt-3 flex justify-end">
+                      <div className="mt-3 flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="gap-1"
+                          onClick={() => onRequestEdit(s)}
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          {t("schedule.edit")}
+                        </Button>
                         <Button
                           variant="ghost-destructive"
                           size="sm"

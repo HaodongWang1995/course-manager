@@ -3,17 +3,20 @@ import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Button } from "@course-manager/ui";
 import { ArrowLeft } from "lucide-react";
+import type { Schedule, Assignment } from "@/api/client";
 import {
   useCourseDetail,
   useUpdateCourse,
   useUpdateCourseStatus,
   useAddSchedule,
+  useUpdateSchedule,
   useDeleteSchedule,
   useCourseAttachments,
   useUploadAttachment,
   useDeleteAttachment,
   useCourseAssignments,
   useCreateAssignment,
+  useUpdateAssignment,
   useDeleteAssignment,
 } from "@/hooks/use-queries";
 import { CourseInfoCard } from "./components/course-info-card";
@@ -36,16 +39,21 @@ export function TeacherCourseDetailPage({ courseId }: TeacherCourseDetailPagePro
   const updateMutation = useUpdateCourse();
   const statusMutation = useUpdateCourseStatus();
   const addScheduleMutation = useAddSchedule();
+  const updateScheduleMutation = useUpdateSchedule();
   const deleteScheduleMutation = useDeleteSchedule();
   const { data: attachments = [] } = useCourseAttachments(courseId);
   const uploadMutation = useUploadAttachment();
   const deleteAttachmentMutation = useDeleteAttachment();
   const { data: assignments = [] } = useCourseAssignments(courseId);
   const createAssignmentMutation = useCreateAssignment();
+  const updateAssignmentMutation = useUpdateAssignment();
   const deleteAssignmentMutation = useDeleteAssignment();
+
   // Dialog state
-  const [showAddSchedule, setShowAddSchedule] = useState(false);
-  const [showAddAssignment, setShowAddAssignment] = useState(false);
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
+  const [showAssignmentDialog, setShowAssignmentDialog] = useState(false);
+  const [editingAssignment, setEditingAssignment] = useState<Assignment | null>(null);
 
   if (isLoading) {
     return (
@@ -69,6 +77,60 @@ export function TeacherCourseDetailPage({ courseId }: TeacherCourseDetailPagePro
       </div>
     );
   }
+
+  const handleOpenAddSchedule = () => {
+    setEditingSchedule(null);
+    setShowScheduleDialog(true);
+  };
+
+  const handleOpenEditSchedule = (schedule: Schedule) => {
+    setEditingSchedule(schedule);
+    setShowScheduleDialog(true);
+  };
+
+  const handleScheduleSubmit = (data: {
+    lesson_number: number;
+    title: string;
+    start_time: string;
+    end_time: string;
+    room: string;
+  }) => {
+    if (editingSchedule) {
+      updateScheduleMutation.mutate(
+        { id: editingSchedule.id, data },
+        { onSuccess: () => setShowScheduleDialog(false) },
+      );
+    } else {
+      addScheduleMutation.mutate(
+        { courseId, data },
+        { onSuccess: () => setShowScheduleDialog(false) },
+      );
+    }
+  };
+
+  const handleOpenAddAssignment = () => {
+    setEditingAssignment(null);
+    setShowAssignmentDialog(true);
+  };
+
+  const handleOpenEditAssignment = (assignment: Assignment) => {
+    setEditingAssignment(assignment);
+    setShowAssignmentDialog(true);
+  };
+
+  const handleAssignmentSubmit = (data: { title: string; description?: string; due_date: string }) => {
+    if (editingAssignment) {
+      updateAssignmentMutation.mutate(
+        { id: editingAssignment.id, data },
+        { onSuccess: () => setShowAssignmentDialog(false) },
+      );
+    } else {
+      createAssignmentMutation.mutate(
+        { courseId, data },
+        { onSuccess: () => setShowAssignmentDialog(false) },
+      );
+    }
+  };
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -96,7 +158,8 @@ export function TeacherCourseDetailPage({ courseId }: TeacherCourseDetailPagePro
       <ScheduleSection
         schedules={course.schedules || []}
         onDelete={(id) => deleteScheduleMutation.mutate(id)}
-        onRequestAdd={() => setShowAddSchedule(true)}
+        onRequestAdd={handleOpenAddSchedule}
+        onRequestEdit={handleOpenEditSchedule}
       />
 
       {/* Attachments */}
@@ -121,35 +184,28 @@ export function TeacherCourseDetailPage({ courseId }: TeacherCourseDetailPagePro
       <AssignmentSection
         assignments={assignments}
         onDelete={(id) => deleteAssignmentMutation.mutate({ id, courseId })}
-        onRequestAdd={() => setShowAddAssignment(true)}
+        onRequestAdd={handleOpenAddAssignment}
+        onRequestEdit={handleOpenEditAssignment}
       />
 
-      {/* Dialogs */}
+      {/* Schedule Dialog (Add / Edit) */}
       <AddScheduleDialog
-        open={showAddSchedule}
-        onOpenChange={setShowAddSchedule}
+        open={showScheduleDialog}
+        onOpenChange={setShowScheduleDialog}
         nextLessonNumber={(course.schedules?.length || 0) + 1}
-        onAdd={(data) =>
-          addScheduleMutation.mutate(
-            { courseId, data },
-            { onSuccess: () => setShowAddSchedule(false) }
-          )
-        }
-        isLoading={addScheduleMutation.isPending}
+        onSubmit={handleScheduleSubmit}
+        isLoading={editingSchedule ? updateScheduleMutation.isPending : addScheduleMutation.isPending}
+        editData={editingSchedule}
       />
 
+      {/* Assignment Dialog (Add / Edit) */}
       <AddAssignmentDialog
-        open={showAddAssignment}
-        onOpenChange={setShowAddAssignment}
-        onAdd={(data) =>
-          createAssignmentMutation.mutate(
-            { courseId, data },
-            { onSuccess: () => setShowAddAssignment(false) }
-          )
-        }
-        isLoading={createAssignmentMutation.isPending}
+        open={showAssignmentDialog}
+        onOpenChange={setShowAssignmentDialog}
+        onSubmit={handleAssignmentSubmit}
+        isLoading={editingAssignment ? updateAssignmentMutation.isPending : createAssignmentMutation.isPending}
+        editData={editingAssignment}
       />
-
     </div>
   );
 }

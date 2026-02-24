@@ -335,6 +335,12 @@ export const assignmentApi = {
       body: JSON.stringify(data),
     });
   },
+  update(id: string, data: Partial<Omit<Assignment, "id" | "course_id" | "created_at">>) {
+    return request<Assignment>(`/api/assignments/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  },
   delete(id: string) {
     return request<{ success: boolean }>(`/api/assignments/${id}`, { method: "DELETE" });
   },

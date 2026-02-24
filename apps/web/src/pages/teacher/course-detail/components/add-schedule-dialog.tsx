@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Button,
   Dialog,
@@ -11,12 +11,13 @@ import { useForm } from "@tanstack/react-form";
 import { scheduleFormValidator } from "@/lib/schemas";
 import { FormTextField, FormDateTimeField } from "@/components/form-field";
 import { useTranslation } from "react-i18next";
+import type { Schedule } from "@/api/client";
 
-interface AddScheduleDialogProps {
+interface ScheduleDialogProps {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   nextLessonNumber: number;
-  onAdd: (data: {
+  onSubmit: (data: {
     lesson_number: number;
     title: string;
     start_time: string;
@@ -24,31 +25,42 @@ interface AddScheduleDialogProps {
     room: string;
   }) => void;
   isLoading: boolean;
+  /** When provided, dialog operates in edit mode */
+  editData?: Schedule | null;
+}
+
+function toDatetimeLocal(iso: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 export function AddScheduleDialog({
   open,
   onOpenChange,
   nextLessonNumber,
-  onAdd,
+  onSubmit,
   isLoading,
-}: AddScheduleDialogProps) {
+  editData,
+}: ScheduleDialogProps) {
   const { t } = useTranslation("teacherCourseDetail");
   const [roomType, setRoomType] = useState<"physical" | "online">("physical");
+  const isEdit = !!editData;
 
   const form = useForm({
     defaultValues: {
-      lesson_number: nextLessonNumber as number | undefined,
-      title: "" as string | undefined,
-      start_time: "",
-      end_time: "",
-      room: "" as string | undefined,
+      lesson_number: (editData?.lesson_number ?? nextLessonNumber) as number | undefined,
+      title: (editData?.title ?? "") as string | undefined,
+      start_time: editData ? toDatetimeLocal(editData.start_time) : "",
+      end_time: editData ? toDatetimeLocal(editData.end_time) : "",
+      room: (editData?.room ?? "") as string | undefined,
     },
     validators: {
       onChange: scheduleFormValidator,
     },
     onSubmit: ({ value }) => {
-      onAdd({
+      onSubmit({
         lesson_number: value.lesson_number ?? nextLessonNumber,
         title: value.title ?? "",
         start_time: value.start_time,
@@ -60,11 +72,30 @@ export function AddScheduleDialog({
     },
   });
 
+  // Reset form when editData changes
+  useEffect(() => {
+    if (open) {
+      form.reset();
+      form.setFieldValue("lesson_number", editData?.lesson_number ?? nextLessonNumber);
+      form.setFieldValue("title", editData?.title ?? "");
+      form.setFieldValue("start_time", editData ? toDatetimeLocal(editData.start_time) : "");
+      form.setFieldValue("end_time", editData ? toDatetimeLocal(editData.end_time) : "");
+      form.setFieldValue("room", editData?.room ?? "");
+      if (editData?.room?.startsWith("http")) {
+        setRoomType("online");
+      } else {
+        setRoomType("physical");
+      }
+    }
+  }, [open, editData]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>{t("addSchedule.title")}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? t("editSchedule.title") : t("addSchedule.title")}
+          </DialogTitle>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -146,7 +177,11 @@ export function AddScheduleDialog({
               {t("addSchedule.cancel")}
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? t("addSchedule.submitting") : t("addSchedule.submit")}
+              {isLoading
+                ? t("addSchedule.submitting")
+                : isEdit
+                  ? t("editSchedule.submit")
+                  : t("addSchedule.submit")}
             </Button>
           </DialogFooter>
         </form>

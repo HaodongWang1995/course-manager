@@ -464,7 +464,12 @@
       "endTime": "结束时间",
       "room": "教室",
       "lessonNumber": "课时编号",
+      "edit": "编辑",
       "delete": "删除"
+    },
+    "editSchedule": {
+      "title": "编辑课时",
+      "submit": "保存更改"
     },
     "addSchedule": {
       "title": "添加课时",
@@ -503,7 +508,12 @@
       "noDescription": "暂无说明",
       "dueDate": "截止日期",
       "createdAt": "创建日期",
+      "edit": "编辑",
       "delete": "删除"
+    },
+    "editAssignment": {
+      "title": "编辑作业",
+      "submit": "保存更改"
     },
     "addAssignment": {
       "title": "添加作业",
