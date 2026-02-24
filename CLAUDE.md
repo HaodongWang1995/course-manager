@@ -2,6 +2,23 @@
 
 A modern course management system built as a monorepo, supporting both Teacher and Student roles with responsive mobile/desktop layouts. Features real backend API with JWT authentication, PostgreSQL database, and full CRUD for courses, enrollments, and schedules.
 
+## Keyword-Triggered Workflows
+
+When the user's message contains any of these keywords, immediately execute the corresponding workflow defined in `.claude/commands/`:
+
+| Keyword | Slash Command | Action |
+|---------|---------------|--------|
+| **【新增TODO】** | `/new-todo` | Create a TODO document in `PRD/` with priority (P0/P1/P2) |
+| **【新增需求】** | `/new-requirement` | Collect requirements, write PRD file, commit |
+| **【按优先级开发】** | `/dev-priority` | Scan `PRD/` → sort by priority → develop highest → test → commit → deploy → regression → archive → **loop** until none left |
+| **【测试功能】** | `/test-feature` | Run all tests (unit + E2E + typecheck), create TODO for each issue found |
+
+**Rules:**
+- When a keyword is detected, follow the full workflow in the corresponding command file without skipping steps
+- PRD documents live in `PRD/`, completed ones go to `PRD/archived/`
+- Priority: P0 (blocker) > P1 (important) > P2 (nice-to-have)
+- Always confirm with the user before deploying to production
+
 ## Baseline Development Requirements
 
 These requirements come from `PRD/PROMP-BASIC.md` and serve as the foundation for every development session.
