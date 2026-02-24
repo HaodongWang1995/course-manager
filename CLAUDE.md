@@ -19,6 +19,45 @@ When the user's message contains any of these keywords, immediately execute the 
 - Priority: P0 (blocker) > P1 (important) > P2 (nice-to-have)
 - Always confirm with the user before deploying to production
 
+## Data Safety Rules (CRITICAL)
+
+**绝对不允许在未经用户确认的情况下导致数据丢失。** 以下操作必须先向用户说明风险并获得明确确认：
+
+1. **数据库相关**
+   - 切换 Docker volume、更换数据库容器、修改 Docker Compose 项目名 → 会导致数据库数据不可访问
+   - DROP TABLE / TRUNCATE / DELETE 无 WHERE 条件的迁移脚本
+   - 重建容器时未挂载原有 volume
+   - 任何可能导致 PostgreSQL 数据目录变更的操作
+
+2. **部署相关**
+   - 更换部署目录或 Docker Compose 项目名（volume 名会跟随变化）
+   - `docker compose down -v`（-v 会删除 volume）
+   - `docker system prune` / `docker volume prune`
+   - 任何涉及停止数据库容器并重建的操作
+
+3. **文件与配置**
+   - 删除或覆盖 `.env` 文件、数据库连接配置
+   - 修改 `docker-compose.prod.yml` 中的 volume 映射
+   - 删除 SQL 迁移文件
+
+4. **确认流程**
+   - 在执行上述任何操作前，必须使用 `AskUserQuestion` 向用户说明：将要执行什么操作、可能丢失什么数据、是否有备份方案
+   - 用户明确同意后才可继续
+   - 如果不确定某个操作是否会影响数据，默认视为有风险，先确认
+
+## Test Account Convention
+
+所有测试账号的密码统一为 `111111`。创建新测试账号时必须使用此密码。
+
+| 邮箱 | 角色 | 说明 |
+|------|------|------|
+| `teacher@test.com` | 教师 | 主测试教师账号（有课程数据） |
+| `teacher001@test.com` | 教师 | 辅助教师账号 |
+| `testteacher@test.com` | 教师 | 辅助教师账号 |
+| `student@test.com` | 学生 | 主测试学生账号（有选课数据） |
+| `student001@test.com` | 学生 | 辅助学生账号 |
+| `teststudent@test.com` | 学生 | 辅助学生账号 |
+
 ## Baseline Development Requirements
 
 These requirements come from `PRD/PROMP-BASIC.md` and serve as the foundation for every development session.
