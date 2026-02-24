@@ -1,5 +1,7 @@
 import { S3Client, DeleteObjectCommand, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import path from "path";
+import fs from "fs";
 
 const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || "";
 const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || "";
@@ -7,8 +9,15 @@ const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || "";
 export const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || "course-manager-files";
 const R2_PUBLIC_URL = (process.env.R2_PUBLIC_URL || "").replace(/\/$/, "");
 
-// Stub mode when R2 credentials are not configured
+// Stub mode when R2 credentials are not configured — uses local filesystem
 export const isStubMode = !R2_ACCESS_KEY_ID;
+
+// Local uploads directory for stub mode
+export const LOCAL_UPLOADS_DIR = path.resolve(process.cwd(), "uploads");
+
+if (isStubMode) {
+  fs.mkdirSync(LOCAL_UPLOADS_DIR, { recursive: true });
+}
 
 let _s3Client: S3Client | null = null;
 
@@ -38,7 +47,8 @@ export function generateFileKey(
 
 export async function createPresignedPutUrl(fileKey: string, contentType: string): Promise<string> {
   if (isStubMode) {
-    return `stub://upload/${fileKey}`;
+    // Return a relative API path; frontend will POST multipart to this
+    return `/api/attachments/upload?file_key=${encodeURIComponent(fileKey)}`;
   }
   const command = new PutObjectCommand({
     Bucket: R2_BUCKET_NAME,
@@ -50,7 +60,7 @@ export async function createPresignedPutUrl(fileKey: string, contentType: string
 
 export async function createPresignedGetUrl(fileKey: string): Promise<string> {
   if (isStubMode) {
-    return `stub://download/${fileKey}`;
+    return `/api/attachments/download/${encodeURIComponent(fileKey)}`;
   }
   if (R2_PUBLIC_URL) {
     return `${R2_PUBLIC_URL}/${fileKey}`;
@@ -62,8 +72,26 @@ export async function createPresignedGetUrl(fileKey: string): Promise<string> {
   return getSignedUrl(getS3Client(), command, { expiresIn: 3600 });
 }
 
+/** Save file to local uploads directory (stub mode) */
+export function saveLocalFile(fileKey: string, buffer: Buffer): void {
+  const filePath = path.join(LOCAL_UPLOADS_DIR, fileKey);
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, buffer);
+}
+
+/** Get the local file path for a file key (stub mode) */
+export function getLocalFilePath(fileKey: string): string {
+  return path.join(LOCAL_UPLOADS_DIR, fileKey);
+}
+
 export async function deleteObject(fileKey: string): Promise<void> {
-  if (isStubMode) return;
+  if (isStubMode) {
+    const filePath = getLocalFilePath(fileKey);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    return;
+  }
   const command = new DeleteObjectCommand({
     Bucket: R2_BUCKET_NAME,
     Key: fileKey,

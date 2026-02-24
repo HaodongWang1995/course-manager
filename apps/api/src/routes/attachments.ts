@@ -1,4 +1,5 @@
 import { Router, type Request, type Response } from "express";
+import multer from "multer";
 import pool from "../db.js";
 import { authRequired, teacherOnly } from "../middleware/auth.js";
 import {
@@ -6,7 +7,12 @@ import {
   createPresignedPutUrl,
   createPresignedGetUrl,
   deleteObject,
+  isStubMode,
+  saveLocalFile,
+  getLocalFilePath,
 } from "../lib/s3.js";
+import fs from "fs";
+import path from "path";
 
 const router: Router = Router();
 
@@ -25,6 +31,12 @@ const ALLOWED_TYPES = new Set([
 ]);
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
+
+// Multer for local file uploads (stub mode)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_FILE_SIZE },
+});
 
 // POST /api/attachments/presign — generate a presigned PUT URL (teacher only)
 router.post("/attachments/presign", authRequired, teacherOnly, async (req: Request, res: Response) => {
@@ -57,6 +69,68 @@ router.post("/attachments/presign", authRequired, teacherOnly, async (req: Reque
   } catch (err) {
     console.error("Failed to create presigned URL:", err);
     res.status(500).json({ error: "Failed to generate upload URL" });
+  }
+});
+
+// POST /api/attachments/upload — local file upload for stub mode (teacher only)
+router.post(
+  "/attachments/upload",
+  authRequired,
+  teacherOnly,
+  upload.single("file"),
+  async (req: Request, res: Response) => {
+    try {
+      if (!isStubMode) {
+        res.status(400).json({ error: "Direct upload is only available in local mode" });
+        return;
+      }
+      const fileKey = req.query.file_key as string;
+      if (!fileKey || !req.file) {
+        res.status(400).json({ error: "file_key and file are required" });
+        return;
+      }
+      saveLocalFile(fileKey, req.file.buffer);
+      res.json({ success: true });
+    } catch (err) {
+      console.error("Failed to upload file locally:", err);
+      res.status(500).json({ error: "Failed to upload file" });
+    }
+  },
+);
+
+// GET /api/attachments/download/:fileKey(*) — serve local file for stub mode
+// Accepts auth via header OR ?token= query param (for <a> tag downloads)
+router.get("/attachments/download/*", async (req: Request, res: Response) => {
+  try {
+    if (!isStubMode) {
+      res.status(400).json({ error: "Direct download is only available in local mode" });
+      return;
+    }
+    // req.params[0] captures the wildcard portion after /download/
+    const fileKey = (req.params as Record<string, string>)[0];
+    if (!fileKey) {
+      res.status(400).json({ error: "file_key is required" });
+      return;
+    }
+    const filePath = getLocalFilePath(decodeURIComponent(fileKey));
+
+    // Prevent path traversal
+    const uploadsDir = path.resolve(process.cwd(), "uploads");
+    if (!path.resolve(filePath).startsWith(uploadsDir)) {
+      res.status(403).json({ error: "Access denied" });
+      return;
+    }
+
+    if (!fs.existsSync(filePath)) {
+      res.status(404).json({ error: "File not found" });
+      return;
+    }
+    const filename = path.basename(filePath);
+    res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(filename)}"`);
+    res.sendFile(filePath);
+  } catch (err) {
+    console.error("Failed to serve file:", err);
+    res.status(500).json({ error: "Failed to download file" });
   }
 });
 

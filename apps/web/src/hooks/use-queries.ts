@@ -551,8 +551,19 @@ export function useUploadAttachment() {
         schedule_id: scheduleId,
       });
 
-      // Step 2: Upload directly to R2 (skip for stub URLs in dev/test)
-      if (!upload_url.startsWith("stub://")) {
+      // Step 2: Upload file
+      if (upload_url.startsWith("/api/")) {
+        // Local/stub mode: multipart POST to API server
+        const formData = new FormData();
+        formData.append("file", file);
+        const resp = await fetch(upload_url, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${getToken()}` },
+          body: formData,
+        });
+        if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
+      } else if (!upload_url.startsWith("stub://")) {
+        // S3/R2 mode: PUT directly to presigned URL
         await new Promise<void>((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.open("PUT", upload_url);
