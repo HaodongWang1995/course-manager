@@ -6,6 +6,7 @@ import {
   UserAvatar,
   BottomNav,
   AuthLoading,
+  PageLayout,
 } from "@course-manager/ui";
 import {
   LayoutDashboard,
@@ -41,7 +42,7 @@ function AppLayout() {
   if (isLoading) return <AuthLoading />;
   if (!isAuthed || !user) return null;
 
-  const isStudent = role === "student";
+  const isStudent = !isTeacherRoute;
 
   const teacherSidebarItems = [
     { label: t("nav.dashboard"), href: "/teacher", icon: LayoutDashboard },
@@ -82,63 +83,45 @@ function AppLayout() {
   const userRoleLabel = isTeacherRoute ? t("auth.role.teacher") : t("auth.role.student");
   const topBarPlaceholder = isTeacherRoute ? t("common.searchTeacher") : t("common.searchStudent");
 
+  const sidebarNode = (
+    <Sidebar
+      items={sidebarItems}
+      sections={[
+        { items: sidebarItems },
+        { title: t("nav.support"), items: supportItems },
+      ]}
+      activeHref={location.pathname}
+      user={{ name: user.name, role: userRoleLabel }}
+      appName={appName}
+    />
+  );
+
+  const topBarNode = (
+    <TopBar searchPlaceholder={topBarPlaceholder}>
+      <NotificationBell count={0} />
+      <button
+        onClick={handleLogout}
+        className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+        title={t("common.logout")}
+      >
+        <LogOut className="h-4 w-4" />
+      </button>
+      <UserAvatar name={user.name} />
+    </TopBar>
+  );
+
   return (
-    <div className="flex h-screen bg-gray-50">
-      <div className="hidden lg:block">
-        <Sidebar
-          items={sidebarItems}
-          sections={[
-            { items: sidebarItems },
-            { title: t("nav.support"), items: supportItems },
-          ]}
-          activeHref={location.pathname}
-          user={{
-            name: user.name,
-            role: userRoleLabel,
-          }}
-          appName={appName}
-        />
-      </div>
-
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {isStudent ? (
-          <div className="hidden lg:block">
-            <TopBar searchPlaceholder={topBarPlaceholder}>
-              <NotificationBell count={0} />
-              <button
-                onClick={handleLogout}
-                className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                title={t("common.logout")}
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
-              <UserAvatar name={user.name} />
-            </TopBar>
-          </div>
-        ) : (
-          <TopBar searchPlaceholder={topBarPlaceholder}>
-            <NotificationBell count={0} />
-            <button
-              onClick={handleLogout}
-              className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-              title={t("common.logout")}
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-            <UserAvatar name={user.name} />
-          </TopBar>
-        )}
-
-        <main className={`flex-1 overflow-y-auto p-4 md:p-6 ${isStudent ? "pb-20 lg:pb-6" : ""}`}>
-          <Outlet />
-        </main>
-      </div>
-
-      {isStudent ? (
-        <div className="lg:hidden">
+    <PageLayout
+      sidebar={sidebarNode}
+      topBar={topBarNode}
+      bottomNav={
+        isStudent ? (
           <BottomNav items={studentBottomNavItems} activeHref={location.pathname} />
-        </div>
-      ) : null}
-    </div>
+        ) : undefined
+      }
+      hideTopBarOnMobile={isStudent}
+    >
+      <Outlet />
+    </PageLayout>
   );
 }
