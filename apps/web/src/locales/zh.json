@@ -515,6 +515,12 @@
       "title": "编辑作业",
       "submit": "保存更改"
     },
+    "submission": {
+      "submitted": "已提交",
+      "submittedStudents": "已提交学生",
+      "notSubmittedStudents": "未提交学生",
+      "none": "无"
+    },
     "addAssignment": {
       "title": "添加作业",
       "fields": {
@@ -796,17 +802,22 @@
     "title": "我的作业",
     "searchPlaceholder": "搜索作业...",
     "filesCount": "{{count}} 个文件",
+    "empty": "暂无作业",
     "filters": {
       "all": "全部",
-      "todo": "待完成",
+      "todo": "待提交",
+      "submitted": "已提交",
+      "late": "已逾期",
       "inProgress": "进行中",
       "completed": "已完成"
     },
     "priority": "重点作业",
+    "dueSoon": "即将截止",
     "submitNow": "立即提交",
     "thisWeek": "本周",
     "actions": {
       "start": "开始",
+      "submit": "提交",
       "continue": "继续",
       "submitLate": "补交"
     },
@@ -814,7 +825,19 @@
       "inProgress": "进行中",
       "done": "已完成",
       "late": "已逾期",
-      "submitted": "已提交"
+      "submitted": "已提交",
+      "graded": "已批改"
+    },
+    "submitDialog": {
+      "title": "提交作业",
+      "uploadPrompt": "拖拽或点击上传文件",
+      "maxSize": "最大 50MB",
+      "uploading": "上传中...",
+      "tooLarge": "文件过大，最大 50MB",
+      "fileOptional": "附件为可选项，您可以不上传文件直接提交。",
+      "cancel": "取消",
+      "submit": "提交作业",
+      "submitting": "提交中..."
     }
   },
   "studentResources": {

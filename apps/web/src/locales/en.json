@@ -515,6 +515,12 @@
       "title": "Edit Assignment",
       "submit": "Save Changes"
     },
+    "submission": {
+      "submitted": "submitted",
+      "submittedStudents": "Submitted Students",
+      "notSubmittedStudents": "Not Submitted Students",
+      "none": "None"
+    },
     "addAssignment": {
       "title": "Add Assignment",
       "fields": {
@@ -796,17 +802,22 @@
     "title": "My Assignments",
     "searchPlaceholder": "Search assignments...",
     "filesCount": "{{count}} files",
+    "empty": "No assignments found",
     "filters": {
       "all": "All",
       "todo": "To Do",
+      "submitted": "Submitted",
+      "late": "Late",
       "inProgress": "In Progress",
       "completed": "Completed"
     },
     "priority": "Priority Assignment",
+    "dueSoon": "Due Soon",
     "submitNow": "Submit Now",
     "thisWeek": "This Week",
     "actions": {
       "start": "Start",
+      "submit": "Submit",
       "continue": "Continue",
       "submitLate": "Submit Late"
     },
@@ -814,7 +825,19 @@
       "inProgress": "In Progress",
       "done": "Done",
       "late": "Late",
-      "submitted": "Submitted"
+      "submitted": "Submitted",
+      "graded": "Graded"
+    },
+    "submitDialog": {
+      "title": "Submit Assignment",
+      "uploadPrompt": "Drag & drop or click to upload a file",
+      "maxSize": "Max 50MB",
+      "uploading": "Uploading...",
+      "tooLarge": "File too large, max 50MB",
+      "fileOptional": "File attachment is optional. You can submit without a file.",
+      "cancel": "Cancel",
+      "submit": "Submit Assignment",
+      "submitting": "Submitting..."
     }
   },
   "studentResources": {

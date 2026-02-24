@@ -369,11 +369,26 @@ export function useStudentAssignments() {
 export function useUpdateAssignmentStatus() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) =>
-      assignmentApi.submit(id, { status }),
+    mutationFn: ({ id, status, file_key, filename, file_size, file_type }: {
+      id: string;
+      status: string;
+      file_key?: string;
+      filename?: string;
+      file_size?: number;
+      file_type?: string;
+    }) =>
+      assignmentApi.submit(id, { status, file_key, filename, file_size, file_type }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: studentKeys.assignments.queryKey });
     },
+  });
+}
+
+export function useAssignmentSubmissions(assignmentId: string) {
+  return useQuery({
+    queryKey: courseKeys.submissions(assignmentId).queryKey,
+    queryFn: () => assignmentApi.getSubmissions(assignmentId),
+    enabled: !!getToken() && !!assignmentId,
   });
 }
 

@@ -2,7 +2,14 @@ import {
   Card,
   CardContent,
   Badge,
-  Progress,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  Button,
+  FileUploadZone,
 } from "@course-manager/ui";
 import {
   Search,
@@ -12,18 +19,13 @@ import {
   Upload,
   Paperclip,
   ChevronRight,
+  X,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useStudentAssignments, useUpdateAssignmentStatus } from "@/hooks/use-queries";
-
-const courseColors: Record<string, string> = {
-  "Math 101 • Algebra": "bg-blue-500",
-  "History 204": "bg-amber-500",
-  "Physics 101": "bg-purple-500",
-  "Literature": "bg-emerald-500",
-  "CS 101": "bg-red-500",
-};
+import { assignmentApi, getToken } from "@/api/client";
+import type { StudentAssignment } from "@/api/client";
 
 export function StudentAssignmentsPage() {
   const { t } = useTranslation("studentAssignments");
@@ -32,46 +34,139 @@ export function StudentAssignmentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
 
+  // Submit dialog state
+  const [submitTarget, setSubmitTarget] = useState<StudentAssignment | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
   const filtered = useMemo(() => {
     return assignments.filter((a) => {
-      const st = a.status || a.submission_status || "";
-      const course = a.course || a.course_title || "";
+      const st = a.submission_status || "";
+      const course = a.course_title || "";
       const matchesSearch = !searchQuery ||
         a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         course.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesFilter =
         activeFilter === "All" ||
-        (activeFilter === "To Do" && st === "todo") ||
-        (activeFilter === "In Progress" && st === "in-progress") ||
-        (activeFilter === "Completed" && st === "completed");
+        (activeFilter === "To Do" && st === "pending") ||
+        (activeFilter === "Submitted" && st === "submitted") ||
+        (activeFilter === "Late" && st === "late");
       return matchesSearch && matchesFilter;
     });
   }, [assignments, searchQuery, activeFilter]);
 
-  const todoCount = assignments.filter((a) => (a.status || a.submission_status) === "todo").length;
-  const urgentAssignment = assignments.find((a) => a.urgent && (a.status || a.submission_status) === "todo");
+  const pendingCount = assignments.filter((a) => a.submission_status === "pending").length;
 
   const filterTabs = [
     { key: "All", label: t("filters.all"), count: null },
-    { key: "To Do", label: t("filters.todo"), count: todoCount || null },
-    { key: "In Progress", label: t("filters.inProgress"), count: null },
-    { key: "Completed", label: t("filters.completed"), count: null },
+    { key: "To Do", label: t("filters.todo"), count: pendingCount || null },
+    { key: "Submitted", label: t("filters.submitted"), count: null },
+    { key: "Late", label: t("filters.late"), count: null },
   ];
 
-  const handleAction = (id: string, currentStatus: string) => {
-    if (currentStatus === "todo") {
-      updateStatus.mutate({ id, status: "in-progress" });
-    } else if (currentStatus === "in-progress" || currentStatus === "late") {
-      updateStatus.mutate({ id, status: "completed" });
-    }
-  };
+  const openSubmitDialog = useCallback((assignment: StudentAssignment) => {
+    setSubmitTarget(assignment);
+    setSelectedFile(null);
+    setUploading(false);
+  }, []);
 
-  const getAction = (status: string) => {
-    if (status === "todo") return t("actions.start");
-    if (status === "in-progress") return t("actions.continue");
-    if (status === "late") return t("actions.submitLate");
+  const handleSubmit = useCallback(async () => {
+    if (!submitTarget) return;
+    setUploading(true);
+
+    try {
+      const isLate = new Date(submitTarget.due_date) < new Date();
+      const status = isLate ? "late" : "submitted";
+
+      let fileKey: string | undefined;
+      let fileName: string | undefined;
+      let fileSize: number | undefined;
+      let fileType: string | undefined;
+
+      // If file is selected, upload it first
+      if (selectedFile) {
+        // Step 1: Presign
+        const { upload_url, file_key } = await assignmentApi.presignSubmission(
+          submitTarget.id,
+          {
+            filename: selectedFile.name,
+            content_type: selectedFile.type || "application/octet-stream",
+            file_size: selectedFile.size,
+          },
+        );
+
+        // Step 2: Upload
+        if (upload_url.startsWith("/api/")) {
+          // Local/stub mode
+          const formData = new FormData();
+          formData.append("file", selectedFile);
+          const resp = await fetch(upload_url, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${getToken()}` },
+            body: formData,
+          });
+          if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
+        } else {
+          // R2 mode
+          await new Promise<void>((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("PUT", upload_url);
+            xhr.setRequestHeader("Content-Type", selectedFile.type || "application/octet-stream");
+            xhr.onload = () =>
+              xhr.status < 300 ? resolve() : reject(new Error(`Upload failed: ${xhr.status}`));
+            xhr.onerror = () => reject(new Error("Upload network error"));
+            xhr.send(selectedFile);
+          });
+        }
+
+        fileKey = file_key;
+        fileName = selectedFile.name;
+        fileSize = selectedFile.size;
+        fileType = selectedFile.type || undefined;
+      }
+
+      // Step 3: Submit
+      updateStatus.mutate(
+        {
+          id: submitTarget.id,
+          status,
+          file_key: fileKey,
+          filename: fileName,
+          file_size: fileSize,
+          file_type: fileType,
+        },
+        {
+          onSuccess: () => {
+            setSubmitTarget(null);
+            setSelectedFile(null);
+            setUploading(false);
+          },
+          onError: () => {
+            setUploading(false);
+          },
+        },
+      );
+    } catch {
+      setUploading(false);
+    }
+  }, [submitTarget, selectedFile, updateStatus]);
+
+  const getStatusBadge = (status: string) => {
+    if (status === "submitted") {
+      return <Badge variant="success" className="text-[10px]">{t("status.submitted")}</Badge>;
+    }
+    if (status === "late") {
+      return <Badge variant="destructive" className="text-[10px]">{t("status.late")}</Badge>;
+    }
+    if (status === "graded") {
+      return <Badge variant="default" className="bg-purple-100 text-purple-700 border-none text-[10px]">{t("status.graded")}</Badge>;
+    }
     return null;
   };
+
+  const urgentAssignment = assignments.find(
+    (a) => a.submission_status === "pending" && new Date(a.due_date) > new Date(),
+  );
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -124,10 +219,12 @@ export function StudentAssignmentsPage() {
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
           <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-red-500 px-2.5 py-1 shadow-sm">
             <AlertTriangle className="h-3 w-3 text-white" />
-            <span className="text-[11px] font-bold text-white">{urgentAssignment.dueLabel}</span>
+            <span className="text-[11px] font-bold text-white">
+              {t("dueSoon")}
+            </span>
           </div>
           <p className="text-xs font-semibold uppercase tracking-widest text-blue-200">
-            {urgentAssignment.course}
+            {urgentAssignment.course_title}
           </p>
           <h3 className="mt-1.5 text-xl font-bold leading-snug text-white pr-28">
             {urgentAssignment.title}
@@ -137,7 +234,7 @@ export function StudentAssignmentsPage() {
             <span>{t("priority")}</span>
           </div>
           <button
-            onClick={() => handleAction(urgentAssignment.id, urgentAssignment.status || urgentAssignment.submission_status || "")}
+            onClick={() => openSubmitDialog(urgentAssignment)}
             className="mt-4 flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-indigo-700 shadow-md transition-all hover:bg-blue-50 active:scale-[0.98]"
           >
             <Upload className="h-4 w-4" />
@@ -146,7 +243,7 @@ export function StudentAssignmentsPage() {
         </div>
       )}
 
-      {/* This Week */}
+      {/* Assignment List */}
       <section>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-400">{t("thisWeek")}</h2>
@@ -155,74 +252,56 @@ export function StudentAssignmentsPage() {
 
         <div className="space-y-3">
           {filtered.map((assignment) => {
-            const assignmentStatus = assignment.status || assignment.submission_status || "";
-            const action = getAction(assignmentStatus);
-            const courseTitle = assignment.course || assignment.course_title || "";
-            const colorKey = Object.keys(courseColors).find((k) =>
-              courseTitle.includes(k) || k.includes(courseTitle)
-            );
-            const courseColor = courseColors[colorKey || ""] || "bg-gray-500";
+            const st = assignment.submission_status || "pending";
+            const isSubmitted = st === "submitted" || st === "graded";
+            const courseTitle = assignment.course_title || "";
 
             return (
               <Card key={assignment.id} className="overflow-hidden">
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
-                    <div className={`mt-1 h-10 w-1 shrink-0 rounded-full ${courseColor}`} />
+                    <div className="mt-1 h-10 w-1 shrink-0 rounded-full bg-blue-500" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-xs font-medium text-gray-500">{courseTitle}</span>
-                        {assignmentStatus === "in-progress" && (
-                          <Badge variant="default" className="bg-blue-100 text-blue-700 border-none text-[10px]">
-                            {t("status.inProgress")}
-                          </Badge>
-                        )}
-                        {assignmentStatus === "completed" && (
-                          <Badge variant="success" className="text-[10px]">{t("status.done")}</Badge>
-                        )}
-                        {assignmentStatus === "late" && (
-                          <Badge variant="destructive" className="text-[10px]">{t("status.late")}</Badge>
-                        )}
+                        {getStatusBadge(st)}
                       </div>
                       <h3 className="mt-1 text-sm font-semibold text-gray-900">{assignment.title}</h3>
-                      {"description" in assignment && assignment.description && (
+                      {assignment.description && (
                         <p className="mt-1 text-xs text-gray-500 line-clamp-2">
-                          {assignment.description as string}
+                          {assignment.description}
                         </p>
-                      )}
-                      {"progress" in assignment && typeof assignment.progress === "number" && (
-                        <div className="mt-2 flex items-center gap-2">
-                          <Progress value={assignment.progress} className="h-1.5 flex-1" />
-                          <span className="text-xs font-medium text-gray-500">{assignment.progress}%</span>
-                        </div>
                       )}
                       <div className="mt-2.5 flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-1 text-xs text-gray-400">
                             <Clock className="h-3 w-3" />
-                            <span>{assignment.dueLabel}</span>
+                            <span>{new Date(assignment.due_date).toLocaleDateString()}</span>
                           </div>
-                          {"filesAttached" in assignment && assignment.filesAttached && (
+                          {assignment.submitted_at && (
                             <div className="flex items-center gap-1 text-xs text-gray-400">
                               <Paperclip className="h-3 w-3" />
-                              <span>{t("filesCount", { count: assignment.filesAttached as number })}</span>
+                              <span>{t("status.submitted")}</span>
                             </div>
                           )}
                         </div>
-                        {action && (
+                        {!isSubmitted && st !== "late" && (
                           <button
-                            onClick={() => handleAction(assignment.id, assignmentStatus)}
-                            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                              assignmentStatus === "late"
-                                ? "bg-red-600 text-white hover:bg-red-700"
-                                : assignmentStatus === "in-progress"
-                                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                                  : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
-                            }`}
+                            onClick={() => openSubmitDialog(assignment)}
+                            className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                           >
-                            {action}
+                            {t("actions.submit")}
                           </button>
                         )}
-                        {assignmentStatus === "completed" && (
+                        {st === "late" && (
+                          <button
+                            onClick={() => openSubmitDialog(assignment)}
+                            className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 transition-colors"
+                          >
+                            {t("actions.submitLate")}
+                          </button>
+                        )}
+                        {isSubmitted && (
                           <div className="flex items-center gap-1 text-xs font-medium text-green-600">
                             <CheckCircle2 className="h-3.5 w-3.5" />
                             <span>{t("status.submitted")}</span>
@@ -235,8 +314,67 @@ export function StudentAssignmentsPage() {
               </Card>
             );
           })}
+
+          {filtered.length === 0 && (
+            <p className="py-8 text-center text-sm text-gray-400">{t("empty")}</p>
+          )}
         </div>
       </section>
+
+      {/* Submit Dialog */}
+      <Dialog open={!!submitTarget} onOpenChange={(open) => { if (!open) setSubmitTarget(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("submitDialog.title")}</DialogTitle>
+            <DialogDescription>
+              {submitTarget?.title} — {submitTarget?.course_title}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            {/* File upload area */}
+            {selectedFile ? (
+              <div className="flex items-center gap-3 rounded-lg border border-gray-200 p-3">
+                <Paperclip className="h-5 w-5 shrink-0 text-gray-400" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-gray-900">{selectedFile.name}</p>
+                  <p className="text-xs text-gray-400">
+                    {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedFile(null)}
+                  className="rounded-full p-1 hover:bg-gray-100"
+                >
+                  <X className="h-4 w-4 text-gray-400" />
+                </button>
+              </div>
+            ) : (
+              <FileUploadZone
+                onFileSelect={(files) => setSelectedFile(files[0])}
+                uploading={uploading}
+                maxSizeMB={50}
+                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.mp4,.zip"
+                uploadPromptText={t("submitDialog.uploadPrompt")}
+                maxSizeText={t("submitDialog.maxSize")}
+                uploadingText={t("submitDialog.uploading")}
+                tooLargeText={t("submitDialog.tooLarge")}
+              />
+            )}
+
+            <p className="text-xs text-gray-400">{t("submitDialog.fileOptional")}</p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSubmitTarget(null)} disabled={uploading}>
+              {t("submitDialog.cancel")}
+            </Button>
+            <Button onClick={handleSubmit} disabled={uploading}>
+              {uploading ? t("submitDialog.submitting") : t("submitDialog.submit")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

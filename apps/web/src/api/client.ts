@@ -316,6 +316,14 @@ export interface StudentAssignment extends Assignment {
   filesAttached?: number;
 }
 
+export interface SubmissionDetail {
+  student_id: string;
+  student_name: string;
+  submission_status: string | null;
+  submitted_at: string | null;
+  attachment_filename: string | null;
+}
+
 export const assignmentApi = {
   listForCourse(courseId: string) {
     return request<Assignment[]>(`/api/courses/${courseId}/assignments`);
@@ -329,11 +337,20 @@ export const assignmentApi = {
   listForStudent() {
     return request<StudentAssignment[]>("/api/students/assignments");
   },
-  submit(id: string, data: { status: string }) {
+  submit(id: string, data: { status: string; file_key?: string; filename?: string; file_size?: number; file_type?: string }) {
     return request<{ id: string }>(`/api/assignments/${id}/submit`, {
       method: "PATCH",
       body: JSON.stringify(data),
     });
+  },
+  presignSubmission(id: string, data: { filename: string; content_type: string; file_size?: number }) {
+    return request<{ upload_url: string; file_key: string }>(`/api/assignments/${id}/presign`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+  getSubmissions(id: string) {
+    return request<SubmissionDetail[]>(`/api/assignments/${id}/submissions`);
   },
   update(id: string, data: Partial<Omit<Assignment, "id" | "course_id" | "created_at">>) {
     return request<Assignment>(`/api/assignments/${id}`, {

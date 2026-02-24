@@ -1,14 +1,83 @@
 import { useState } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@course-manager/ui";
-import { BookOpen, Calendar, ChevronDown, ChevronUp, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@course-manager/ui";
+import { BookOpen, Calendar, ChevronDown, ChevronUp, Pencil, Plus, Trash2, Users } from "lucide-react";
 import type { Assignment } from "@/api/client";
 import { useTranslation } from "react-i18next";
+import { useAssignmentSubmissions } from "@/hooks/use-queries";
 
 interface AssignmentSectionProps {
   assignments: Assignment[];
   onDelete: (id: string) => void;
   onRequestAdd: () => void;
   onRequestEdit: (assignment: Assignment) => void;
+}
+
+function SubmissionStats({ assignmentId }: { assignmentId: string }) {
+  const { t } = useTranslation("teacherCourseDetail");
+  const { data: submissions = [] } = useAssignmentSubmissions(assignmentId);
+
+  if (submissions.length === 0) return null;
+
+  const submitted = submissions.filter((s) => s.submission_status === "submitted" || s.submission_status === "late" || s.submission_status === "graded");
+  const notSubmitted = submissions.filter((s) => !s.submission_status || s.submission_status === "pending");
+
+  return (
+    <TooltipProvider delayDuration={200}>
+      <div className="flex items-center gap-1.5 text-xs text-gray-500">
+        <Users className="h-3 w-3" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="cursor-help font-medium text-green-600 underline decoration-dotted">
+              {submitted.length}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-60">
+            <p className="mb-1 text-xs font-semibold">{t("submission.submittedStudents")}</p>
+            {submitted.length === 0 ? (
+              <p className="text-xs text-gray-400">{t("submission.none")}</p>
+            ) : (
+              <ul className="space-y-0.5">
+                {submitted.map((s) => (
+                  <li key={s.student_id} className="text-xs">{s.student_name}</li>
+                ))}
+              </ul>
+            )}
+          </TooltipContent>
+        </Tooltip>
+        <span>/</span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="cursor-help font-medium text-gray-500 underline decoration-dotted">
+              {submissions.length}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-60">
+            <p className="mb-1 text-xs font-semibold">{t("submission.notSubmittedStudents")}</p>
+            {notSubmitted.length === 0 ? (
+              <p className="text-xs text-gray-400">{t("submission.none")}</p>
+            ) : (
+              <ul className="space-y-0.5">
+                {notSubmitted.map((s) => (
+                  <li key={s.student_id} className="text-xs">{s.student_name}</li>
+                ))}
+              </ul>
+            )}
+          </TooltipContent>
+        </Tooltip>
+        <span className="text-gray-400">{t("submission.submitted")}</span>
+      </div>
+    </TooltipProvider>
+  );
 }
 
 export function AssignmentSection({
@@ -53,10 +122,13 @@ export function AssignmentSection({
                       {!isExpanded && a.description && (
                         <p className="mt-0.5 text-xs text-gray-500 line-clamp-1">{a.description}</p>
                       )}
-                      <p className="mt-1 flex items-center gap-1 text-xs text-gray-400">
-                        <Calendar className="h-3 w-3" />
-                        {t("assignment.due", { date: new Date(a.due_date).toLocaleDateString() })}
-                      </p>
+                      <div className="mt-1 flex items-center gap-3">
+                        <p className="flex items-center gap-1 text-xs text-gray-400">
+                          <Calendar className="h-3 w-3" />
+                          {t("assignment.due", { date: new Date(a.due_date).toLocaleDateString() })}
+                        </p>
+                        <SubmissionStats assignmentId={a.id} />
+                      </div>
                     </div>
                     {isExpanded ? (
                       <ChevronUp className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
