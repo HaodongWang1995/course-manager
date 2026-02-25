@@ -2,7 +2,7 @@
 
 > 创建时间：2026-02-25
 > 优先级：P1
-> 状态：待修复
+> 状态：已完成
 > 来源：线上回归测试 (http://100.23.242.232)
 
 ---
@@ -43,6 +43,6 @@
 
 ## 任务清单
 
-- [ ] 在 `teacherCourseDetail` 命名空间中添加 `upload` 子对象（zh.json + en.json）
-- [ ] 将 student-table.tsx 中 "Sort by: Student ID" 替换为 `t("table.sort.id")` 并在 locale 文件 `teacherStudents` 命名空间中添加对应 key
-- [ ] 重新构建并部署到线上验证
+- [x] 在 `teacherCourseDetail` 命名空间中添加 `upload` 子对象（zh.json + en.json）
+- [x] 将 student-table.tsx 中 "Sort by: Student ID" 替换为 `t("table.sort.id")` 并在 locale 文件 `teacherStudents` 命名空间中添加对应 key
+- [x] 重新构建并部署到线上验证

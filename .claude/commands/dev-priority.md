@@ -66,17 +66,22 @@ git commit -m "feat({功能名}): {简短描述}"
 
 ### 步骤 5 — 部署
 
-部署到 EC2：
+部署到 EC2（在服务器上构建，不在本地构建镜像）：
 
 ```bash
-# 本地构建镜像并推送
-docker compose -f docker-compose.prod.yml build
-docker save course-manager-web course-manager-api | ssh -i ~/.ssh/course-manager-key.pem ec2-user@100.23.242.232 'docker load'
-scp docker-compose.prod.yml ec2-user@100.23.242.232:~/course-manager/
+# 推送代码到远程仓库
+git push origin master
+
+# SSH 到服务器，拉取代码并在服务器上构建
 ssh -i ~/.ssh/course-manager-key.pem ec2-user@100.23.242.232 \
-  "cd ~/course-manager && docker compose -f docker-compose.prod.yml up -d"
+  "cd ~/course-manager && git reset --hard origin/master && git clean -fd && git pull origin master && docker compose -f docker-compose.prod.yml up -d --build"
 
 # 如有 DB 迁移
+ssh -i ~/.ssh/course-manager-key.pem ec2-user@100.23.242.232 \
+  "docker exec -i course-manager-postgres-1 psql -U postgres -d coursemanager" <<'EOSQL'
+\i /path/to/migration.sql
+EOSQL
+# 或者：
 cat apps/api/sql/00X_xxx.sql | ssh -i ~/.ssh/course-manager-key.pem ec2-user@100.23.242.232 \
   "docker exec -i course-manager-postgres-1 psql -U postgres -d coursemanager"
 
