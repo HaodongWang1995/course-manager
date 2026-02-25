@@ -499,6 +499,12 @@
     "attachment": {
       "title": "课程附件"
     },
+    "upload": {
+      "prompt": "拖拽文件到此处或点击上传",
+      "maxSize": "最大 {{mb}}MB",
+      "uploading": "上传中...",
+      "tooLarge": "文件过大，最大 {{mb}}MB"
+    },
     "assignment": {
       "title": "作业",
       "addButton": "添加作业",
@@ -701,7 +707,8 @@
         "nameAsc": "按姓名排序（A-Z）",
         "nameDesc": "按姓名排序（Z-A）",
         "attendanceAsc": "按出勤率排序（低→高）",
-        "attendanceDesc": "按出勤率排序（高→低）"
+        "attendanceDesc": "按出勤率排序（高→低）",
+        "id": "按学号排序"
       },
       "loading": "加载中...",
       "emptyAll": "暂无学生数据（尚无学生报名课程）",

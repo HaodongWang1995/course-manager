@@ -499,6 +499,12 @@
     "attachment": {
       "title": "Course Attachments"
     },
+    "upload": {
+      "prompt": "Drag & drop files here or click to upload",
+      "maxSize": "Max {{mb}}MB",
+      "uploading": "Uploading...",
+      "tooLarge": "File too large, max {{mb}}MB"
+    },
     "assignment": {
       "title": "Assignments",
       "addButton": "Add Assignment",
@@ -701,7 +707,8 @@
         "nameAsc": "Sort by: Name (A-Z)",
         "nameDesc": "Sort by: Name (Z-A)",
         "attendanceAsc": "Sort by: Attendance (Low-High)",
-        "attendanceDesc": "Sort by: Attendance (High-Low)"
+        "attendanceDesc": "Sort by: Attendance (High-Low)",
+        "id": "Sort by: Student ID"
       },
       "loading": "Loading...",
       "emptyAll": "No students yet (no students have enrolled in courses)",

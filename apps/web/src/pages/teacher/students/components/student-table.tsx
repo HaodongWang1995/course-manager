@@ -124,7 +124,7 @@ export function StudentTable({
           <option value="name-desc">{t("table.sort.nameDesc")}</option>
           <option value="attendance-high">{t("table.sort.attendanceDesc")}</option>
           <option value="attendance-low">{t("table.sort.attendanceAsc")}</option>
-          <option value="id">Sort by: Student ID</option>
+          <option value="id">{t("table.sort.id")}</option>
         </select>
       </div>
       {/* Students Table */}
