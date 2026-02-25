@@ -499,6 +499,9 @@
     "attachment": {
       "title": "Course Attachments"
     },
+    "attachments": {
+      "empty": "No attachments"
+    },
     "upload": {
       "prompt": "Drag & drop files here or click to upload",
       "maxSize": "Max {{mb}}MB",

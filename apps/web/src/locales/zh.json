@@ -499,6 +499,9 @@
     "attachment": {
       "title": "课程附件"
     },
+    "attachments": {
+      "empty": "暂无附件"
+    },
     "upload": {
       "prompt": "拖拽文件到此处或点击上传",
       "maxSize": "最大 {{mb}}MB",
