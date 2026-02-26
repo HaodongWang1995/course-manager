@@ -106,8 +106,8 @@ pnpm dev
 
 | Role | Email | Password |
 |------|-------|----------|
-| Teacher | demoui@example.com | password123 |
-| Student | demostudent@example.com | password123 |
+| Teacher | teacher@test.com | 111111 |
+| Student | student@test.com | 111111 |
 
 Register a new account at `/login` to create your own.
 
@@ -123,21 +123,37 @@ pnpm build
 # Type checking
 pnpm typecheck
 
-# Run all tests
-pnpm test
-
-# Run tests with coverage
-pnpm test:coverage
-
 # Lint
 pnpm lint
-
-# Run E2E tests (requires running dev server)
-cd apps/web && pnpm e2e
 
 # Clean build artifacts
 pnpm clean
 ```
+
+## Testing
+
+```bash
+# Run all unit/integration tests (api + web + ui)
+pnpm test
+
+# Run with coverage report
+pnpm test:coverage
+
+# Run a single package's tests
+pnpm --filter @course-manager/api test
+pnpm --filter @course-manager/web test
+pnpm --filter @course-manager/ui test
+
+# Run with verbose output (per package, Turborepo doesn't pass flags directly)
+cd apps/api  && pnpm exec vitest run --reporter=verbose
+cd apps/web  && pnpm exec vitest run --reporter=verbose
+cd packages/ui && pnpm exec vitest run --reporter=verbose
+
+# E2E tests (requires dev server running: pnpm dev)
+cd apps/web && pnpm e2e
+```
+
+**Current coverage:** 275 unit/integration tests + 8 E2E tests.
 
 ## API Endpoints
 
