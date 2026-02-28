@@ -269,9 +269,27 @@ export interface Deadline {
   created_at: string;
 }
 
+export interface TeacherStudentDetail {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  created_at: string;
+  enrollments: Array<{
+    enrollment_id: string;
+    course_id: string;
+    course_title: string;
+    status: string;
+    created_at: string;
+  }>;
+}
+
 export const teacherApi = {
   students() {
     return request<TeacherStudent[]>("/api/teachers/students");
+  },
+  studentDetail(studentId: string) {
+    return request<TeacherStudentDetail>(`/api/teachers/students/${studentId}`);
   },
   schedule() {
     return request<TeacherScheduleItem[]>("/api/teachers/schedule");

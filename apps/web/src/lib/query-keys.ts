@@ -10,6 +10,9 @@ export const teacherKeys = createQueryKeys("teacher", {
   }),
   schedule: null,
   students: null,
+  studentDetail: (studentId: string) => ({
+    queryKey: [studentId],
+  }),
   stats: null,
   deadlines: null,
   enrollments: (courseId: string, params?: { status?: string }) => ({

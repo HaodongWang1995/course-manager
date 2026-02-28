@@ -60,6 +60,63 @@ describe("GET /api/teachers/students", () => {
   });
 });
 
+describe("GET /api/teachers/students/:studentId", () => {
+  it("returns 401 without auth", async () => {
+    const res = await request(app).get("/api/teachers/students/s-1");
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 403 for student", async () => {
+    const res = await request(app)
+      .get("/api/teachers/students/s-1")
+      .set("Authorization", `Bearer ${studentToken()}`);
+    expect(res.status).toBe(403);
+  });
+
+  it("returns 404 when student not found", async () => {
+    mockPool.query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+
+    const res = await request(app)
+      .get("/api/teachers/students/s-999")
+      .set("Authorization", `Bearer ${teacherToken()}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  it("returns student detail with enrollments", async () => {
+    mockPool.query
+      .mockResolvedValueOnce({
+        rows: [{ id: "s-1", name: "Alice", email: "alice@test.com", avatar: null, created_at: "2026-01-01" }],
+        rowCount: 1,
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          { enrollment_id: "e-1", course_id: "c-1", course_title: "Math", status: "approved", created_at: "2026-02-01" },
+        ],
+        rowCount: 1,
+      });
+
+    const res = await request(app)
+      .get("/api/teachers/students/s-1")
+      .set("Authorization", `Bearer ${teacherToken()}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.name).toBe("Alice");
+    expect(res.body.enrollments).toHaveLength(1);
+    expect(res.body.enrollments[0].course_title).toBe("Math");
+  });
+
+  it("returns 500 on database error", async () => {
+    mockPool.query.mockRejectedValueOnce(new Error("DB down"));
+
+    const res = await request(app)
+      .get("/api/teachers/students/s-1")
+      .set("Authorization", `Bearer ${teacherToken()}`);
+
+    expect(res.status).toBe(500);
+  });
+});
+
 describe("GET /api/teachers/schedule", () => {
   it("returns 401 without auth", async () => {
     const res = await request(app).get("/api/teachers/schedule");

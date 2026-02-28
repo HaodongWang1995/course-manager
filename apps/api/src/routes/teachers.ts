@@ -27,6 +27,43 @@ router.get("/students", authRequired, teacherOnly, async (req: Request, res: Res
   }
 });
 
+// GET /api/teachers/students/:studentId — student detail for teacher
+router.get("/students/:studentId", authRequired, teacherOnly, async (req: Request, res: Response) => {
+  try {
+    const teacherId = req.user!.userId;
+    const { studentId } = req.params;
+
+    // Get student basic info + enrollments in this teacher's courses
+    const studentResult = await pool.query(
+      `SELECT u.id, u.name, u.email, u.avatar, u.created_at
+       FROM users u WHERE u.id = $1 AND u.role = 'student'`,
+      [studentId],
+    );
+    if (studentResult.rows.length === 0) {
+      res.status(404).json({ error: "学生不存在" });
+      return;
+    }
+
+    const enrollmentsResult = await pool.query(
+      `SELECT e.id AS enrollment_id, e.course_id, c.title AS course_title,
+              e.status, e.created_at
+       FROM enrollments e
+       JOIN courses c ON c.id = e.course_id
+       WHERE e.student_id = $1 AND c.teacher_id = $2
+       ORDER BY e.created_at DESC`,
+      [studentId, teacherId],
+    );
+
+    res.json({
+      ...studentResult.rows[0],
+      enrollments: enrollmentsResult.rows,
+    });
+  } catch (err) {
+    console.error("Failed to get student detail:", err);
+    res.status(500).json({ error: "获取学生详情失败" });
+  }
+});
+
 // GET /api/teachers/schedule — today's schedules for teacher's courses
 router.get("/schedule", authRequired, teacherOnly, async (req: Request, res: Response) => {
   try {

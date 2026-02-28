@@ -961,5 +961,55 @@
     "subtitle": "与您的老师和同学沟通交流",
     "comingSoon": "消息功能正在开发中",
     "comingSoonDesc": "我们正在打造更好的师生沟通体验，敬请期待。"
+  },
+  "studentDetail": {
+    "title": "学生档案",
+    "loading": "正在加载学生档案...",
+    "notFound": "未找到该学生",
+    "active": "活跃",
+    "joined": "加入于",
+    "message": "发消息",
+    "exportReport": "导出报告",
+    "comingSoon": "即将推出！",
+    "performance": {
+      "title": "表现概览",
+      "subtitle": "本学期各项指标详细分析",
+      "semester": "第2学期",
+      "attendanceLabel": "出勤率",
+      "attendanceNote": "缺勤 2 天",
+      "homeworkLabel": "作业完成",
+      "homeworkNote": "2 份待批改",
+      "skills": {
+        "attendance": "出勤",
+        "homework": "作业",
+        "participation": "课堂参与",
+        "grades": "成绩"
+      }
+    },
+    "courses": {
+      "title": "已选课程",
+      "empty": "暂无已选课程",
+      "gradePrefix": "等级 ",
+      "attendancePrefix": "出勤率：",
+      "viewAll": "查看完整课表"
+    },
+    "notes": {
+      "title": "私人备注",
+      "addNew": "新增",
+      "showHistory": "查看历史（共 {{count}} 条）",
+      "categories": {
+        "behavioral": "行为表现",
+        "parentMeeting": "家长会议"
+      }
+    },
+    "submissions": {
+      "title": "近期提交",
+      "submitted": "提交于",
+      "graded": "已批改",
+      "pendingReview": "待批改",
+      "archived": "已归档",
+      "teacher": "教师",
+      "viewDetails": "查看详情"
+    }
   }
 }

@@ -229,7 +229,8 @@ export function StudentTable({
                   </td>
                   <td className="px-4 py-3">
                     <Link
-                      to="/teacher/students"
+                      to="/teacher/students/$studentId"
+                      params={{ studentId: student.id }}
                       className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800"
                     >
                       <Eye className="h-3.5 w-3.5" />

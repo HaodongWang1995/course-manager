@@ -309,6 +309,14 @@ export function useTeacherStudents() {
   });
 }
 
+export function useTeacherStudentDetail(studentId: string) {
+  return useQuery({
+    queryKey: teacherKeys.studentDetail(studentId).queryKey,
+    queryFn: () => teacherApi.studentDetail(studentId),
+    enabled: !!getToken() && !!studentId,
+  });
+}
+
 export function useTeacherStats() {
   return useQuery({
     queryKey: teacherKeys.stats.queryKey,

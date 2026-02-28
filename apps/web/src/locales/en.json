@@ -961,5 +961,55 @@
     "subtitle": "Communicate with your teachers and classmates",
     "comingSoon": "Messaging is under development",
     "comingSoonDesc": "We're building a better teacher-student communication experience. Stay tuned."
+  },
+  "studentDetail": {
+    "title": "Student Profile",
+    "loading": "Loading student profile...",
+    "notFound": "Student not found",
+    "active": "Active",
+    "joined": "Joined",
+    "message": "Message",
+    "exportReport": "Export Report",
+    "comingSoon": "Coming soon!",
+    "performance": {
+      "title": "Performance Overview",
+      "subtitle": "Detailed breakdown of current semester metrics",
+      "semester": "Semester 2",
+      "attendanceLabel": "Attendance",
+      "attendanceNote": "2 days missed",
+      "homeworkLabel": "Homework",
+      "homeworkNote": "2 pending review",
+      "skills": {
+        "attendance": "Attendance",
+        "homework": "Homework",
+        "participation": "Participation",
+        "grades": "Grades"
+      }
+    },
+    "courses": {
+      "title": "Enrolled Courses",
+      "empty": "No enrolled courses",
+      "gradePrefix": "Grade ",
+      "attendancePrefix": "Attendance: ",
+      "viewAll": "View Full Curriculum"
+    },
+    "notes": {
+      "title": "Private Notes",
+      "addNew": "Add New",
+      "showHistory": "Show History ({{count}} Notes)",
+      "categories": {
+        "behavioral": "Behavioral",
+        "parentMeeting": "Parent Meeting"
+      }
+    },
+    "submissions": {
+      "title": "Recent Submissions",
+      "submitted": "Submitted",
+      "graded": "Graded",
+      "pendingReview": "Pending Review",
+      "archived": "Archived",
+      "teacher": "Teacher",
+      "viewDetails": "View Details"
+    }
   }
 }
