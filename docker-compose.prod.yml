@@ -22,13 +22,12 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     restart: unless-stopped
-    # No host port mapping - accessed only via nginx internal network
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/course_manager
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
       PORT: "3001"
       NODE_ENV: production
-      CORS_ORIGIN: http://100.23.242.232
+      CORS_ORIGIN: https://mrdogestudio.work,http://mrdogestudio.work
       R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
       R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
@@ -44,10 +43,18 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     restart: unless-stopped
-    ports:
-      - "80:80"
+    # No host port - only accessible via cloudflared tunnel on Docker network
     depends_on:
       - api
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - web
 
 volumes:
   postgres_data:

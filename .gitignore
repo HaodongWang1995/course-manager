@@ -15,7 +15,7 @@ figma-assets/
 # Playwright MCP logs and test artifacts
 .playwright-mcp/
 apps/web/test-results/
-*.png
+screenshots/
 
 # TanStack Router build cache
 apps/web/.tanstack/
