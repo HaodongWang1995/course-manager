@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@course-manager/ui";
-import { ChevronDown, ChevronUp, Clock, MapPin, Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Clock, MapPin, Pencil, PenLine, Plus, Trash2 } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import type { Schedule } from "@/api/client";
 import { formatLocalDateTime, formatLocalTime } from "@/lib/time";
 import { useTranslation } from "react-i18next";
@@ -19,6 +20,8 @@ export function ScheduleSection({
   onRequestEdit,
 }: ScheduleSectionProps) {
   const { t } = useTranslation("teacherCourseDetail");
+  const { t: tFeedback } = useTranslation();
+  const navigate = useNavigate();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
@@ -96,6 +99,17 @@ export function ScheduleSection({
                         </div>
                       </dl>
                       <div className="mt-3 flex justify-end gap-2">
+                        {new Date(s.end_time) < new Date() && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="gap-1 text-blue-600 hover:text-blue-700"
+                            onClick={() => navigate({ to: "/teacher/student-feedback/$scheduleId", params: { scheduleId: s.id } })}
+                          >
+                            <PenLine className="h-3.5 w-3.5" />
+                            {tFeedback("studentLessonFeedback.writeFeedback")}
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="sm"
