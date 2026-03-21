@@ -99,3 +99,11 @@ export const supportSchema = z.object({
   subject: z.string().min(1, "请输入主题"),
   body: z.string().min(1, "请输入内容"),
 });
+
+export const studentFeedbackSchema = z.object({
+  rating: z.number().min(1).max(5).nullable().optional(),
+  comment: z.string().max(2000).nullable().optional(),
+  suggestion: z.string().max(2000).nullable().optional(),
+});
+
+export type StudentFeedbackFormData = z.infer<typeof studentFeedbackSchema>;

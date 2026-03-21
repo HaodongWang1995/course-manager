@@ -71,6 +71,14 @@ export const attachmentKeys = createQueryKeys("attachment", {
   }),
 });
 
+export const studentFeedbackKeys = createQueryKeys("studentFeedback", {
+  bySchedule: (scheduleId: string) => ({ queryKey: [scheduleId] }),
+  studentHistory: (studentId: string, courseId: string) => ({ queryKey: [studentId, courseId] }),
+  myFeedbacks: (params?: { course_id?: string; page?: number }) => ({ queryKey: [params] }),
+  myLatest: null,
+  myCourse: (courseId: string, params?: { page?: number }) => ({ queryKey: [courseId, params] }),
+});
+
 export const queryKeys = mergeQueryKeys(
   authKeys,
   teacherKeys,
@@ -78,4 +86,5 @@ export const queryKeys = mergeQueryKeys(
   courseKeys,
   feedbackKeys,
   attachmentKeys,
+  studentFeedbackKeys,
 );

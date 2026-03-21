@@ -13,7 +13,9 @@
     "enrollments": "Enrollments",
     "reports": "Reports",
     "home": "Home",
-    "browse": "Browse"
+    "browse": "Browse",
+    "studentFeedback": "Student Feedback",
+    "lessonFeedback": "Lesson Feedback"
   },
   "auth": {
     "tabs": { "login": "Login", "register": "Sign Up" },
@@ -1011,5 +1013,39 @@
       "teacher": "Teacher",
       "viewDetails": "View Details"
     }
+  },
+  "studentLessonFeedback": {
+    "title": "Lesson Feedback",
+    "writeFeedback": "Write Feedback",
+    "rating": "Performance Rating",
+    "comment": "Comment",
+    "commentPlaceholder": "Enter your comment on the student's performance...",
+    "suggestion": "Suggestion",
+    "suggestionPlaceholder": "Enter improvement suggestions...",
+    "saveAllDrafts": "Save All Drafts",
+    "publishAll": "Publish All",
+    "publishConfirm": "Publish all feedback for this lesson? Students will be able to see them.",
+    "revoke": "Revoke",
+    "revokeConfirm": "Revoke this feedback? The student will no longer see it.",
+    "statusDraft": "Draft",
+    "statusPublished": "Published",
+    "statusNotWritten": "Not Written",
+    "noFeedback": "No lesson feedback yet",
+    "filterByCourse": "Filter by Course",
+    "allCourses": "All Courses",
+    "loadMore": "Load More",
+    "lessonEnded": "Lesson Ended",
+    "lessonNotEnded": "Lesson Not Ended",
+    "latestFeedback": "Latest Feedback",
+    "viewAll": "View All",
+    "feedbackHistory": "Feedback History",
+    "savedAt": "Saved at",
+    "publishedCount": "Published {{count}} feedbacks",
+    "atLeastOneField": "At least one of rating, comment, or suggestion is required",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "saveError": "Save failed",
+    "conflictPublished": "This feedback is published. Please revoke it first.",
+    "batchLimitExceeded": "Maximum 50 feedbacks per batch"
   }
 }

@@ -492,6 +492,118 @@ export const feedbackApi = {
   },
 };
 
+// ── Student Lesson Feedback ────────────────────────
+
+export interface StudentLessonFeedback {
+  id: string;
+  schedule_id: string;
+  student_id: string;
+  rating: number | null;
+  comment: string | null;
+  suggestion: string | null;
+  status: "draft" | "published";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StudentFeedbackWithLesson extends StudentLessonFeedback {
+  lesson_number: number;
+  lesson_title: string;
+  lesson_date: string;
+}
+
+export interface StudentFeedbackWithContext extends StudentLessonFeedback {
+  course_id: string;
+  course_title: string;
+  teacher_name: string;
+  lesson_number: number;
+  lesson_title: string;
+  lesson_date: string;
+}
+
+export interface ScheduleFeedbackStudent {
+  student_id: string;
+  student_name: string;
+  student_avatar: string | null;
+  feedback: {
+    id: string;
+    rating: number | null;
+    comment: string | null;
+    suggestion: string | null;
+    status: "draft" | "published";
+    updated_at: string;
+  } | null;
+}
+
+export interface ScheduleFeedbackResponse {
+  schedule: { id: string; lesson_number: number; title: string; start_time: string; end_time: string };
+  course: { id: string; title: string };
+  students: ScheduleFeedbackStudent[];
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface BatchSaveResult {
+  success: string[];
+  skipped: string[];
+  deleted: string[];
+  errors: Array<{ student_id: string; error: string }>;
+}
+
+export const studentFeedbackApi = {
+  getScheduleFeedbacks(scheduleId: string) {
+    return request<ScheduleFeedbackResponse>(`/api/student-feedback/schedule/${scheduleId}`);
+  },
+  saveFeedback(data: { schedule_id: string; student_id: string; rating?: number | null; comment?: string | null; suggestion?: string | null }) {
+    return request<StudentLessonFeedback | { deleted: true }>("/api/student-feedback", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+  batchSave(data: { schedule_id: string; feedbacks: Array<{ student_id: string; rating?: number | null; comment?: string | null; suggestion?: string | null }> }) {
+    return request<BatchSaveResult>("/api/student-feedback/batch", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+  publishAll(scheduleId: string) {
+    return request<{ published_count: number }>(`/api/student-feedback/schedule/${scheduleId}/publish`, {
+      method: "PATCH",
+    });
+  },
+  revoke(id: string) {
+    return request<StudentLessonFeedback>(`/api/student-feedback/${id}/revoke`, {
+      method: "PATCH",
+    });
+  },
+  getStudentHistory(studentId: string, courseId: string) {
+    return request<StudentFeedbackWithLesson[]>(`/api/student-feedback/student/${studentId}/course/${courseId}`);
+  },
+  getMyFeedbacks(params?: { course_id?: string; page?: number; limit?: number }) {
+    const searchParams = new URLSearchParams();
+    if (params?.course_id) searchParams.set("course_id", params.course_id);
+    if (params?.page) searchParams.set("page", String(params.page));
+    if (params?.limit) searchParams.set("limit", String(params.limit));
+    const qs = searchParams.toString();
+    return request<PaginatedResponse<StudentFeedbackWithContext>>(`/api/student-feedback/my${qs ? `?${qs}` : ""}`);
+  },
+  getMyLatest() {
+    return request<StudentFeedbackWithContext | null>("/api/student-feedback/my/latest");
+  },
+  getMyCourseFeedbacks(courseId: string, params?: { page?: number; limit?: number }) {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set("page", String(params.page));
+    if (params?.limit) searchParams.set("limit", String(params.limit));
+    const qs = searchParams.toString();
+    return request<PaginatedResponse<StudentFeedbackWithContext>>(`/api/student-feedback/my/course/${courseId}${qs ? `?${qs}` : ""}`);
+  },
+};
+
 // ── Attachments ─────────────────────────────────────
 
 export interface Attachment {

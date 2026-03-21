@@ -31,6 +31,7 @@ import { Route as appStudentSettingsRouteImport } from './routes/(app)/student/s
 import { Route as appStudentScheduleRouteImport } from './routes/(app)/student/schedule'
 import { Route as appStudentResourcesRouteImport } from './routes/(app)/student/resources'
 import { Route as appStudentMessagesRouteImport } from './routes/(app)/student/messages'
+import { Route as appStudentLessonFeedbackRouteImport } from './routes/(app)/student/lesson-feedback'
 import { Route as appStudentGradesRouteImport } from './routes/(app)/student/grades'
 import { Route as appStudentEnrollmentsRouteImport } from './routes/(app)/student/enrollments'
 import { Route as appStudentAssignmentsRouteImport } from './routes/(app)/student/assignments'
@@ -38,10 +39,12 @@ import { Route as appCoursesCourseIdRouteImport } from './routes/(app)/courses.$
 import { Route as appTeacherStudentsIndexRouteImport } from './routes/(app)/teacher/students.index'
 import { Route as appTeacherCoursesIndexRouteImport } from './routes/(app)/teacher/courses.index'
 import { Route as appTeacherStudentsStudentIdRouteImport } from './routes/(app)/teacher/students.$studentId'
+import { Route as appTeacherStudentFeedbackScheduleIdRouteImport } from './routes/(app)/teacher/student-feedback.$scheduleId'
 import { Route as appTeacherFeedbackCourseIdRouteImport } from './routes/(app)/teacher/feedback.$courseId'
 import { Route as appTeacherCoursesCourseIdRouteImport } from './routes/(app)/teacher/courses.$courseId'
 import { Route as appStudentFeedbackCourseIdRouteImport } from './routes/(app)/student/feedback.$courseId'
 import { Route as appStudentCoursesCourseIdRouteImport } from './routes/(app)/student/courses.$courseId'
+import { Route as appTeacherStudentFeedbackHistoryStudentIdCourseIdRouteImport } from './routes/(app)/teacher/student-feedback-history.$studentId.$courseId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -152,6 +155,12 @@ const appStudentMessagesRoute = appStudentMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => appStudentRouteRoute,
 } as any)
+const appStudentLessonFeedbackRoute =
+  appStudentLessonFeedbackRouteImport.update({
+    id: '/lesson-feedback',
+    path: '/lesson-feedback',
+    getParentRoute: () => appStudentRouteRoute,
+  } as any)
 const appStudentGradesRoute = appStudentGradesRouteImport.update({
   id: '/grades',
   path: '/grades',
@@ -188,6 +197,12 @@ const appTeacherStudentsStudentIdRoute =
     path: '/$studentId',
     getParentRoute: () => appTeacherStudentsRoute,
   } as any)
+const appTeacherStudentFeedbackScheduleIdRoute =
+  appTeacherStudentFeedbackScheduleIdRouteImport.update({
+    id: '/student-feedback/$scheduleId',
+    path: '/student-feedback/$scheduleId',
+    getParentRoute: () => appTeacherRouteRoute,
+  } as any)
 const appTeacherFeedbackCourseIdRoute =
   appTeacherFeedbackCourseIdRouteImport.update({
     id: '/feedback/$courseId',
@@ -212,6 +227,12 @@ const appStudentCoursesCourseIdRoute =
     path: '/courses/$courseId',
     getParentRoute: () => appStudentRouteRoute,
   } as any)
+const appTeacherStudentFeedbackHistoryStudentIdCourseIdRoute =
+  appTeacherStudentFeedbackHistoryStudentIdCourseIdRouteImport.update({
+    id: '/student-feedback-history/$studentId/$courseId',
+    path: '/student-feedback-history/$studentId/$courseId',
+    getParentRoute: () => appTeacherRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -224,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/student/assignments': typeof appStudentAssignmentsRoute
   '/student/enrollments': typeof appStudentEnrollmentsRoute
   '/student/grades': typeof appStudentGradesRoute
+  '/student/lesson-feedback': typeof appStudentLessonFeedbackRoute
   '/student/messages': typeof appStudentMessagesRoute
   '/student/resources': typeof appStudentResourcesRoute
   '/student/schedule': typeof appStudentScheduleRoute
@@ -243,9 +265,11 @@ export interface FileRoutesByFullPath {
   '/student/feedback/$courseId': typeof appStudentFeedbackCourseIdRoute
   '/teacher/courses/$courseId': typeof appTeacherCoursesCourseIdRoute
   '/teacher/feedback/$courseId': typeof appTeacherFeedbackCourseIdRoute
+  '/teacher/student-feedback/$scheduleId': typeof appTeacherStudentFeedbackScheduleIdRoute
   '/teacher/students/$studentId': typeof appTeacherStudentsStudentIdRoute
   '/teacher/courses/': typeof appTeacherCoursesIndexRoute
   '/teacher/students/': typeof appTeacherStudentsIndexRoute
+  '/teacher/student-feedback-history/$studentId/$courseId': typeof appTeacherStudentFeedbackHistoryStudentIdCourseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -255,6 +279,7 @@ export interface FileRoutesByTo {
   '/student/assignments': typeof appStudentAssignmentsRoute
   '/student/enrollments': typeof appStudentEnrollmentsRoute
   '/student/grades': typeof appStudentGradesRoute
+  '/student/lesson-feedback': typeof appStudentLessonFeedbackRoute
   '/student/messages': typeof appStudentMessagesRoute
   '/student/resources': typeof appStudentResourcesRoute
   '/student/schedule': typeof appStudentScheduleRoute
@@ -272,9 +297,11 @@ export interface FileRoutesByTo {
   '/student/feedback/$courseId': typeof appStudentFeedbackCourseIdRoute
   '/teacher/courses/$courseId': typeof appTeacherCoursesCourseIdRoute
   '/teacher/feedback/$courseId': typeof appTeacherFeedbackCourseIdRoute
+  '/teacher/student-feedback/$scheduleId': typeof appTeacherStudentFeedbackScheduleIdRoute
   '/teacher/students/$studentId': typeof appTeacherStudentsStudentIdRoute
   '/teacher/courses': typeof appTeacherCoursesIndexRoute
   '/teacher/students': typeof appTeacherStudentsIndexRoute
+  '/teacher/student-feedback-history/$studentId/$courseId': typeof appTeacherStudentFeedbackHistoryStudentIdCourseIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -289,6 +316,7 @@ export interface FileRoutesById {
   '/(app)/student/assignments': typeof appStudentAssignmentsRoute
   '/(app)/student/enrollments': typeof appStudentEnrollmentsRoute
   '/(app)/student/grades': typeof appStudentGradesRoute
+  '/(app)/student/lesson-feedback': typeof appStudentLessonFeedbackRoute
   '/(app)/student/messages': typeof appStudentMessagesRoute
   '/(app)/student/resources': typeof appStudentResourcesRoute
   '/(app)/student/schedule': typeof appStudentScheduleRoute
@@ -308,9 +336,11 @@ export interface FileRoutesById {
   '/(app)/student/feedback/$courseId': typeof appStudentFeedbackCourseIdRoute
   '/(app)/teacher/courses/$courseId': typeof appTeacherCoursesCourseIdRoute
   '/(app)/teacher/feedback/$courseId': typeof appTeacherFeedbackCourseIdRoute
+  '/(app)/teacher/student-feedback/$scheduleId': typeof appTeacherStudentFeedbackScheduleIdRoute
   '/(app)/teacher/students/$studentId': typeof appTeacherStudentsStudentIdRoute
   '/(app)/teacher/courses/': typeof appTeacherCoursesIndexRoute
   '/(app)/teacher/students/': typeof appTeacherStudentsIndexRoute
+  '/(app)/teacher/student-feedback-history/$studentId/$courseId': typeof appTeacherStudentFeedbackHistoryStudentIdCourseIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -325,6 +355,7 @@ export interface FileRouteTypes {
     | '/student/assignments'
     | '/student/enrollments'
     | '/student/grades'
+    | '/student/lesson-feedback'
     | '/student/messages'
     | '/student/resources'
     | '/student/schedule'
@@ -344,9 +375,11 @@ export interface FileRouteTypes {
     | '/student/feedback/$courseId'
     | '/teacher/courses/$courseId'
     | '/teacher/feedback/$courseId'
+    | '/teacher/student-feedback/$scheduleId'
     | '/teacher/students/$studentId'
     | '/teacher/courses/'
     | '/teacher/students/'
+    | '/teacher/student-feedback-history/$studentId/$courseId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -356,6 +389,7 @@ export interface FileRouteTypes {
     | '/student/assignments'
     | '/student/enrollments'
     | '/student/grades'
+    | '/student/lesson-feedback'
     | '/student/messages'
     | '/student/resources'
     | '/student/schedule'
@@ -373,9 +407,11 @@ export interface FileRouteTypes {
     | '/student/feedback/$courseId'
     | '/teacher/courses/$courseId'
     | '/teacher/feedback/$courseId'
+    | '/teacher/student-feedback/$scheduleId'
     | '/teacher/students/$studentId'
     | '/teacher/courses'
     | '/teacher/students'
+    | '/teacher/student-feedback-history/$studentId/$courseId'
   id:
     | '__root__'
     | '/'
@@ -389,6 +425,7 @@ export interface FileRouteTypes {
     | '/(app)/student/assignments'
     | '/(app)/student/enrollments'
     | '/(app)/student/grades'
+    | '/(app)/student/lesson-feedback'
     | '/(app)/student/messages'
     | '/(app)/student/resources'
     | '/(app)/student/schedule'
@@ -408,9 +445,11 @@ export interface FileRouteTypes {
     | '/(app)/student/feedback/$courseId'
     | '/(app)/teacher/courses/$courseId'
     | '/(app)/teacher/feedback/$courseId'
+    | '/(app)/teacher/student-feedback/$scheduleId'
     | '/(app)/teacher/students/$studentId'
     | '/(app)/teacher/courses/'
     | '/(app)/teacher/students/'
+    | '/(app)/teacher/student-feedback-history/$studentId/$courseId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -576,6 +615,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appStudentMessagesRouteImport
       parentRoute: typeof appStudentRouteRoute
     }
+    '/(app)/student/lesson-feedback': {
+      id: '/(app)/student/lesson-feedback'
+      path: '/lesson-feedback'
+      fullPath: '/student/lesson-feedback'
+      preLoaderRoute: typeof appStudentLessonFeedbackRouteImport
+      parentRoute: typeof appStudentRouteRoute
+    }
     '/(app)/student/grades': {
       id: '/(app)/student/grades'
       path: '/grades'
@@ -625,6 +671,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appTeacherStudentsStudentIdRouteImport
       parentRoute: typeof appTeacherStudentsRoute
     }
+    '/(app)/teacher/student-feedback/$scheduleId': {
+      id: '/(app)/teacher/student-feedback/$scheduleId'
+      path: '/student-feedback/$scheduleId'
+      fullPath: '/teacher/student-feedback/$scheduleId'
+      preLoaderRoute: typeof appTeacherStudentFeedbackScheduleIdRouteImport
+      parentRoute: typeof appTeacherRouteRoute
+    }
     '/(app)/teacher/feedback/$courseId': {
       id: '/(app)/teacher/feedback/$courseId'
       path: '/feedback/$courseId'
@@ -653,6 +706,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appStudentCoursesCourseIdRouteImport
       parentRoute: typeof appStudentRouteRoute
     }
+    '/(app)/teacher/student-feedback-history/$studentId/$courseId': {
+      id: '/(app)/teacher/student-feedback-history/$studentId/$courseId'
+      path: '/student-feedback-history/$studentId/$courseId'
+      fullPath: '/teacher/student-feedback-history/$studentId/$courseId'
+      preLoaderRoute: typeof appTeacherStudentFeedbackHistoryStudentIdCourseIdRouteImport
+      parentRoute: typeof appTeacherRouteRoute
+    }
   }
 }
 
@@ -660,6 +720,7 @@ interface appStudentRouteRouteChildren {
   appStudentAssignmentsRoute: typeof appStudentAssignmentsRoute
   appStudentEnrollmentsRoute: typeof appStudentEnrollmentsRoute
   appStudentGradesRoute: typeof appStudentGradesRoute
+  appStudentLessonFeedbackRoute: typeof appStudentLessonFeedbackRoute
   appStudentMessagesRoute: typeof appStudentMessagesRoute
   appStudentResourcesRoute: typeof appStudentResourcesRoute
   appStudentScheduleRoute: typeof appStudentScheduleRoute
@@ -674,6 +735,7 @@ const appStudentRouteRouteChildren: appStudentRouteRouteChildren = {
   appStudentAssignmentsRoute: appStudentAssignmentsRoute,
   appStudentEnrollmentsRoute: appStudentEnrollmentsRoute,
   appStudentGradesRoute: appStudentGradesRoute,
+  appStudentLessonFeedbackRoute: appStudentLessonFeedbackRoute,
   appStudentMessagesRoute: appStudentMessagesRoute,
   appStudentResourcesRoute: appStudentResourcesRoute,
   appStudentScheduleRoute: appStudentScheduleRoute,
@@ -724,6 +786,8 @@ interface appTeacherRouteRouteChildren {
   appTeacherSupportRoute: typeof appTeacherSupportRoute
   appTeacherIndexRoute: typeof appTeacherIndexRoute
   appTeacherFeedbackCourseIdRoute: typeof appTeacherFeedbackCourseIdRoute
+  appTeacherStudentFeedbackScheduleIdRoute: typeof appTeacherStudentFeedbackScheduleIdRoute
+  appTeacherStudentFeedbackHistoryStudentIdCourseIdRoute: typeof appTeacherStudentFeedbackHistoryStudentIdCourseIdRoute
 }
 
 const appTeacherRouteRouteChildren: appTeacherRouteRouteChildren = {
@@ -736,6 +800,10 @@ const appTeacherRouteRouteChildren: appTeacherRouteRouteChildren = {
   appTeacherSupportRoute: appTeacherSupportRoute,
   appTeacherIndexRoute: appTeacherIndexRoute,
   appTeacherFeedbackCourseIdRoute: appTeacherFeedbackCourseIdRoute,
+  appTeacherStudentFeedbackScheduleIdRoute:
+    appTeacherStudentFeedbackScheduleIdRoute,
+  appTeacherStudentFeedbackHistoryStudentIdCourseIdRoute:
+    appTeacherStudentFeedbackHistoryStudentIdCourseIdRoute,
 }
 
 const appTeacherRouteRouteWithChildren = appTeacherRouteRoute._addFileChildren(

@@ -13,7 +13,9 @@
     "enrollments": "选课管理",
     "reports": "报告",
     "home": "首页",
-    "browse": "浏览课程"
+    "browse": "浏览课程",
+    "studentFeedback": "学生反馈",
+    "lessonFeedback": "课后反馈"
   },
   "auth": {
     "tabs": { "login": "登录", "register": "注册" },
@@ -1011,5 +1013,39 @@
       "teacher": "教师",
       "viewDetails": "查看详情"
     }
+  },
+  "studentLessonFeedback": {
+    "title": "课后反馈",
+    "writeFeedback": "写反馈",
+    "rating": "课堂表现评分",
+    "comment": "课堂评语",
+    "commentPlaceholder": "请输入对该学生的课堂表现评价...",
+    "suggestion": "改进建议",
+    "suggestionPlaceholder": "请输入学习改进建议...",
+    "saveAllDrafts": "保存全部草稿",
+    "publishAll": "发布全部反馈",
+    "publishConfirm": "确认发布该课时所有反馈？发布后学生即可查看。",
+    "revoke": "撤回",
+    "revokeConfirm": "确认撤回该反馈？撤回后学生将无法查看。",
+    "statusDraft": "草稿",
+    "statusPublished": "已发布",
+    "statusNotWritten": "未填写",
+    "noFeedback": "暂无课后反馈",
+    "filterByCourse": "筛选课程",
+    "allCourses": "全部课程",
+    "loadMore": "加载更多",
+    "lessonEnded": "课时已结束",
+    "lessonNotEnded": "课时尚未结束",
+    "latestFeedback": "最近反馈",
+    "viewAll": "查看全部",
+    "feedbackHistory": "反馈历史",
+    "savedAt": "保存于",
+    "publishedCount": "已发布 {{count}} 条反馈",
+    "atLeastOneField": "评分、评语、建议至少填一项",
+    "saving": "保存中...",
+    "saved": "已保存",
+    "saveError": "保存失败",
+    "conflictPublished": "该反馈已发布，请先撤回再编辑",
+    "batchLimitExceeded": "单次最多保存 50 条反馈"
   }
 }

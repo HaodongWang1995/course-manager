@@ -10,6 +10,7 @@ import {
   resourceApi,
   feedbackApi,
   attachmentApi,
+  studentFeedbackApi,
   setToken,
   clearToken,
   getToken,
@@ -28,6 +29,7 @@ import {
   courseKeys,
   feedbackKeys,
   attachmentKeys,
+  studentFeedbackKeys,
 } from "@/lib/query-keys";
 
 // ── Auth (Real API) ──────────────────────────────────
@@ -624,5 +626,91 @@ export function useUploadAttachment() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: attachmentKeys._def });
     },
+  });
+}
+
+// ── Student Lesson Feedback ──────────────────────────
+
+export function useScheduleFeedbacks(scheduleId: string) {
+  return useQuery({
+    queryKey: studentFeedbackKeys.bySchedule(scheduleId).queryKey,
+    queryFn: () => studentFeedbackApi.getScheduleFeedbacks(scheduleId),
+    enabled: !!scheduleId,
+  });
+}
+
+export function useSaveStudentFeedback() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: studentFeedbackApi.saveFeedback,
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: studentFeedbackKeys.bySchedule(variables.schedule_id).queryKey,
+      });
+    },
+  });
+}
+
+export function useBatchSaveStudentFeedback() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: studentFeedbackApi.batchSave,
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: studentFeedbackKeys.bySchedule(variables.schedule_id).queryKey,
+      });
+    },
+  });
+}
+
+export function usePublishScheduleFeedbacks() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: studentFeedbackApi.publishAll,
+    onSuccess: (_data, scheduleId) => {
+      queryClient.invalidateQueries({
+        queryKey: studentFeedbackKeys.bySchedule(scheduleId).queryKey,
+      });
+    },
+  });
+}
+
+export function useRevokeStudentFeedback() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: studentFeedbackApi.revoke,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: studentFeedbackKeys._def });
+    },
+  });
+}
+
+export function useStudentFeedbackHistory(studentId: string, courseId: string) {
+  return useQuery({
+    queryKey: studentFeedbackKeys.studentHistory(studentId, courseId).queryKey,
+    queryFn: () => studentFeedbackApi.getStudentHistory(studentId, courseId),
+    enabled: !!studentId && !!courseId,
+  });
+}
+
+export function useMyFeedbacks(params?: { course_id?: string; page?: number }) {
+  return useQuery({
+    queryKey: studentFeedbackKeys.myFeedbacks(params).queryKey,
+    queryFn: () => studentFeedbackApi.getMyFeedbacks(params),
+  });
+}
+
+export function useMyLatestFeedback() {
+  return useQuery({
+    queryKey: studentFeedbackKeys.myLatest.queryKey,
+    queryFn: () => studentFeedbackApi.getMyLatest(),
+  });
+}
+
+export function useMyCourseFeedbacks(courseId: string, params?: { page?: number }) {
+  return useQuery({
+    queryKey: studentFeedbackKeys.myCourse(courseId, params).queryKey,
+    queryFn: () => studentFeedbackApi.getMyCourseFeedbacks(courseId, params),
+    enabled: !!courseId,
   });
 }

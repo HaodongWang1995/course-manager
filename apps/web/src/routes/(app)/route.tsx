@@ -21,6 +21,7 @@ import {
   Home,
   LogOut,
   Search,
+  PenLine,
 } from "lucide-react";
 import { useAuthGuard, useAuthLogout } from "@/hooks/use-auth-guard";
 import { useTranslation } from "react-i18next";
@@ -60,6 +61,7 @@ function AppLayout() {
     { label: t("nav.grades"), href: "/student/grades", icon: BarChart3 },
     { label: t("nav.messages"), href: "/student/messages", icon: MessageSquare },
     { label: t("nav.resources"), href: "/student/resources", icon: FolderOpen },
+    { label: t("nav.lessonFeedback"), href: "/student/lesson-feedback", icon: PenLine },
   ];
 
   const teacherSupportItems = [
